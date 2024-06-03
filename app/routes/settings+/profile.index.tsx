@@ -248,7 +248,6 @@ function UpdateProfile() {
 			<div className="mt-8 flex justify-center">
 				<StatusButton
 					type="submit"
-					size="wide"
 					name="intent"
 					value={profileUpdateActionIntent}
 					status={fetcher.state !== 'idle' ? 'pending' : form.status ?? 'idle'}
