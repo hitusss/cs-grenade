@@ -16,55 +16,30 @@ model User {
   username String  @unique
   name     String?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
   image       UserImage?
   password    Password?
-  notes       Note[]
   roles       Role[]
   sessions    Session[]
   connections Connection[]
-}
 
-model Note {
-  id      String @id @default(cuid())
-  title   String
-  content String
+  notifications Notification[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  favorites      Favorite[]
+  tickets        Ticket[]
+  ticketMessages TicketMessage[]
 
-  owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  ownerId String
-
-  images NoteImage[]
-
-  // non-unique foreign key
-  @@index([ownerId])
-  // This helps our order by in the user search a LOT
-  @@index([ownerId, updatedAt])
-}
-
-model NoteImage {
-  id          String  @id @default(cuid())
-  altText     String?
-  contentType String
-  blob        Bytes
+  maps                Map[]
+  destinations        Destination[]
+  grenades            Grenade[]
+  grenadeImageChanges GrenadeImageChanges[]
+  grenadeChanges      GrenadeChanges[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  note   Note   @relation(fields: [noteId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  noteId String
-
-  // non-unique foreign key
-  @@index([noteId])
 }
 
 model UserImage {
-  id          String  @id @default(cuid())
-  altText     String?
+  id          String @id @default(cuid())
   contentType String
   blob        Bytes
 
@@ -94,33 +69,6 @@ model Session {
 
   // non-unique foreign key
   @@index([userId])
-}
-
-model Permission {
-  id          String @id @default(cuid())
-  action      String // e.g. create, read, update, delete
-  entity      String // e.g. note, user, etc.
-  access      String // e.g. own or any
-  description String @default("")
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  roles Role[]
-
-  @@unique([action, entity, access])
-}
-
-model Role {
-  id          String @id @default(cuid())
-  name        String @unique
-  description String @default("")
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  users       User[]
-  permissions Permission[]
 }
 
 model Verification {
@@ -154,6 +102,33 @@ model Verification {
   @@unique([target, type])
 }
 
+model Permission {
+  id          String @id @default(cuid())
+  action      String // e.g. create, read, update, delete
+  entity      String // e.g. note, user, etc.
+  access      String // e.g. own or any
+  description String @default("")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  roles Role[]
+
+  @@unique([action, entity, access])
+}
+
+model Role {
+  id          String @id @default(cuid())
+  name        String @unique
+  description String @default("")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users       User[]
+  permissions Permission[]
+}
+
 model Connection {
   id           String @id @default(cuid())
   providerName String
@@ -166,4 +141,257 @@ model Connection {
   userId String
 
   @@unique([providerName, providerId])
+}
+
+model Notification {
+  id String @id @default(cuid())
+
+  title       String
+  description String?
+  redirectTo  String?
+
+  seen Boolean @default(false)
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Map {
+  name     String  @id
+  label    String
+  isActive Boolean @default(true)
+
+  image MapImage?
+  logo  MapLogo?
+  radar MapRadar?
+
+  destinations Destination[]
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  grenade Grenade[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model MapImage {
+  id          String @id @default(cuid())
+  contentType String
+  blob        Bytes
+
+  map     Map    @relation(fields: [mapName], references: [name], onDelete: Cascade, onUpdate: Cascade)
+  mapName String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model MapLogo {
+  id          String @id @default(cuid())
+  contentType String
+  blob        Bytes
+
+  map     Map    @relation(fields: [mapName], references: [name], onDelete: Cascade, onUpdate: Cascade)
+  mapName String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model MapRadar {
+  id          String @id @default(cuid())
+  contentType String
+  blob        Bytes
+
+  map     Map    @relation(fields: [mapName], references: [name], onDelete: Cascade, onUpdate: Cascade)
+  mapName String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Destination {
+  id String @id @default(cuid())
+
+  verified Boolean @default(false)
+
+  map     Map    @relation(fields: [mapName], references: [name], onDelete: Cascade, onUpdate: Cascade)
+  mapName String
+
+  team String
+  type String
+
+  x String
+  y String
+
+  name String
+
+  grenades Grenade[]
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([mapName, team, type, x, y])
+}
+
+model Grenade {
+  id String @id @default(cuid())
+
+  verified Boolean @default(false)
+
+  map     Map    @relation(fields: [mapName], references: [name], onDelete: Cascade, onUpdate: Cascade)
+  mapName String
+
+  destination   Destination @relation(fields: [destinationId], references: [id])
+  destinationId String
+
+  team String
+  type String
+
+  x String
+  y String
+
+  name        String
+  description String?
+
+  images GrenadeImage[]
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  grenadeChanges GrenadeChanges?
+
+  favorites Favorite[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model GrenadeChanges {
+  id String @id @default(cuid())
+
+  name        String
+  description String?
+
+  grenadeImageChanges GrenadeImageChanges[]
+
+  grenade   Grenade @relation(fields: [grenadeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  grenadeId String  @unique
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model GrenadeImage {
+  id          String @id @default(cuid())
+  contentType String
+  blob        Bytes
+
+  order String
+
+  description String?
+
+  grenade   Grenade @relation(fields: [grenadeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  grenadeId String
+
+  grenadeImageChanges GrenadeImageChanges?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model GrenadeImageChanges {
+  id String @id @default(cuid())
+
+  grenadeImage   GrenadeImage? @relation(fields: [grenadeImageId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  grenadeImageId String?       @unique
+
+  delete Boolean @default(false)
+
+  contentType String?
+  blob        Bytes?
+
+  order String?
+
+  description String?
+
+  grenade   GrenadeChanges? @relation(fields: [grenadeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  grenadeId String?
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Favorite {
+  id String @id @default(cuid())
+
+  grenade   Grenade @relation(fields: [grenadeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  grenadeId String
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([grenadeId, userId])
+}
+
+model Ticket {
+  id       String          @id @default(cuid())
+  open     Boolean         @default(true)
+  title    String
+  messages TicketMessage[]
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TicketMessage {
+  id String @id @default(cuid())
+
+  message String
+  images  TicketImage[]
+
+  seen Boolean @default(false)
+
+  ticket   Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  ticketId String
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TicketImage {
+  id          String @id @default(cuid())
+  contentType String
+  blob        Bytes
+
+  order String
+
+  ticketMessage   TicketMessage @relation(fields: [ticketMessageId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  ticketMessageId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
