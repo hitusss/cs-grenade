@@ -8,6 +8,7 @@
     "#tests/*": "./tests/*"
   },
   "scripts": {
+    "icon:add": "sly add lucide-icons",
     "build": "run-s build:*",
     "build:icons": "tsx ./other/build-icons.ts",
     "build:remix": "remix vite:build --sourcemapClient --sourcemapServer",
