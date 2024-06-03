@@ -27,14 +27,32 @@ jobs:
         with:
           node-version: 20
 
+      - name: 📦 Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: 🗃️ Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - uses: actions/cache@v4
+        name: 🗃️ Setup pnpm cache
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
       - name: 📥 Download deps
-        uses: bahmutov/npm-install@v1
+        run: pnpm install
 
       - name: 🖼 Build icons
-        run: npm run build:icons
+        run: pnpm run build:icons
 
       - name: 🔬 Lint
-        run: npm run lint
+        run: pnpm run lint
 
   typecheck:
     name: ʦ TypeScript
@@ -48,14 +66,32 @@ jobs:
         with:
           node-version: 20
 
+      - name: 📦 Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: 🗃️ Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - uses: actions/cache@v4
+        name: 🗃️ Setup pnpm cache
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
       - name: 📥 Download deps
-        uses: bahmutov/npm-install@v1
+        run: pnpm install
 
       - name: 🖼 Build icons
-        run: npm run build:icons
+        run: pnpm run build:icons
 
       - name: 🔎 Type check
-        run: npm run typecheck --if-present
+        run: pnpm run typecheck
 
   vitest:
     name: ⚡ Vitest
@@ -64,22 +100,40 @@ jobs:
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v4
 
+      - name: 🏄 Copy test env vars
+        run: cp .env.example .env
+
       - name: ⎔ Setup node
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
+      - name: 📦 Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: 🗃️ Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - uses: actions/cache@v4
+        name: 🗃️ Setup pnpm cache
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
       - name: 📥 Download deps
-        uses: bahmutov/npm-install@v1
+        run: pnpm install
 
-      - name: 🏄 Copy test env vars
-        run: cp .env.example .env
-
-      - name: 🖼 Build icons
-        run: npm run build:icons
+      - name: 🛠 Setup Test Environment
+        run: pnpm run test:setup
 
       - name: ⚡ Run vitest
-        run: npm run test -- --coverage
+        run: pnpm run test:coverage
 
   playwright:
     name: 🎭 Playwright
@@ -97,14 +151,29 @@ jobs:
         with:
           node-version: 20
 
+      - name: 📦 Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: 🗃️ Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - uses: actions/cache@v4
+        name: 🗃️ Setup pnpm cache
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
       - name: 📥 Download deps
-        uses: bahmutov/npm-install@v1
+        run: pnpm install
 
-      - name: 📥 Install Playwright Browsers
-        run: npm run test:e2e:install
-
-      - name: 🛠 Setup Database
-        run: npx prisma migrate deploy
+      - name: 🛠 Setup E2E Test Environment
+        run: pnpm run test:e2e:setup
 
       - name: 🏦 Cache Database
         id: db-cache
@@ -118,15 +187,12 @@ jobs:
 
       - name: 🌱 Seed Database
         if: steps.db-cache.outputs.cache-hit != 'true'
-        run: npx prisma db seed
+        run: pnpm run db:seed
         env:
           MINIMAL_SEED: true
 
-      - name: 🏗 Build
-        run: npm run build
-
       - name: 🎭 Playwright tests
-        run: npx playwright test
+        run: pnpm run test:e2e:run
 
       - name: 📊 Upload report
         uses: actions/upload-artifact@v4

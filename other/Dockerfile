@@ -3,6 +3,11 @@
 # base node image
 FROM node:20-bookworm-slim as base
 
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+RUN corepack prepare pnpm@9 --activate
+
 # set for base and all layer that inherit from it
 ENV NODE_ENV production
 
@@ -14,8 +19,9 @@ FROM base as deps
 
 WORKDIR /myapp
 
-ADD package.json package-lock.json .npmrc ./
-RUN npm install --include=dev
+ADD package.json pnpm-lock.yaml .npmrc ./
+ADD prisma .
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod false --frozen-lockfile
 
 # Setup production node_modules
 FROM base as production-deps
@@ -23,8 +29,8 @@ FROM base as production-deps
 WORKDIR /myapp
 
 COPY --from=deps /myapp/node_modules /myapp/node_modules
-ADD package.json package-lock.json .npmrc ./
-RUN npm prune --omit=dev
+ADD package.json pnpm-lock.yaml .npmrc ./
+RUN pnpm prune --prod
 
 # Build the app
 FROM base as build
@@ -35,9 +41,6 @@ ENV COMMIT_SHA=$COMMIT_SHA
 WORKDIR /myapp
 
 COPY --from=deps /myapp/node_modules /myapp/node_modules
-
-ADD prisma .
-RUN npx prisma generate
 
 ADD . .
 
@@ -68,7 +71,6 @@ RUN echo "#!/bin/sh\nset -x\nsqlite3 \$DATABASE_URL" > /usr/local/bin/database-c
 WORKDIR /myapp
 
 COPY --from=production-deps /myapp/node_modules /myapp/node_modules
-COPY --from=build /myapp/node_modules/.prisma /myapp/node_modules/.prisma
 
 COPY --from=build /myapp/server-build /myapp/server-build
 COPY --from=build /myapp/build /myapp/build
