@@ -32,7 +32,7 @@ import { createToastHeaders } from '#app/utils/toast.server.ts'
 import { type BreadcrumbHandle } from './profile.tsx'
 
 export const handle: BreadcrumbHandle & SEOHandle = {
-	breadcrumb: <Icon name="link-2">Connections</Icon>,
+	breadcrumb: <Icon name="link">Connections</Icon>,
 	getSitemapEntries: () => null,
 }
 
@@ -200,7 +200,7 @@ function Connection({
 											: deleteFetcher.data?.status ?? 'idle'
 									}
 								>
-									<Icon name="cross-1" />
+									<Icon name="x" />
 								</StatusButton>
 							</TooltipTrigger>
 							<TooltipContent>Disconnect this account</TooltipContent>
@@ -211,7 +211,7 @@ function Connection({
 				<TooltipProvider>
 					<Tooltip open={infoOpen} onOpenChange={setInfoOpen}>
 						<TooltipTrigger onClick={() => setInfoOpen(true)}>
-							<Icon name="question-mark-circled"></Icon>
+							<Icon name="circle-help"></Icon>
 						</TooltipTrigger>
 						<TooltipContent>
 							You cannot delete your last connection unless you have a password.

@@ -134,30 +134,28 @@ export default function EditUserProfile() {
 			<div className="col-span-full flex flex-col gap-6">
 				<div>
 					<Link to="change-email">
-						<Icon name="envelope-closed">
-							Change email from {data.user.email}
-						</Icon>
+						<Icon name="mail">Change email from {data.user.email}</Icon>
 					</Link>
 				</div>
 				<div>
 					<Link to="two-factor">
 						{data.isTwoFactorEnabled ? (
-							<Icon name="lock-closed">2FA is enabled</Icon>
+							<Icon name="lock">2FA is enabled</Icon>
 						) : (
-							<Icon name="lock-open-1">Enable 2FA</Icon>
+							<Icon name="lock-open">Enable 2FA</Icon>
 						)}
 					</Link>
 				</div>
 				<div>
 					<Link to={data.hasPassword ? 'password' : 'password/create'}>
-						<Icon name="dots-horizontal">
+						<Icon name="rectangle-ellipsis">
 							{data.hasPassword ? 'Change Password' : 'Create a Password'}
 						</Icon>
 					</Link>
 				</div>
 				<div>
 					<Link to="connections">
-						<Icon name="link-2">Manage connections</Icon>
+						<Icon name="link">Manage connections</Icon>
 					</Link>
 				</div>
 				<SignOutOfSessions />
@@ -303,7 +301,7 @@ function SignOutOfSessions() {
 								: fetcher.data?.status ?? 'idle'
 						}
 					>
-						<Icon name="avatar">
+						<Icon name="circle-user">
 							{dc.doubleCheck
 								? `Are you sure?`
 								: `Sign out of ${otherSessionsCount} other sessions`}
@@ -311,7 +309,7 @@ function SignOutOfSessions() {
 					</StatusButton>
 				</fetcher.Form>
 			) : (
-				<Icon name="avatar">This is your only session</Icon>
+				<Icon name="circle-user">This is your only session</Icon>
 			)}
 		</div>
 	)

@@ -295,15 +295,8 @@ function UserDropdown() {
 				<DropdownMenuContent sideOffset={8} align="start">
 					<DropdownMenuItem asChild>
 						<Link prefetch="intent" to={`/users/${user.username}`}>
-							<Icon className="text-body-md" name="avatar">
+							<Icon className="text-body-md" name="circle-user">
 								Profile
-							</Icon>
-						</Link>
-					</DropdownMenuItem>
-					<DropdownMenuItem asChild>
-						<Link prefetch="intent" to={`/users/${user.username}/notes`}>
-							<Icon className="text-body-md" name="pencil-2">
-								Notes
 							</Icon>
 						</Link>
 					</DropdownMenuItem>
@@ -316,7 +309,7 @@ function UserDropdown() {
 						}}
 					>
 						<Form action="/logout" method="POST" ref={formRef}>
-							<Icon className="text-body-md" name="exit">
+							<Icon className="text-body-md" name="log-out">
 								<button type="submit">Logout</button>
 							</Icon>
 						</Form>
