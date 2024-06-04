@@ -38,7 +38,6 @@
     "validate": "run-p \"test -- --run\" lint typecheck test:e2e:run",
     "postinstall": "pnpm run db:generate"
   },
-  "prettier": "@epic-web/config/prettier",
   "eslintIgnore": [
     "/node_modules",
     "/build",
@@ -117,6 +116,7 @@
   "devDependencies": {
     "@epic-web/config": "^1.7.5",
     "@faker-js/faker": "^8.4.1",
+    "@ianvs/prettier-plugin-sort-imports": "^4.2.1",
     "@playwright/test": "^1.44.1",
     "@remix-run/dev": "2.9.2",
     "@remix-run/serve": "2.9.2",
