@@ -36,6 +36,7 @@ import { Icon, href as iconsHref } from './components/ui/icon.tsx'
 import { Toaster } from './components/ui/sonner.tsx'
 import { ThemeSwitch, useTheme } from './routes/resources+/theme-switch.tsx'
 import tailwindStyleSheetUrl from './styles/tailwind.css?url'
+import colorsStyleSheetUrl from './styles/colors.css?url'
 import { getUserId, logout } from './utils/auth.server.ts'
 import { ClientHintCheck, getHints } from './utils/client-hints.tsx'
 import { prisma } from './utils/db.server.ts'
@@ -43,7 +44,8 @@ import { getEnv } from './utils/env.server.ts'
 import { honeypot } from './utils/honeypot.server.ts'
 import { combineHeaders, getDomainUrl, getUserImgSrc } from './utils/misc.tsx'
 import { useNonce } from './utils/nonce-provider.ts'
-import { type Theme, getTheme } from './utils/theme.server.ts'
+import { getTheme } from './utils/theme.server.ts'
+import { type Mode, type Color } from './utils/theme.ts'
 import { makeTimings, time } from './utils/timing.server.ts'
 import { getToast } from './utils/toast.server.ts'
 import { useOptionalUser, useUser } from './utils/user.ts'
@@ -68,6 +70,7 @@ export const links: LinksFunction = () => {
 		//These should match the css preloads above to avoid css as render blocking resource
 		{ rel: 'icon', type: 'image/svg+xml', href: '/favicons/favicon.svg' },
 		{ rel: 'stylesheet', href: tailwindStyleSheetUrl },
+		{ rel: 'stylesheet', href: colorsStyleSheetUrl },
 	].filter(Boolean)
 }
 
@@ -152,18 +155,20 @@ export const headers: HeadersFunction = ({ loaderHeaders }) => {
 function Document({
 	children,
 	nonce,
-	theme = 'light',
+	mode = 'light',
+	color = 'yellow',
 	env = {},
 	allowIndexing = true,
 }: {
 	children: React.ReactNode
 	nonce: string
-	theme?: Theme
+	mode?: Mode
+	color?: Color
 	env?: Record<string, string>
 	allowIndexing?: boolean
 }) {
 	return (
-		<html lang="en" className={`${theme} h-full overflow-x-hidden`}>
+		<html lang="en" className={`${mode} ${color} h-full overflow-x-hidden`}>
 			<head>
 				<ClientHintCheck nonce={nonce} />
 				<Meta />
@@ -203,7 +208,8 @@ function App() {
 	return (
 		<Document
 			nonce={nonce}
-			theme={theme}
+			mode={theme.mode}
+			color={theme.color}
 			allowIndexing={allowIndexing}
 			env={data.ENV}
 		>
@@ -233,10 +239,13 @@ function App() {
 
 				<div className="container flex justify-between pb-5">
 					<Logo />
-					<ThemeSwitch userPreference={data.requestInfo.userPrefs.theme} />
+					<ThemeSwitch
+						userMode={data.requestInfo.userPrefs.theme.mode}
+						userColor={data.requestInfo.userPrefs.theme.color}
+					/>
 				</div>
 			</div>
-			<Toaster closeButton position="top-center" theme={theme} />
+			<Toaster closeButton position="top-center" theme={theme.mode} />
 			<EpicProgress />
 		</Document>
 	)

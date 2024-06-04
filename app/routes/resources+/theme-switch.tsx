@@ -1,16 +1,42 @@
-import { useForm, getFormProps } from '@conform-to/react'
+import {
+	useForm,
+	getFormProps,
+	useInputControl,
+	getInputProps,
+} from '@conform-to/react'
 import { parseWithZod } from '@conform-to/zod'
 import { invariantResponse } from '@epic-web/invariant'
 import { json, type ActionFunctionArgs } from '@remix-run/node'
 import { useFetcher, useFetchers } from '@remix-run/react'
 import { z } from 'zod'
-import { Icon } from '#app/components/ui/icon.tsx'
+import { Icon, type IconName } from '#app/components/ui/icon.tsx'
 import { useHints } from '#app/utils/client-hints.tsx'
 import { useRequestInfo } from '#app/utils/request-info.ts'
-import { type Theme, setTheme } from '#app/utils/theme.server.ts'
+import { setTheme } from '#app/utils/theme.server.ts'
+import { type Mode, type Color, modes, colors } from '#app/utils/theme.ts'
+
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuPortal,
+	DropdownMenuTrigger,
+} from '#app/components/ui/dropdown-menu.tsx'
+import {
+	ToggleGroup,
+	ToggleGroupItem,
+} from '#app/components/ui/toggle-group.tsx'
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from '#app/components/ui/tooltip.tsx'
+import { Button } from '#app/components/ui/button.tsx'
+import { ErrorList } from '#app/components/forms.tsx'
 
 const ThemeFormSchema = z.object({
-	theme: z.enum(['system', 'light', 'dark']),
+	mode: z.enum(modes),
+	color: z.enum(colors),
 })
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -21,64 +47,143 @@ export async function action({ request }: ActionFunctionArgs) {
 
 	invariantResponse(submission.status === 'success', 'Invalid theme received')
 
-	const { theme } = submission.value
+	const { mode, color } = submission.value
 
 	const responseInit = {
-		headers: { 'set-cookie': setTheme(theme) },
+		headers: setTheme(mode, color),
 	}
+
 	return json({ result: submission.reply() }, responseInit)
 }
 
 export function ThemeSwitch({
-	userPreference,
+	userMode,
+	userColor,
 }: {
-	userPreference?: Theme | null
+	userMode?: Mode | null
+	userColor?: Color | null
 }) {
 	const fetcher = useFetcher<typeof action>()
 
-	const [form] = useForm({
+	const [form, fields] = useForm<z.infer<typeof ThemeFormSchema>>({
 		id: 'theme-switch',
 		lastResult: fetcher.data?.result,
 	})
 
-	const optimisticMode = useOptimisticThemeMode()
-	const mode = optimisticMode ?? userPreference ?? 'system'
-	const nextMode =
-		mode === 'system' ? 'light' : mode === 'light' ? 'dark' : 'system'
-	const modeLabel = {
-		light: (
-			<Icon name="sun">
-				<span className="sr-only">Light</span>
-			</Icon>
-		),
-		dark: (
-			<Icon name="moon">
-				<span className="sr-only">Dark</span>
-			</Icon>
-		),
-		system: (
-			<Icon name="laptop">
-				<span className="sr-only">System</span>
-			</Icon>
-		),
+	const modeControl = useInputControl({
+		...fields.mode,
+		initialValue: userMode ?? 'system',
+	})
+	const colorControl = useInputControl({
+		...fields.color,
+		initialValue: userColor ?? 'yellow',
+	})
+
+	const optimisticTheme = useOptimisticTheme()
+
+	const modeValue = optimisticTheme?.mode ?? modeControl.value
+	const colorValue = optimisticTheme?.color ?? colorControl.value
+
+	const modeIcons: Record<(typeof modes)[number], IconName> = {
+		system: 'laptop',
+		light: 'sun',
+		dark: 'moon',
 	}
 
 	return (
-		<fetcher.Form
-			method="POST"
-			{...getFormProps(form)}
-			action="/resources/theme-switch"
-		>
-			<input type="hidden" name="theme" value={nextMode} />
-			<div className="flex gap-2">
-				<button
-					type="submit"
-					className="flex h-8 w-8 cursor-pointer items-center justify-center"
-				>
-					{modeLabel[mode]}
-				</button>
-			</div>
-		</fetcher.Form>
+		<TooltipProvider>
+			<DropdownMenu>
+				<DropdownMenuTrigger asChild>
+					<Button variant="ghost" size="icon">
+						<Icon name="palette" />
+					</Button>
+				</DropdownMenuTrigger>
+				<DropdownMenuPortal>
+					<DropdownMenuContent sideOffset={8} align="start">
+						<fetcher.Form
+							method="POST"
+							{...getFormProps(form)}
+							action="/resources/theme-switch"
+							className="space-y-2 p-4"
+						>
+							<h3>Theme</h3>
+							<input
+								{...getInputProps(fields.mode, { type: 'hidden' })}
+								value={modeControl.value}
+								readOnly
+							/>
+							<input
+								{...getInputProps(fields.color, { type: 'hidden' })}
+								value={colorControl.value}
+								readOnly
+							/>
+
+							<div>
+								<p>Mode</p>
+								<ToggleGroup
+									type="single"
+									value={modeValue}
+									onValueChange={(v: Mode) => modeControl.change(v)}
+									className="grid grid-cols-4"
+								>
+									{modes.map(mode => (
+										<Tooltip key={mode}>
+											<TooltipTrigger>
+												<ToggleGroupItem
+													value={mode}
+													disabled={mode === modeValue}
+													asChild
+												>
+													<div>
+														<Icon name={modeIcons[mode]}>
+															<span className="sr-only">{mode}</span>
+														</Icon>
+													</div>
+												</ToggleGroupItem>
+											</TooltipTrigger>
+											<TooltipContent>{mode}</TooltipContent>
+										</Tooltip>
+									))}
+								</ToggleGroup>
+								<ErrorList errors={fields.mode.errors} />
+							</div>
+							<div>
+								<p>Color</p>
+								<ToggleGroup
+									type="single"
+									value={colorValue}
+									onValueChange={(v: Color) => colorControl.change(v)}
+									className="grid grid-cols-4"
+								>
+									{colors.map(color => (
+										<Tooltip key={color}>
+											<TooltipTrigger>
+												<ToggleGroupItem
+													value={color}
+													disabled={color === colorValue}
+													asChild
+												>
+													<div>
+														<span
+															className={`${color} size-4 rounded-full bg-primary`}
+														>
+															<span className="sr-only">{color}</span>
+														</span>
+													</div>
+												</ToggleGroupItem>
+											</TooltipTrigger>
+											<TooltipContent>{color}</TooltipContent>
+										</Tooltip>
+									))}
+								</ToggleGroup>
+								<ErrorList errors={fields.color.errors} />
+							</div>
+							<ErrorList errors={form.errors} id={form.errorId} />
+						</fetcher.Form>
+					</DropdownMenuContent>
+				</DropdownMenuPortal>
+			</DropdownMenu>
+		</TooltipProvider>
 	)
 }
 
@@ -86,7 +191,7 @@ export function ThemeSwitch({
  * If the user's changing their theme mode preference, this will return the
  * value it's being changed to.
  */
-export function useOptimisticThemeMode() {
+export function useOptimisticTheme() {
 	const fetchers = useFetchers()
 	const themeFetcher = fetchers.find(
 		f => f.formAction === '/resources/theme-switch',
@@ -98,7 +203,10 @@ export function useOptimisticThemeMode() {
 		})
 
 		if (submission.status === 'success') {
-			return submission.value.theme
+			return {
+				mode: submission.value.mode,
+				color: submission.value.color,
+			}
 		}
 	}
 }
@@ -110,9 +218,17 @@ export function useOptimisticThemeMode() {
 export function useTheme() {
 	const hints = useHints()
 	const requestInfo = useRequestInfo()
-	const optimisticMode = useOptimisticThemeMode()
-	if (optimisticMode) {
-		return optimisticMode === 'system' ? hints.theme : optimisticMode
+	const optimisticTheme = useOptimisticTheme()
+
+	if (optimisticTheme) {
+		return {
+			mode:
+				optimisticTheme.mode === 'system' ? hints.theme : optimisticTheme.mode,
+			color: optimisticTheme.color,
+		}
 	}
-	return requestInfo.userPrefs.theme ?? hints.theme
+	return {
+		mode: requestInfo.userPrefs.theme.mode ?? hints.theme,
+		color: requestInfo.userPrefs.theme.color ?? 'yellow',
+	}
 }

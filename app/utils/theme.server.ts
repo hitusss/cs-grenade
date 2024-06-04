@@ -1,19 +1,49 @@
 import * as cookie from 'cookie'
+import { type Mode, type Color, type Theme, modes, colors } from './theme.ts'
 
-const cookieName = 'en_theme'
-export type Theme = 'light' | 'dark'
+const modeCookieName = 'en_theme_mode'
 
-export function getTheme(request: Request): Theme | null {
+const colorCookieName = 'en_theme_color'
+
+export function getTheme(request: Request) {
 	const cookieHeader = request.headers.get('cookie')
-	const parsed = cookieHeader ? cookie.parse(cookieHeader)[cookieName] : 'light'
-	if (parsed === 'light' || parsed === 'dark') return parsed
-	return null
+
+	let mode = cookieHeader
+		? cookie.parse(cookieHeader)[modeCookieName]
+		: 'system'
+	if (mode === undefined) mode = 'system'
+	if (!modes.includes(mode)) mode = 'system'
+
+	let color = cookieHeader
+		? cookie.parse(cookieHeader)[colorCookieName]
+		: 'yellow'
+	if (color === undefined) color = 'yellow'
+	if (!colors.includes(color)) color = 'yellow'
+
+	return {
+		mode,
+		color,
+	} as Theme
 }
 
-export function setTheme(theme: Theme | 'system') {
-	if (theme === 'system') {
-		return cookie.serialize(cookieName, '', { path: '/', maxAge: -1 })
+export function setTheme(mode: Mode, color: Color) {
+	const headers = new Headers()
+	if (mode === 'system') {
+		headers.append(
+			'Set-Cookie',
+			cookie.serialize(modeCookieName, '', { path: '/', maxAge: -1 }),
+		)
 	} else {
-		return cookie.serialize(cookieName, theme, { path: '/', maxAge: 31536000 })
+		headers.append(
+			'Set-Cookie',
+			cookie.serialize(modeCookieName, mode, { path: '/', maxAge: 31536000 }),
+		)
 	}
+
+	headers.append(
+		'Set-Cookie',
+		cookie.serialize(colorCookieName, color, { path: '/', maxAge: 31536000 }),
+	)
+
+	return headers
 }
