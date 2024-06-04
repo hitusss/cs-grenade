@@ -2,6 +2,7 @@ import * as React from 'react'
 import { OTPInput, OTPInputContext } from 'input-otp'
 
 import { cn } from '#app/utils/misc.tsx'
+
 import { Icon } from './icon.tsx'
 
 const InputOTP = React.forwardRef<

@@ -1,11 +1,12 @@
-import { createId as cuid } from '@paralleldrive/cuid2'
 import { redirect } from '@remix-run/node'
+import { createId as cuid } from '@paralleldrive/cuid2'
 import { GitHubStrategy } from 'remix-auth-github'
 import { z } from 'zod'
+
 import { cache, cachified } from '../cache.server.ts'
 import { connectionSessionStorage } from '../connections.server.ts'
 import { type Timings } from '../timing.server.ts'
-import { MOCK_CODE_GITHUB_HEADER, MOCK_CODE_GITHUB } from './constants.ts'
+import { MOCK_CODE_GITHUB, MOCK_CODE_GITHUB_HEADER } from './constants.ts'
 import { type AuthProvider } from './provider.ts'
 
 const GitHubUserSchema = z.object({ login: z.string() })

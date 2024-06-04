@@ -1,5 +1,6 @@
 import * as cookie from 'cookie'
-import { type Mode, type Color, type Theme, modes, colors } from './theme.ts'
+
+import { colors, modes, type Color, type Mode, type Theme } from './theme.ts'
 
 const modeCookieName = 'en_theme_mode'
 

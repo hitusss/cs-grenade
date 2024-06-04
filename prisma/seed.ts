@@ -1,4 +1,5 @@
 import { prisma } from '#app/utils/db.server.ts'
+
 import { cleanupDb } from '#tests/db-utils.ts'
 
 async function seed() {

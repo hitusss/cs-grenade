@@ -1,11 +1,12 @@
 import { json, redirect, type LoaderFunctionArgs } from '@remix-run/node'
 import { Link, useLoaderData } from '@remix-run/react'
 import { z } from 'zod'
+
+import { prisma } from '#app/utils/db.server.ts'
+import { cn, getUserImgSrc, useDelayedIsPending } from '#app/utils/misc.tsx'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { ErrorList } from '#app/components/forms.tsx'
 import { SearchBar } from '#app/components/search-bar.tsx'
-import { prisma } from '#app/utils/db.server.ts'
-import { cn, getUserImgSrc, useDelayedIsPending } from '#app/utils/misc.tsx'
 
 const UserSearchResultSchema = z.object({
 	id: z.string(),

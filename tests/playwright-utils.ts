@@ -1,6 +1,7 @@
 import { test as base } from '@playwright/test'
 import { type User as UserModel } from '@prisma/client'
 import * as setCookieParser from 'set-cookie-parser'
+
 import {
 	getPasswordHash,
 	getSessionExpirationDate,
@@ -10,11 +11,12 @@ import { prisma } from '#app/utils/db.server.ts'
 import { MOCK_CODE_GITHUB_HEADER } from '#app/utils/providers/constants.js'
 import { normalizeEmail } from '#app/utils/providers/provider.js'
 import { authSessionStorage } from '#app/utils/session.server.ts'
+
 import { createUser } from './db-utils.ts'
 import {
-	type GitHubUser,
 	deleteGitHubUser,
 	insertGitHubUser,
+	type GitHubUser,
 } from './mocks/github.ts'
 
 export * from './db-utils.ts'

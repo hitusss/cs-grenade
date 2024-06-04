@@ -1,8 +1,9 @@
+import { useRef } from 'react'
 import {
 	json,
-	type LoaderFunctionArgs,
 	type HeadersFunction,
 	type LinksFunction,
+	type LoaderFunctionArgs,
 	type MetaFunction,
 } from '@remix-run/node'
 import {
@@ -18,8 +19,8 @@ import {
 	useSubmit,
 } from '@remix-run/react'
 import { withSentry } from '@sentry/remix'
-import { useRef } from 'react'
 import { HoneypotProvider } from 'remix-utils/honeypot/react'
+
 import { GeneralErrorBoundary } from './components/error-boundary.tsx'
 import { EpicProgress } from './components/progress-bar.tsx'
 import { SearchBar } from './components/search-bar.tsx'
@@ -35,8 +36,8 @@ import {
 import { Icon, href as iconsHref } from './components/ui/icon.tsx'
 import { Toaster } from './components/ui/sonner.tsx'
 import { ThemeSwitch, useTheme } from './routes/resources+/theme-switch.tsx'
-import tailwindStyleSheetUrl from './styles/tailwind.css?url'
 import colorsStyleSheetUrl from './styles/colors.css?url'
+import tailwindStyleSheetUrl from './styles/tailwind.css?url'
 import { getUserId, logout } from './utils/auth.server.ts'
 import { ClientHintCheck, getHints } from './utils/client-hints.tsx'
 import { prisma } from './utils/db.server.ts'
@@ -45,7 +46,7 @@ import { honeypot } from './utils/honeypot.server.ts'
 import { combineHeaders, getDomainUrl, getUserImgSrc } from './utils/misc.tsx'
 import { useNonce } from './utils/nonce-provider.ts'
 import { getTheme } from './utils/theme.server.ts'
-import { type Mode, type Color } from './utils/theme.ts'
+import { type Color, type Mode } from './utils/theme.ts'
 import { makeTimings, time } from './utils/timing.server.ts'
 import { getToast } from './utils/toast.server.ts'
 import { useOptionalUser, useUser } from './utils/user.ts'

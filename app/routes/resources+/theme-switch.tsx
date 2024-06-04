@@ -1,26 +1,27 @@
+import { json, type ActionFunctionArgs } from '@remix-run/node'
+import { useFetcher, useFetchers } from '@remix-run/react'
 import {
-	useForm,
 	getFormProps,
-	useInputControl,
 	getInputProps,
+	useForm,
+	useInputControl,
 } from '@conform-to/react'
 import { parseWithZod } from '@conform-to/zod'
 import { invariantResponse } from '@epic-web/invariant'
-import { json, type ActionFunctionArgs } from '@remix-run/node'
-import { useFetcher, useFetchers } from '@remix-run/react'
 import { z } from 'zod'
-import { Icon, type IconName } from '#app/components/ui/icon.tsx'
+
 import { useHints } from '#app/utils/client-hints.tsx'
 import { useRequestInfo } from '#app/utils/request-info.ts'
 import { setTheme } from '#app/utils/theme.server.ts'
-import { type Mode, type Color, modes, colors } from '#app/utils/theme.ts'
-
+import { colors, modes, type Color, type Mode } from '#app/utils/theme.ts'
+import { Button } from '#app/components/ui/button.tsx'
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuPortal,
 	DropdownMenuTrigger,
 } from '#app/components/ui/dropdown-menu.tsx'
+import { Icon, type IconName } from '#app/components/ui/icon.tsx'
 import {
 	ToggleGroup,
 	ToggleGroupItem,
@@ -31,7 +32,6 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from '#app/components/ui/tooltip.tsx'
-import { Button } from '#app/components/ui/button.tsx'
 import { ErrorList } from '#app/components/forms.tsx'
 
 const ThemeFormSchema = z.object({
