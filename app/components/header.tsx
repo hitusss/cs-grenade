@@ -3,6 +3,7 @@ import { Form, Link, useSubmit } from '@remix-run/react'
 
 import { getUserImgSrc } from '#app/utils/misc.tsx'
 import { useOptionalUser, useUser } from '#app/utils/user.ts'
+import { ThemeSwitch } from '#app/routes/resources+/theme-switch.tsx'
 
 import { Logo } from './logo.tsx'
 import { Button } from './ui/button.tsx'
@@ -23,6 +24,7 @@ export function Header() {
 			<nav className="flex flex-wrap items-center justify-between gap-4 sm:flex-nowrap md:gap-8">
 				<Logo className="size-12" />
 				<div className="flex items-center gap-10">
+					<ThemeSwitch />
 					{user ? (
 						<UserDropdown />
 					) : (
