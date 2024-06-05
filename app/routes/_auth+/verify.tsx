@@ -8,9 +8,9 @@ import { z } from 'zod'
 import { checkHoneypot } from '#app/utils/honeypot.server.ts'
 import { useIsPending } from '#app/utils/misc.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
+import { AuthLayout } from '#app/components/auth-layout.tsx'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { ErrorList, OTPField } from '#app/components/forms.tsx'
-import { Spacer } from '#app/components/spacer.tsx'
 
 import { validateRequest } from './verify.server.ts'
 
@@ -44,27 +44,25 @@ export default function VerifyRoute() {
 	)
 	const type = parseWithZoddType.success ? parseWithZoddType.data : null
 
-	const checkEmail = (
-		<>
-			<h1 className="text-h1">Check your email</h1>
-			<p className="mt-3 text-body-md text-muted-foreground">
-				We've sent you a code to verify your email address.
-			</p>
-		</>
-	)
+	const checkEmail = {
+		title: 'Check your email',
+		subtitle: "We've sent you a code to verify your email address.",
+	}
 
-	const headings: Record<VerificationTypes, React.ReactNode> = {
+	const headings: Record<
+		VerificationTypes,
+		{
+			title: string
+			subtitle?: string
+		}
+	> = {
 		onboarding: checkEmail,
 		'reset-password': checkEmail,
 		'change-email': checkEmail,
-		'2fa': (
-			<>
-				<h1 className="text-h1">Check your 2FA app</h1>
-				<p className="mt-3 text-body-md text-muted-foreground">
-					Please enter your 2FA code to verify your identity.
-				</p>
-			</>
-		),
+		'2fa': {
+			title: 'Check your 2FA app',
+			subtitle: 'Please enter your 2FA code to verify your identity.',
+		},
 	}
 
 	const [form, fields] = useForm({
@@ -83,56 +81,49 @@ export default function VerifyRoute() {
 	})
 
 	return (
-		<main className="container flex flex-col justify-center pb-32 pt-20">
-			<div className="text-center">
-				{type ? headings[type] : 'Invalid Verification Type'}
-			</div>
-
-			<Spacer size="xs" />
-
-			<div className="mx-auto flex w-72 max-w-full flex-col justify-center gap-1">
-				<div>
+		<AuthLayout
+			title={type ? headings[type].title : 'Invalid Verification Type'}
+			subtitle={type ? headings[type].subtitle : ''}
+		>
+			<>
+				<Form method="POST" {...getFormProps(form)} className="flex-1">
+					<HoneypotInputs />
+					<div className="flex items-center justify-center">
+						<OTPField
+							labelProps={{
+								htmlFor: fields[codeQueryParam].id,
+								children: 'Code',
+							}}
+							inputProps={{
+								...getInputProps(fields[codeQueryParam], { type: 'text' }),
+								autoComplete: 'one-time-code',
+							}}
+							errors={fields[codeQueryParam].errors}
+						/>
+					</div>
+					<input
+						{...getInputProps(fields[typeQueryParam], { type: 'hidden' })}
+					/>
+					<input
+						{...getInputProps(fields[targetQueryParam], { type: 'hidden' })}
+					/>
+					<input
+						{...getInputProps(fields[redirectToQueryParam], {
+							type: 'hidden',
+						})}
+					/>
 					<ErrorList errors={form.errors} id={form.errorId} />
-				</div>
-				<div className="flex w-full gap-2">
-					<Form method="POST" {...getFormProps(form)} className="flex-1">
-						<HoneypotInputs />
-						<div className="flex items-center justify-center">
-							<OTPField
-								labelProps={{
-									htmlFor: fields[codeQueryParam].id,
-									children: 'Code',
-								}}
-								inputProps={{
-									...getInputProps(fields[codeQueryParam], { type: 'text' }),
-									autoComplete: 'one-time-code',
-								}}
-								errors={fields[codeQueryParam].errors}
-							/>
-						</div>
-						<input
-							{...getInputProps(fields[typeQueryParam], { type: 'hidden' })}
-						/>
-						<input
-							{...getInputProps(fields[targetQueryParam], { type: 'hidden' })}
-						/>
-						<input
-							{...getInputProps(fields[redirectToQueryParam], {
-								type: 'hidden',
-							})}
-						/>
-						<StatusButton
-							className="w-full"
-							status={isPending ? 'pending' : form.status ?? 'idle'}
-							type="submit"
-							disabled={isPending}
-						>
-							Submit
-						</StatusButton>
-					</Form>
-				</div>
-			</div>
-		</main>
+					<StatusButton
+						className="w-full"
+						status={isPending ? 'pending' : form.status ?? 'idle'}
+						type="submit"
+						disabled={isPending}
+					>
+						Submit
+					</StatusButton>
+				</Form>
+			</>
+		</AuthLayout>
 	)
 }
 

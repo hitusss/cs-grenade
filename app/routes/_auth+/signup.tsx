@@ -21,6 +21,7 @@ import { checkHoneypot } from '#app/utils/honeypot.server.ts'
 import { useIsPending } from '#app/utils/misc.tsx'
 import { EmailSchema } from '#app/utils/user-validation.ts'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
+import { AuthLayout } from '#app/components/auth-layout.tsx'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { ErrorList, Field } from '#app/components/forms.tsx'
 
@@ -135,14 +136,11 @@ export default function SignupRoute() {
 	})
 
 	return (
-		<div className="container flex flex-col justify-center pb-32 pt-20">
-			<div className="text-center">
-				<h1 className="text-h1">Let's start your journey!</h1>
-				<p className="mt-3 text-body-md text-muted-foreground">
-					Please enter your email.
-				</p>
-			</div>
-			<div className="mx-auto mt-16 min-w-full max-w-sm sm:min-w-[368px]">
+		<AuthLayout
+			title="Let's start your journey!"
+			subtitle="Please enter your email."
+		>
+			<>
 				<Form method="POST" {...getFormProps(form)}>
 					<HoneypotInputs />
 					<Field
@@ -167,7 +165,7 @@ export default function SignupRoute() {
 						Submit
 					</StatusButton>
 				</Form>
-				<ul className="mt-5 flex flex-col gap-5 border-b-2 border-t-2 border-border py-3">
+				<ul className="grid gap-6 border-b-2 border-t-2 border-border py-3">
 					{providerNames.map(providerName => (
 						<li key={providerName}>
 							<ProviderConnectionForm
@@ -178,8 +176,8 @@ export default function SignupRoute() {
 						</li>
 					))}
 				</ul>
-			</div>
-		</div>
+			</>
+		</AuthLayout>
 	)
 }
 
