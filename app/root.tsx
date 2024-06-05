@@ -17,13 +17,13 @@ import { withSentry } from '@sentry/remix'
 import { HoneypotProvider } from 'remix-utils/honeypot/react'
 
 import { GeneralErrorBoundary } from './components/error-boundary.tsx'
+import { Footer } from './components/footer.tsx'
 import { Header } from './components/header.tsx'
-import { Logo } from './components/logo.tsx'
 import { EpicProgress } from './components/progress-bar.tsx'
 import { useToast } from './components/toaster.tsx'
 import { href as iconsHref } from './components/ui/icon.tsx'
 import { Toaster } from './components/ui/sonner.tsx'
-import { ThemeSwitch, useTheme } from './routes/resources+/theme-switch.tsx'
+import { useTheme } from './routes/resources+/theme-switch.tsx'
 import colorsStyleSheetUrl from './styles/colors.css?url'
 import tailwindStyleSheetUrl from './styles/tailwind.css?url'
 import { getUserId, logout } from './utils/auth.server.ts'
@@ -204,10 +204,7 @@ function App() {
 					<Outlet />
 				</div>
 
-				<div className="container flex justify-between pb-5">
-					<Logo className="size-12" />
-					<ThemeSwitch />
-				</div>
+				<Footer />
 			</div>
 			<Toaster closeButton position="top-center" theme={theme.mode} />
 			<EpicProgress />
