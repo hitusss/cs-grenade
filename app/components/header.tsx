@@ -1,8 +1,7 @@
 import { useRef } from 'react'
 import { Form, Link, useSubmit } from '@remix-run/react'
 
-import { getUserImgSrc } from '#app/utils/misc.tsx'
-import { useOptionalUser, useUser } from '#app/utils/user.ts'
+import { getUserImgSrc, useOptionalUser, useUser } from '#app/utils/user.ts'
 import { ThemeSwitch } from '#app/routes/resources+/theme-switch.tsx'
 
 import { Logo } from './logo.tsx'

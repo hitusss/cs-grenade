@@ -6,10 +6,6 @@ import { extendTailwindMerge } from 'tailwind-merge'
 
 import { extendedTheme } from './extended-theme.ts'
 
-export function getUserImgSrc(imageId?: string | null) {
-	return imageId ? `/resources/user-images/${imageId}` : '/img/user.png'
-}
-
 export function getErrorMessage(error: unknown) {
 	if (typeof error === 'string') return error
 	if (

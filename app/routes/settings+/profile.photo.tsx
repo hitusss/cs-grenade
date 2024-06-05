@@ -21,11 +21,8 @@ import { z } from 'zod'
 
 import { requireUserId } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
-import {
-	getUserImgSrc,
-	useDoubleCheck,
-	useIsPending,
-} from '#app/utils/misc.tsx'
+import { useDoubleCheck, useIsPending } from '#app/utils/misc.tsx'
+import { getUserImgSrc } from '#app/utils/user.ts'
 import { Button } from '#app/components/ui/button.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'

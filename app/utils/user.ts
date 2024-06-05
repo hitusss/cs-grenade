@@ -3,6 +3,10 @@ import { useRouteLoaderData } from '@remix-run/react'
 
 import { type loader as rootLoader } from '#app/root.tsx'
 
+export function getUserImgSrc(imageId?: string | null) {
+	return imageId ? `/resources/user-images/${imageId}` : '/img/user.png'
+}
+
 function isUser(user: any): user is SerializeFrom<typeof rootLoader>['user'] {
 	return user && typeof user === 'object' && typeof user.id === 'string'
 }
