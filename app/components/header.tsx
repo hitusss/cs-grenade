@@ -46,7 +46,12 @@ function UserDropdown() {
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
-				<Button asChild variant="secondary">
+				<Button
+					asChild
+					variant="secondary"
+					size="icon"
+					className="sm:w-auto sm:px-4"
+				>
 					<Link
 						to={`/users/${user.username}`}
 						// this is for progressive enhancement
@@ -58,7 +63,7 @@ function UserDropdown() {
 							alt={user.name ?? user.username}
 							src={getUserImgSrc(user.image?.id)}
 						/>
-						<span className="text-body-sm font-bold">
+						<span className="hidden sm:block text-body-sm font-bold">
 							{user.name ?? user.username}
 						</span>
 					</Link>
