@@ -22,6 +22,7 @@ import { withSentry } from '@sentry/remix'
 import { HoneypotProvider } from 'remix-utils/honeypot/react'
 
 import { GeneralErrorBoundary } from './components/error-boundary.tsx'
+import { Logo } from './components/logo.tsx'
 import { EpicProgress } from './components/progress-bar.tsx'
 import { SearchBar } from './components/search-bar.tsx'
 import { useToast } from './components/toaster.tsx'
@@ -217,7 +218,7 @@ function App() {
 			<div className="flex h-screen flex-col justify-between">
 				<header className="container py-6">
 					<nav className="flex flex-wrap items-center justify-between gap-4 sm:flex-nowrap md:gap-8">
-						<Logo />
+						<Logo className="size-12" />
 						<div className="ml-auto hidden max-w-sm flex-1 sm:block">
 							{searchBar}
 						</div>
@@ -239,7 +240,7 @@ function App() {
 				</div>
 
 				<div className="container flex justify-between pb-5">
-					<Logo />
+					<Logo className="size-12" />
 					<ThemeSwitch
 						userMode={data.requestInfo.userPrefs.theme.mode}
 						userColor={data.requestInfo.userPrefs.theme.color}
@@ -249,19 +250,6 @@ function App() {
 			<Toaster closeButton position="top-center" theme={theme.mode} />
 			<EpicProgress />
 		</Document>
-	)
-}
-
-function Logo() {
-	return (
-		<Link to="/" className="group grid leading-snug">
-			<span className="font-light transition group-hover:-translate-x-1">
-				epic
-			</span>
-			<span className="font-bold transition group-hover:translate-x-1">
-				notes
-			</span>
-		</Link>
 	)
 }
 
