@@ -56,19 +56,17 @@ export async function action({ request }: ActionFunctionArgs) {
 	return json({ result: submission.reply() }, responseInit)
 }
 
-export function ThemeSwitch({
-	userMode,
-	userColor,
-}: {
-	userMode?: Mode | null
-	userColor?: Color | null
-}) {
+export function ThemeSwitch() {
 	const fetcher = useFetcher<typeof action>()
 
 	const [form, fields] = useForm<z.infer<typeof ThemeFormSchema>>({
 		id: 'theme-switch',
 		lastResult: fetcher.data?.result,
 	})
+
+	const requestInfo = useRequestInfo()
+	const userMode = requestInfo.userPrefs.theme.mode
+	const userColor = requestInfo.userPrefs.theme.color
 
 	const modeControl = useInputControl({
 		...fields.mode,

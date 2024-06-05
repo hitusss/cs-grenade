@@ -241,10 +241,7 @@ function App() {
 
 				<div className="container flex justify-between pb-5">
 					<Logo className="size-12" />
-					<ThemeSwitch
-						userMode={data.requestInfo.userPrefs.theme.mode}
-						userColor={data.requestInfo.userPrefs.theme.color}
-					/>
+					<ThemeSwitch />
 				</div>
 			</div>
 			<Toaster closeButton position="top-center" theme={theme.mode} />
