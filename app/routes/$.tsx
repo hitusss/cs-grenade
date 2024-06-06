@@ -5,10 +5,12 @@
 // ensure the user gets the right status code and we can display a nicer error
 // message for them than the Remix and/or browser default.
 
-import { Link, useLocation } from '@remix-run/react'
+import { useLocation } from '@remix-run/react'
 
-import { Icon } from '#app/components/ui/icon.tsx'
-import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
+import {
+	ErrorComponent,
+	GeneralErrorBoundary,
+} from '#app/components/error-boundary.tsx'
 
 export async function loader() {
 	throw new Response('Not found', { status: 404 })
@@ -26,17 +28,15 @@ export function ErrorBoundary() {
 		<GeneralErrorBoundary
 			statusHandlers={{
 				404: () => (
-					<div className="flex flex-col gap-6">
-						<div className="flex flex-col gap-3">
-							<h1>We can't find this page:</h1>
-							<pre className="whitespace-pre-wrap break-all text-body-lg">
-								{location.pathname}
-							</pre>
-						</div>
-						<Link to="/" className="text-body-md underline">
-							<Icon name="arrow-left">Back to home</Icon>
-						</Link>
-					</div>
+					<ErrorComponent
+						heading="404 - Page not found"
+						error={`Page not found at ${location.pathname}`}
+						link={{
+							to: '/',
+							icon: 'arrow-left',
+							label: 'Go to home',
+						}}
+					/>
 				),
 			}}
 		/>
