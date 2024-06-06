@@ -58,7 +58,6 @@ export const links: LinksFunction = () => {
 		//These should match the css preloads above to avoid css as render blocking resource
 		{ rel: 'icon', type: 'image/svg+xml', href: '/favicons/favicon.svg' },
 		{ rel: 'stylesheet', href: tailwindStyleSheetUrl },
-		{ rel: 'stylesheet', href: colorsStyleSheetUrl },
 	].filter(Boolean)
 }
 
