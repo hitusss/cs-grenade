@@ -55,7 +55,7 @@ export default function TwoFactorRoute() {
 		<div className="flex flex-col gap-4">
 			{data.is2FAEnabled ? (
 				<>
-					<p className="text-lg">
+					<p>
 						<Icon name="check">
 							You have enabled two-factor authentication.
 						</Icon>
@@ -71,7 +71,7 @@ export default function TwoFactorRoute() {
 							You have not enabled two-factor authentication yet.
 						</Icon>
 					</p>
-					<p className="text-sm">
+					<p className="text-body-xs">
 						Two factor authentication adds an extra layer of security to your
 						account. You will need to enter a code from an authenticator app
 						like{' '}

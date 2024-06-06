@@ -209,7 +209,7 @@ export default function OnboardingProviderRoute() {
 							alt="Profile"
 							className="h-24 w-24 rounded-full"
 						/>
-						<p className="text-body-sm text-muted-foreground">
+						<p className="text-muted-foreground">
 							You can change your photo later
 						</p>
 						<input {...getInputProps(fields.imageUrl, { type: 'hidden' })} />

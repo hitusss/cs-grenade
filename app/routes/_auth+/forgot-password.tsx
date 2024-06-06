@@ -169,7 +169,7 @@ export default function ForgotPasswordRoute() {
 						Recover password
 					</StatusButton>
 				</forgotPassword.Form>
-				<Link to="/login" className="text-center text-body-sm font-bold">
+				<Link to="/login" className="text-center font-bold">
 					Back to Login
 				</Link>
 			</>
