@@ -9,7 +9,7 @@ export default {
 		'^(@remix-run/(.*)$)|^(@remix-run$)',
 		'<THIRD_PARTY_MODULES>',
 		'',
-		'^types$',
+		'^#types$',
 		'^#app/utils/(.*)$',
 		'^#app/components/ui/(.*)$',
 		'^#app/components/(.*)$',
