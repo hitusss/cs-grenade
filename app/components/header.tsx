@@ -21,7 +21,10 @@ export function Header() {
 	return (
 		<header className="container py-6">
 			<nav className="flex flex-wrap items-center justify-between gap-4 sm:flex-nowrap md:gap-8">
-				<Logo className="size-12" />
+				<Link to="/">
+					<Logo className="size-12" />
+					<span className="sr-only">Home</span>
+				</Link>
 				<div className="flex items-center gap-10">
 					<ThemeSwitch />
 					{user ? (
