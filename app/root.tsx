@@ -75,6 +75,28 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		desc: 'getUserId in root',
 	})
 
+	const maps = await time(
+		() =>
+			prisma.map.findMany({
+				select: {
+					name: true,
+					label: true,
+					isActive: true,
+					image: {
+						select: {
+							id: true,
+						},
+					},
+					logo: {
+						select: {
+							id: true,
+						},
+					},
+				},
+			}),
+		{ timings, type: 'select maps', desc: 'select maps in root' },
+	)
+
 	const user = userId
 		? await time(
 				() =>
@@ -109,6 +131,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 	return json(
 		{
+			maps,
 			user,
 			requestInfo: {
 				hints: getHints(request),
