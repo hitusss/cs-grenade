@@ -17,7 +17,7 @@ import {
 } from '#app/utils/connections.tsx'
 import { checkHoneypot } from '#app/utils/honeypot.server.ts'
 import { useIsPending } from '#app/utils/misc.tsx'
-import { PasswordSchema, UsernameSchema } from '#app/utils/user-validation.ts'
+import { PasswordSchema, UsernameSchema } from '#app/utils/validators/user.ts'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { AuthLayout } from '#app/components/auth-layout.tsx'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'

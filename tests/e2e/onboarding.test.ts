@@ -9,7 +9,7 @@ import {
 import {
 	USERNAME_MAX_LENGTH,
 	USERNAME_MIN_LENGTH,
-} from '#app/utils/user-validation'
+} from '#app/utils/validators/user.ts'
 
 import { readEmail } from '#tests/mocks/utils.ts'
 import { test as base, createUser, expect } from '#tests/playwright-utils.ts'
@@ -263,7 +263,7 @@ test('shows help texts on entering invalid details on onboarding page after GitH
 	expect(createAccountButton.getByText('error')).not.toBeAttached()
 
 	// invalid chars in username
-	await usernameInput.fill('U$er_name') // $ is invalid char, see app/utils/user-validation.ts.
+	await usernameInput.fill('U$er_name') // $ is invalid char, see app/utils/validators/user.ts.
 	await createAccountButton.click()
 
 	await expect(createAccountButton.getByRole('status')).toBeVisible()

@@ -11,7 +11,7 @@ import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 
 import { requireAnonymous, resetUserPassword } from '#app/utils/auth.server.ts'
 import { useIsPending } from '#app/utils/misc.tsx'
-import { PasswordAndConfirmPasswordSchema } from '#app/utils/user-validation.ts'
+import { PasswordAndConfirmPasswordSchema } from '#app/utils/validators/user.ts'
 import { verifySessionStorage } from '#app/utils/verification.server.ts'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { AuthLayout } from '#app/components/auth-layout.tsx'

@@ -27,7 +27,7 @@ import {
 	NameSchema,
 	PasswordAndConfirmPasswordSchema,
 	UsernameSchema,
-} from '#app/utils/user-validation.ts'
+} from '#app/utils/validators/user.ts'
 import { verifySessionStorage } from '#app/utils/verification.server.ts'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { AuthLayout } from '#app/components/auth-layout.tsx'
