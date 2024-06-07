@@ -1,8 +1,12 @@
-import React, { useId } from 'react'
+import React, { useEffect, useId, useState } from 'react'
 import { useInputControl } from '@conform-to/react'
+import { cva, type VariantProps } from 'class-variance-authority'
 import { REGEXP_ONLY_DIGITS_AND_CHARS, type OTPInputProps } from 'input-otp'
 
+import { cn } from '#app/utils/misc.tsx'
+
 import { Checkbox, type CheckboxProps } from './ui/checkbox.tsx'
+import { Icon } from './ui/icon.tsx'
 import {
 	InputOTP,
 	InputOTPGroup,
@@ -10,7 +14,7 @@ import {
 	InputOTPSlot,
 } from './ui/input-otp.tsx'
 import { Input } from './ui/input.tsx'
-import { Label } from './ui/label.tsx'
+import { Label, labelVariants } from './ui/label.tsx'
 import { Textarea } from './ui/textarea.tsx'
 
 export type ListOfErrors = Array<string | null | undefined> | null | undefined
@@ -196,6 +200,144 @@ export function CheckboxField({
 				/>
 			</div>
 			<div className="px-4 pb-3 pt-1">
+				{errorId ? <ErrorList id={errorId} errors={errors} /> : null}
+			</div>
+		</div>
+	)
+}
+
+const imageFieldVariants = cva('object-cover', {
+	variants: {
+		size: {
+			default: 'size-32',
+			sm: 'size-16',
+			lg: 'size-48',
+		},
+		fullRounded: {
+			true: 'rounded-full',
+			false: 'rounded-md',
+		},
+	},
+	defaultVariants: {
+		size: 'default',
+		fullRounded: false,
+	},
+})
+
+export function ImageField({
+	labelProps,
+	inputProps,
+	errors,
+	className,
+	existingImage,
+	size,
+	fullRounded,
+}: {
+	labelProps: React.LabelHTMLAttributes<HTMLLabelElement>
+	inputProps: React.InputHTMLAttributes<HTMLInputElement>
+	errors?: ListOfErrors
+	className?: string
+	existingImage?: string
+} & VariantProps<typeof imageFieldVariants>) {
+	const [imageSrc, setImageSrc] = useState<string | undefined>()
+	const fallbackId = useId()
+	const id = inputProps.id ?? fallbackId
+	const errorId = errors?.length ? `${id}-error` : undefined
+
+	useEffect(() => {
+		const form = document.querySelector<HTMLFormElement>(`#${inputProps.form}`)
+		if (!form) return
+		const onReset = () => {
+			setImageSrc(undefined)
+		}
+		form.addEventListener('reset', onReset)
+		return () => form.removeEventListener('reset', onReset)
+	}, [inputProps.form])
+
+	return (
+		<div>
+			<label htmlFor={id} className="relative grid gap-1">
+				<span className={labelVariants({ className: 'px-2' })}>
+					{labelProps.children}
+				</span>
+				{imageSrc || existingImage ? (
+					<span
+						className={cn(
+							'bg-primary rounded-full p-2 size-10 grid place-content-center absolute z-10 cursor-pointer',
+							fullRounded ? 'right-0 bottom-0' : '-right-5 -bottom-5',
+						)}
+					>
+						<Icon name="pencil" />
+					</span>
+				) : null}
+				<div
+					className={cn(
+						imageFieldVariants({
+							size,
+							fullRounded,
+						}),
+						'relative ring-offset-background focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2',
+						className,
+					)}
+				>
+					<div
+						className={cn(
+							imageFieldVariants({ size, fullRounded }),
+							'grid place-items-center border-2',
+							className,
+						)}
+					>
+						{imageSrc || existingImage ? (
+							<img
+								src={imageSrc ?? existingImage}
+								className={cn(
+									imageFieldVariants({
+										size,
+										fullRounded,
+									}),
+									className,
+								)}
+								alt=""
+							/>
+						) : (
+							<Icon name="plus" className="size-6 text-border" />
+						)}
+						<input
+							id={id}
+							aria-invalid={errorId ? true : undefined}
+							aria-describedby={errorId}
+							{...inputProps}
+							type="file"
+							accept={inputProps.accept ?? 'image/jpeg, image/png'}
+							className={cn(
+								imageFieldVariants({
+									size,
+									fullRounded,
+								}),
+								'absolute inset-0 z-0 cursor-pointer opacity-0',
+							)}
+							onChange={e => {
+								const file = e.currentTarget.files?.[0]
+								if (file) {
+									const reader = new FileReader()
+									reader.onload = event => {
+										setImageSrc(event.target?.result?.toString() ?? undefined)
+									}
+									reader.readAsDataURL(file)
+								}
+							}}
+						/>
+					</div>
+				</div>
+			</label>
+
+			<div
+				className={imageFieldVariants({
+					size,
+					fullRounded,
+					className: 'h-auto min-h-[32px] pb-3 pt-1',
+				})}
+			>
 				{errorId ? <ErrorList id={errorId} errors={errors} /> : null}
 			</div>
 		</div>
