@@ -6,6 +6,10 @@ import { extendTailwindMerge } from 'tailwind-merge'
 
 import { extendedTheme } from './extended-theme.ts'
 
+export function toSlug(str: string) {
+	return str.toLowerCase().replace(/\s+/g, '-')
+}
+
 export function getErrorMessage(error: unknown) {
 	if (typeof error === 'string') return error
 	if (
