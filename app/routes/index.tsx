@@ -1,3 +1,55 @@
+import { Link, useRouteLoaderData } from '@remix-run/react'
+
+import { userHasPermission } from '#app/utils/permissions.ts'
+import { useOptionalUser } from '#app/utils/user.ts'
+import { Button } from '#app/components/ui/button.tsx'
+import MapsList from '#app/components/maps-list.tsx'
+import { type loader as rootLoader } from '#app/root.tsx'
+
 export default function Index() {
-	return <div>Home</div>
+	const data = useRouteLoaderData<typeof rootLoader>('root')
+	const user = useOptionalUser()
+	const hasPermission = userHasPermission(user, 'create:map')
+
+	const activeMaps =
+		data?.maps
+			.filter(map => map.isActive)
+			.map(map => ({
+				name: map.name,
+				label: map.label,
+				isActive: true,
+				imageId: map.image?.id,
+				logoId: map.logo?.id,
+			})) || []
+	const inactiveMaps =
+		data?.maps
+			.filter(map => !map.isActive)
+			.map(map => ({
+				name: map.name,
+				label: map.label,
+				isActive: false,
+				imageId: map.image?.id,
+				logoId: map.logo?.id,
+			})) || []
+
+	return (
+		<div className="container">
+			<div className="flex justify-between items-center">
+				<h1>Maps</h1>
+				{hasPermission ? (
+					<Button asChild>
+						<Link to="/map/new">Create map</Link>
+					</Button>
+				) : null}
+			</div>
+			<MapsList maps={activeMaps} />
+
+			{inactiveMaps.length > 0 ? (
+				<>
+					<h2 className="mt-12">Inactive maps</h2>
+					<MapsList maps={inactiveMaps} />
+				</>
+			) : null}
+		</div>
+	)
 }
