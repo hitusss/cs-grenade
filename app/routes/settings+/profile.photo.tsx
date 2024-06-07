@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import {
 	json,
 	redirect,
@@ -26,7 +25,7 @@ import { getUserImgSrc } from '#app/utils/user.ts'
 import { Button } from '#app/components/ui/button.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
-import { ErrorList } from '#app/components/forms.tsx'
+import { ErrorList, ImageField } from '#app/components/forms.tsx'
 
 import { type BreadcrumbHandle } from './profile.tsx'
 
@@ -138,57 +137,25 @@ export default function PhotoRoute() {
 	const pendingIntent = isPending ? navigation.formData?.get('intent') : null
 	const lastSubmissionIntent = fields.intent.value
 
-	const [newImageSrc, setNewImageSrc] = useState<string | null>(null)
-
 	return (
 		<div>
 			<Form
 				method="POST"
 				encType="multipart/form-data"
 				className="flex flex-col items-center justify-center gap-10"
-				onReset={() => setNewImageSrc(null)}
 				{...getFormProps(form)}
 			>
-				<img
-					src={
-						newImageSrc ?? (data.user ? getUserImgSrc(data.user.image?.id) : '')
+				<ImageField
+					inputProps={getInputProps(fields.photoFile, { type: 'file' })}
+					labelProps={{ children: 'Photo' }}
+					errors={fields.photoFile.errors}
+					size="lg"
+					existingImage={
+						data.user ? getUserImgSrc(data.user.image?.id) : undefined
 					}
-					className="h-52 w-52 rounded-full object-cover"
-					alt={data.user?.name ?? data.user?.username}
+					fullRounded
 				/>
-				<ErrorList errors={fields.photoFile.errors} id={fields.photoFile.id} />
 				<div className="flex gap-4">
-					{/*
-						We're doing some kinda odd things to make it so this works well
-						without JavaScript. Basically, we're using CSS to ensure the right
-						buttons show up based on the input's "valid" state (whether or not
-						an image has been selected). Progressive enhancement FTW!
-					*/}
-					<input
-						{...getInputProps(fields.photoFile, { type: 'file' })}
-						accept="image/*"
-						className="peer sr-only"
-						required
-						tabIndex={newImageSrc ? -1 : 0}
-						onChange={e => {
-							const file = e.currentTarget.files?.[0]
-							if (file) {
-								const reader = new FileReader()
-								reader.onload = event => {
-									setNewImageSrc(event.target?.result?.toString() ?? null)
-								}
-								reader.readAsDataURL(file)
-							}
-						}}
-					/>
-					<Button
-						asChild
-						className="cursor-pointer peer-valid:hidden peer-focus-within:ring-2 peer-focus-visible:ring-2"
-					>
-						<label htmlFor={fields.photoFile.id}>
-							<Icon name="pencil">Change</Icon>
-						</label>
-					</Button>
 					<StatusButton
 						name="intent"
 						value="submit"
@@ -207,7 +174,7 @@ export default function PhotoRoute() {
 					<Button
 						variant="destructive"
 						className="peer-invalid:hidden"
-						{...form.reset.getButtonProps()}
+						type="reset"
 					>
 						<Icon name="trash">Reset</Icon>
 					</Button>
