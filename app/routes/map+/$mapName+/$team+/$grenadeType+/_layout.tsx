@@ -1,5 +1,5 @@
 import { json, redirect, type LoaderFunctionArgs } from '@remix-run/node'
-import { Link, useLoaderData } from '@remix-run/react'
+import { Link, Outlet, useLoaderData } from '@remix-run/react'
 import { invariantResponse } from '@epic-web/invariant'
 
 import { prisma } from '#app/utils/db.server.ts'
@@ -105,7 +105,9 @@ export default function MapLayout() {
 						</Button>
 					) : null}
 				</div>
-				<Map imageId={map.radar?.id} />
+				<Map imageId={map.radar?.id}>
+					<Outlet />
+				</Map>
 			</div>
 		</div>
 	)
