@@ -80,7 +80,7 @@ export function Map({
 			<TooltipProvider delayDuration={0}>
 				<div
 					ref={mapRef}
-					className="relative isolate aspect-square h-[70vw] max-h-[70vh] w-[70vh] max-w-[70vw] rounded-xl border-8 border-primary bg-primary [&_a]:rounded-none [&_a]:shadow-none [&_button]:rounded-none [&_button]:shadow-none"
+					className="relative isolate aspect-square w-full sm:h-[75vw] sm:max-h-[75vh] sm:w-[75vh] sm:max-w-[75vw] rounded-xl border-8 border-primary bg-primary [&_a]:rounded-none [&_a]:shadow-none [&_button]:rounded-none [&_button]:shadow-none"
 				>
 					{children}
 				</div>
