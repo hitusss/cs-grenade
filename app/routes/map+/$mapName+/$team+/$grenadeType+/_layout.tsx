@@ -74,37 +74,39 @@ export default function MapLayout() {
 	const user = useOptionalUser()
 	const canEditMap = userHasPermission(user, 'update:map')
 	return (
-		<div className="grid gap-6 place-items-center">
-			<h1>{map.label}</h1>
-			<div className="flex gap-6">
-				<MapNav
-					label="Team"
-					items={teams.map(t => ({
-						value: t,
-						to: `/map/${mapName}/${t}/${grenadeType}`,
-						label: teamLabels[t],
-						img: `/img/teams/${t}.png`,
-					}))}
-					currentValue={team}
-				/>
-				<MapNav
-					label="Grenade"
-					items={grenadeTypes.map(g => ({
-						value: g,
-						to: `/map/${mapName}/${team}/${g}`,
-						label: grenadeLabels[g],
-						img: `/img/grenades/${g}.png`,
-					}))}
-					currentValue={grenadeType}
-				/>
-			</div>
+		<div className="grid animate-in fade-in zoom-in duration-500 place-items-center">
+			<div className="grid gap-6">
+				<h1>{map.label}</h1>
+				<div className="flex gap-6 flex-wrap w-full items-center justify-start">
+					<MapNav
+						label="Team"
+						items={teams.map(t => ({
+							value: t,
+							to: `/map/${mapName}/${t}/${grenadeType}`,
+							label: teamLabels[t],
+							img: `/img/teams/${t}.png`,
+						}))}
+						currentValue={team}
+					/>
+					<MapNav
+						label="Grenade"
+						items={grenadeTypes.map(g => ({
+							value: g,
+							to: `/map/${mapName}/${team}/${g}`,
+							label: grenadeLabels[g],
+							img: `/img/grenades/${g}.png`,
+						}))}
+						currentValue={grenadeType}
+					/>
 
-			<Map imageId={map.radar?.id} />
-			{canEditMap ? (
-				<Button asChild>
-					<Link to={`/map/${mapName}/edit`}>Edit Map</Link>
-				</Button>
-			) : null}
+					{canEditMap ? (
+						<Button asChild className="ml-auto self-end">
+							<Link to={`/map/${mapName}/edit`}>Edit Map</Link>
+						</Button>
+					) : null}
+				</div>
+				<Map imageId={map.radar?.id} />
+			</div>
 		</div>
 	)
 }
