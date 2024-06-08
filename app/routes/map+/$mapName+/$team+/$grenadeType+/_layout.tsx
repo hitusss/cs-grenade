@@ -1,8 +1,11 @@
 import { json, redirect, type LoaderFunctionArgs } from '@remix-run/node'
-import { Outlet, useLoaderData } from '@remix-run/react'
+import { Link, useLoaderData } from '@remix-run/react'
 import { invariantResponse } from '@epic-web/invariant'
 
 import { prisma } from '#app/utils/db.server.ts'
+import { userHasPermission } from '#app/utils/permissions.ts'
+import { useOptionalUser } from '#app/utils/user.ts'
+import { Button } from '#app/components/ui/button.tsx'
 
 import { grenadeTypes } from '#types/grenades-types.ts'
 import { teams } from '#types/teams.ts'
@@ -66,11 +69,17 @@ export async function loader({ params }: LoaderFunctionArgs) {
 
 export default function MapLayout() {
 	const { mapName, map } = useLoaderData<typeof loader>()
+	const user = useOptionalUser()
+	const canEditMap = userHasPermission(user, 'update:map')
 	return (
 		<div>
 			<h1>{map.label}</h1>
 			<pre>{JSON.stringify(map, null, 2)}</pre>
-			<Outlet />
+			{canEditMap ? (
+				<Button asChild>
+					<Link to={`/map/${mapName}/edit`}>Edit Map</Link>
+				</Button>
+			) : null}
 		</div>
 	)
 }
