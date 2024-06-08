@@ -6,9 +6,11 @@ import { prisma } from '#app/utils/db.server.ts'
 import { userHasPermission } from '#app/utils/permissions.ts'
 import { useOptionalUser } from '#app/utils/user.ts'
 import { Button } from '#app/components/ui/button.tsx'
+import { MapNav } from '#app/components/map-nav.tsx'
+import { Map } from '#app/components/map.tsx'
 
-import { grenadeTypes } from '#types/grenades-types.ts'
-import { teams } from '#types/teams.ts'
+import { grenadeLabels, grenadeTypes } from '#types/grenades-types.ts'
+import { teamLabels, teams } from '#types/teams.ts'
 
 export async function loader({ params }: LoaderFunctionArgs) {
 	let { mapName, team, grenadeType } = params
@@ -64,17 +66,40 @@ export async function loader({ params }: LoaderFunctionArgs) {
 
 	invariantResponse(map, 'Not Found', { status: 404 })
 
-	return json({ mapName, map })
+	return json({ mapName, team, grenadeType, map })
 }
 
 export default function MapLayout() {
-	const { mapName, map } = useLoaderData<typeof loader>()
+	const { mapName, team, grenadeType, map } = useLoaderData<typeof loader>()
 	const user = useOptionalUser()
 	const canEditMap = userHasPermission(user, 'update:map')
 	return (
-		<div>
+		<div className="grid gap-6 place-items-center">
 			<h1>{map.label}</h1>
-			<pre>{JSON.stringify(map, null, 2)}</pre>
+			<div className="flex gap-6">
+				<MapNav
+					label="Team"
+					items={teams.map(t => ({
+						value: t,
+						to: `/map/${mapName}/${t}/${grenadeType}`,
+						label: teamLabels[t],
+						img: `/img/teams/${t}.png`,
+					}))}
+					currentValue={team}
+				/>
+				<MapNav
+					label="Grenade"
+					items={grenadeTypes.map(g => ({
+						value: g,
+						to: `/map/${mapName}/${team}/${g}`,
+						label: grenadeLabels[g],
+						img: `/img/grenades/${g}.png`,
+					}))}
+					currentValue={grenadeType}
+				/>
+			</div>
+
+			<Map imageId={map.radar?.id} />
 			{canEditMap ? (
 				<Button asChild>
 					<Link to={`/map/${mapName}/edit`}>Edit Map</Link>
