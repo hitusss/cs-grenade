@@ -14,6 +14,7 @@ import {
 	useLoaderData,
 } from '@remix-run/react'
 import { withSentry } from '@sentry/remix'
+import openLayersSheetUrl from 'ol/ol.css?url'
 import { HoneypotProvider } from 'remix-utils/honeypot/react'
 
 import { GeneralErrorBoundary } from './components/error-boundary.tsx'
@@ -57,6 +58,7 @@ export const links: LinksFunction = () => {
 		//These should match the css preloads above to avoid css as render blocking resource
 		{ rel: 'icon', type: 'image/svg+xml', href: '/favicons/favicon.svg' },
 		{ rel: 'stylesheet', href: tailwindStyleSheetUrl },
+		{ rel: 'stylesheet', href: openLayersSheetUrl },
 	].filter(Boolean)
 }
 
