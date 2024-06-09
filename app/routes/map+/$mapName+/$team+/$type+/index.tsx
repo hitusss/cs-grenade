@@ -7,7 +7,7 @@ import { Button } from '#app/components/ui/button.tsx'
 export default function MapPage() {
 	const user = useOptionalUser()
 	const hasPermission = userHasPermission(user, 'create:destination')
-	console.log(user, hasPermission)
+
 	return (
 		<>
 			{user ? (

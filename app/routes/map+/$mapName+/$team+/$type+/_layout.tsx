@@ -13,7 +13,7 @@ import { grenadeLabels, grenadeTypes } from '#types/grenades-types.ts'
 import { teamLabels, teams } from '#types/teams.ts'
 
 export async function loader({ params }: LoaderFunctionArgs) {
-	let { mapName, team, grenadeType } = params
+	let { mapName, team, type } = params
 
 	let shouldRedirect = false
 	if (!team || teams.includes(team) === false) {
@@ -21,13 +21,13 @@ export async function loader({ params }: LoaderFunctionArgs) {
 		team = teams[0]
 	}
 
-	if (!grenadeType || grenadeTypes.includes(grenadeType) === false) {
+	if (!type || grenadeTypes.includes(type) === false) {
 		shouldRedirect = true
-		grenadeType = grenadeTypes[0]
+		type = grenadeTypes[0]
 	}
 
 	if (shouldRedirect) {
-		return redirect(`/map/${mapName}/${team}/${grenadeType}`)
+		return redirect(`/map/${mapName}/${team}/${type}`)
 	}
 
 	const map = await prisma.map.findUnique({
@@ -39,7 +39,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
 			radar: { select: { id: true } },
 			destinations: {
 				where: {
-					type: grenadeType,
+					type,
 					team,
 					verified: true,
 				},
@@ -66,11 +66,11 @@ export async function loader({ params }: LoaderFunctionArgs) {
 
 	invariantResponse(map, 'Not Found', { status: 404 })
 
-	return json({ mapName, team, grenadeType, map })
+	return json({ mapName, team, type, map })
 }
 
 export default function MapLayout() {
-	const { mapName, team, grenadeType, map } = useLoaderData<typeof loader>()
+	const { mapName, team, type, map } = useLoaderData<typeof loader>()
 	const user = useOptionalUser()
 	const canEditMap = userHasPermission(user, 'update:map')
 	return (
@@ -82,7 +82,7 @@ export default function MapLayout() {
 						label="Team"
 						items={teams.map(t => ({
 							value: t,
-							to: `/map/${mapName}/${t}/${grenadeType}`,
+							to: `/map/${mapName}/${t}/${type}`,
 							label: teamLabels[t],
 							img: `/img/teams/${t}.png`,
 						}))}
@@ -96,7 +96,7 @@ export default function MapLayout() {
 							label: grenadeLabels[g],
 							img: `/img/grenades/${g}.png`,
 						}))}
-						currentValue={grenadeType}
+						currentValue={type}
 					/>
 
 					{canEditMap ? (
