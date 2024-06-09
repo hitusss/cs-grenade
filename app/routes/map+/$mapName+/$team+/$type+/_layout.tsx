@@ -13,22 +13,11 @@ import { grenadeLabels, grenadeTypes } from '#types/grenades-types.ts'
 import { teamLabels, teams } from '#types/teams.ts'
 
 export async function loader({ params }: LoaderFunctionArgs) {
-	let { mapName, team, type } = params
+	const { mapName, team, type } = params
 
-	let shouldRedirect = false
-	if (!team || teams.includes(team) === false) {
-		shouldRedirect = true
-		team = teams[0]
-	}
-
-	if (!type || grenadeTypes.includes(type) === false) {
-		shouldRedirect = true
-		type = grenadeTypes[0]
-	}
-
-	if (shouldRedirect) {
-		return redirect(`/map/${mapName}/${team}/${type}`)
-	}
+	invariantResponse(mapName, 'Map name is required')
+	invariantResponse(team, 'Team is required')
+	invariantResponse(type, 'Grenade type is required')
 
 	const map = await prisma.map.findUnique({
 		where: {
