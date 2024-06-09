@@ -6,6 +6,7 @@ import {
 } from '@remix-run/node'
 import { useActionData } from '@remix-run/react'
 import { parseWithZod } from '@conform-to/zod'
+import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { z } from 'zod'
 
 import { prisma } from '#app/utils/db.server.ts'
@@ -15,6 +16,10 @@ import { requireUserWithPermission } from '#app/utils/permissions.server.ts'
 import { redirectWithToast } from '#app/utils/toast.server.ts'
 import { MAX_SIZE, NewMapSchema } from '#app/utils/validators/map.ts'
 import { MapForm } from '#app/components/map-form.tsx'
+
+export const handle: SEOHandle = {
+	getSitemapEntries: () => null,
+}
 
 export async function action({ request }: ActionFunctionArgs) {
 	const userId = await requireUserWithPermission(request, 'create:map')
