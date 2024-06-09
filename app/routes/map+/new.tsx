@@ -3,6 +3,7 @@ import {
 	unstable_createMemoryUploadHandler,
 	unstable_parseMultipartFormData,
 	type ActionFunctionArgs,
+	type LoaderFunctionArgs,
 } from '@remix-run/node'
 import { useActionData } from '@remix-run/react'
 import { parseWithZod } from '@conform-to/zod'
@@ -19,6 +20,11 @@ import { MapForm } from '#app/components/map-form.tsx'
 
 export const handle: SEOHandle = {
 	getSitemapEntries: () => null,
+}
+
+export async function loader({ request }: LoaderFunctionArgs) {
+	await requireUserWithPermission(request, 'create:map')
+	return json({})
 }
 
 export async function action({ request }: ActionFunctionArgs) {
