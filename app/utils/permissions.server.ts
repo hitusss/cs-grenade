@@ -6,11 +6,11 @@ import { requireUserId } from './auth.server.ts'
 import { prisma } from './db.server.ts'
 import { parsePermissionString } from './permissions.ts'
 
-export function throwUnauthorized({
+export function unauthorized({
 	message,
 	...rest
 }: { message: string } & Record<string, unknown>) {
-	throw json(
+	return json(
 		{
 			error: 'Unauthorized',
 			message,
@@ -18,6 +18,24 @@ export function throwUnauthorized({
 		},
 		{ status: 403 },
 	)
+}
+
+export async function getUserPermissions(userId: string) {
+	const user = await prisma.user.findUniqueOrThrow({
+		where: { id: userId },
+		select: {
+			roles: {
+				select: {
+					name: true,
+					permissions: {
+						select: { entity: true, action: true, access: true },
+					},
+				},
+			},
+		},
+	})
+
+	return user
 }
 
 export async function requireUserWithPermission(
@@ -45,7 +63,7 @@ export async function requireUserWithPermission(
 		},
 	})
 	if (!user) {
-		return throwUnauthorized({
+		throw unauthorized({
 			message: `Unauthorized: required permissions: ${permission}`,
 			requiredPermission: permissionData,
 		})
@@ -60,7 +78,7 @@ export async function requireUserWithRole(request: Request, name: string) {
 		where: { id: userId, roles: { some: { name } } },
 	})
 	if (!user) {
-		return throwUnauthorized({
+		throw unauthorized({
 			message: `Unauthorized: required role: ${name}`,
 			requiredRole: name,
 		})
