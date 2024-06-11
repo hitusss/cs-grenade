@@ -26,30 +26,6 @@ export async function loader({ params }: LoaderFunctionArgs) {
 		select: {
 			label: true,
 			radar: { select: { id: true } },
-			destinations: {
-				where: {
-					type,
-					team,
-					verified: true,
-				},
-				select: {
-					id: true,
-					x: true,
-					y: true,
-					name: true,
-					grenades: {
-						where: {
-							verified: true,
-						},
-						select: {
-							id: true,
-							name: true,
-							x: true,
-							y: true,
-						},
-					},
-				},
-			},
 		},
 	})
 
