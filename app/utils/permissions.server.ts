@@ -1,6 +1,6 @@
 import { json } from '@remix-run/node'
 
-import { type PermissionString } from '#types/permissions.js'
+import { type PermissionString } from '#types/permissions.ts'
 
 import { requireUserId } from './auth.server.ts'
 import { prisma } from './db.server.ts'
