@@ -24,7 +24,7 @@ export async function updateDestination({
 	const userPermissions = await getUserPermissions(userId)
 	const hasPermission = userHasPermission(
 		userPermissions,
-		isOwn ? 'update:destination' : 'delete:destination:any',
+		isOwn ? 'update:destination' : 'update:destination:any',
 	)
 
 	if (!isOwn && !hasPermission) {
