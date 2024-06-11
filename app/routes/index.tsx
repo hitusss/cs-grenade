@@ -8,8 +8,9 @@ import { type loader as rootLoader } from '#app/root.tsx'
 
 export default function Index() {
 	const data = useRouteLoaderData<typeof rootLoader>('root')
+
 	const user = useOptionalUser()
-	const hasPermission = userHasPermission(user, 'create:map')
+	const hasCreateMapPermission = userHasPermission(user, 'create:map')
 
 	const activeMaps =
 		data?.maps
@@ -36,7 +37,7 @@ export default function Index() {
 		<div className="container">
 			<div className="flex justify-between items-center">
 				<h1>Maps</h1>
-				{hasPermission ? (
+				{hasCreateMapPermission ? (
 					<Button asChild>
 						<Link to="/map/new">Create map</Link>
 					</Button>

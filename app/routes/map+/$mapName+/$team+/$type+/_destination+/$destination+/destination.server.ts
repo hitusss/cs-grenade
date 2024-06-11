@@ -22,18 +22,18 @@ export async function updateDestination({
 	y: string
 }) {
 	const userPermissions = await getUserPermissions(userId)
-	const hasPermission = userHasPermission(
+	const hasUpdateDestinationPermission = userHasPermission(
 		userPermissions,
 		isOwn ? 'update:destination' : 'update:destination:any',
 	)
 
-	if (!isOwn && !hasPermission) {
+	if (!isOwn && !hasUpdateDestinationPermission) {
 		throw unauthorized({
 			message: 'You do not have permission to edit this destination',
 		})
 	}
 
-	if (hasPermission) {
+	if (hasUpdateDestinationPermission) {
 		await prisma.destination.update({
 			where: { id },
 			data: {
@@ -55,7 +55,7 @@ export async function updateDestination({
 	}
 
 	return await redirectWithToast(`..`, {
-		title: `Destination ${hasPermission ? 'updated' : 'changes requested'}`,
+		title: `Destination ${hasUpdateDestinationPermission ? 'updated' : 'changes requested'}`,
 		description: ``,
 		type: 'success',
 	})
@@ -71,12 +71,12 @@ export async function deleteDestination({
 	id: string
 }) {
 	const userPermissions = await getUserPermissions(userId)
-	const hasPermission = userHasPermission(
+	const hasDeleteDestinationPermission = userHasPermission(
 		userPermissions,
 		isOwn ? 'delete:destination' : 'delete:destination:any',
 	)
 
-	if (!hasPermission) {
+	if (!hasDeleteDestinationPermission) {
 		throw unauthorized({
 			message: 'You do not have permission to delete this destination',
 		})

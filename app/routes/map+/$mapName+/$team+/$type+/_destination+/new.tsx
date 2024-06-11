@@ -27,7 +27,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export async function action({ request, params }: ActionFunctionArgs) {
 	const userId = await requireUserId(request)
 	const userPermissions = await getUserPermissions(userId)
-	const hasPermission = userHasPermission(userPermissions, 'create:destination')
+	const hasCreateDestinationPermission = userHasPermission(
+		userPermissions,
+		'create:destination',
+	)
 
 	const { mapName, team, type } = params
 
@@ -55,7 +58,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
 	await prisma.destination.create({
 		data: {
-			verified: hasPermission,
+			verified: hasCreateDestinationPermission,
 			x,
 			y,
 			name,
@@ -67,7 +70,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	})
 
 	return await redirectWithToast(`..`, {
-		title: `Destination ${hasPermission ? 'created' : 'requested'}`,
+		title: `Destination ${hasCreateDestinationPermission ? 'created' : 'requested'}`,
 		description: ``,
 		type: 'success',
 	})
@@ -77,14 +80,21 @@ export default function NewDestinationPage() {
 	const actionData = useActionData<typeof action>()
 
 	const user = useUser()
-	const hasPermission = userHasPermission(user, 'create:destination')
+	const hasCreateDestinationPermission = userHasPermission(
+		user,
+		'create:destination',
+	)
 
 	return (
 		<>
 			<MapBackButton />
 			<MapTitle>Select location to add destination</MapTitle>
 			<DestinationForm
-				title={hasPermission ? 'Create Destination' : 'Request Destination'}
+				title={
+					hasCreateDestinationPermission
+						? 'Create Destination'
+						: 'Request Destination'
+				}
 				type="new"
 				result={actionData?.result}
 			>
@@ -94,7 +104,9 @@ export default function NewDestinationPage() {
 				<Button variant="destructive" type="button" asChild>
 					<Link to="..">Cancel</Link>
 				</Button>
-				<Button type="submit">{hasPermission ? 'Create' : 'Request'}</Button>
+				<Button type="submit">
+					{hasCreateDestinationPermission ? 'Create' : 'Request'}
+				</Button>
 			</DestinationForm>
 		</>
 	)

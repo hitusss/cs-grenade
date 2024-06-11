@@ -141,8 +141,11 @@ export default function EditDestinationPage() {
 
 	const user = useUser()
 	const isUserDestination = loaderData.destination.userId === user.id
-	const hasUpdatePermissions = userHasPermission(user, 'update:destination')
-	const hasDeletePermissions = userHasPermission(
+	const hasUpdateDestinationPermission = userHasPermission(
+		user,
+		'update:destination',
+	)
+	const hasDeleteDestinationPermission = userHasPermission(
 		user,
 		isUserDestination ? 'delete:destination' : 'delete:destination:any',
 	)
@@ -168,7 +171,7 @@ export default function EditDestinationPage() {
 				<Button variant="destructive" type="button" asChild>
 					<Link to="..">Back</Link>
 				</Button>
-				{hasDeletePermissions ? (
+				{hasDeleteDestinationPermission ? (
 					<Button
 						variant="destructive"
 						{...deleteDC.getButtonProps({
@@ -185,7 +188,7 @@ export default function EditDestinationPage() {
 					</Button>
 				) : null}
 				<Button type="submit" name="intent" value="update">
-					{hasUpdatePermissions ? 'Update' : 'Request changes'}
+					{hasUpdateDestinationPermission ? 'Update' : 'Request changes'}
 				</Button>
 			</DestinationForm>
 		</>

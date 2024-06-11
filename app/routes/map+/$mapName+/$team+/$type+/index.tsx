@@ -44,14 +44,18 @@ export default function MapPage() {
 	const loaderData = useLoaderData<typeof loader>()
 
 	const user = useOptionalUser()
-	const hasPermission = userHasPermission(user, 'create:destination')
+	const hasCreateDestinationPermission = userHasPermission(
+		user,
+		'create:destination',
+	)
 
 	return (
 		<>
 			{user ? (
 				<Button className="absolute bottom-0 right-0 z-10" asChild>
 					<Link to="new">
-						{hasPermission ? 'Create' : 'Request'} new destination
+						{hasCreateDestinationPermission ? 'Create' : 'Request'} new
+						destination
 					</Link>
 				</Button>
 			) : null}
