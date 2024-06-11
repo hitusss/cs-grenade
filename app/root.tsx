@@ -198,7 +198,14 @@ function Document({
 						__html: `window.ENV = ${JSON.stringify(env)}`,
 					}}
 				/>
-				<ScrollRestoration nonce={nonce} />
+				<ScrollRestoration
+					nonce={nonce}
+					getKey={location => {
+						if (location.pathname.startsWith('/users')) return '/users'
+						if (location.pathname.startsWith('/map')) return '/map'
+						return location.key
+					}}
+				/>
 				<Scripts nonce={nonce} />
 			</body>
 		</html>
