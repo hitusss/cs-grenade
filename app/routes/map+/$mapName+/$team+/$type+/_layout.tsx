@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import { json, type LoaderFunctionArgs } from '@remix-run/node'
 import { Link, Outlet, useLoaderData } from '@remix-run/react'
 import { invariantResponse } from '@epic-web/invariant'
@@ -36,10 +37,21 @@ export async function loader({ params }: LoaderFunctionArgs) {
 
 export default function MapLayout() {
 	const { mapName, team, type, map } = useLoaderData<typeof loader>()
+	const containerRef = useRef<HTMLDivElement>(null)
+
 	const user = useOptionalUser()
 	const canEditMap = userHasPermission(user, 'update:map')
+
+	useEffect(() => {
+		if (!containerRef.current) return
+		containerRef.current.scrollIntoView()
+	}, [])
+
 	return (
-		<div className="grid animate-in fade-in zoom-in duration-500 place-items-center">
+		<div
+			ref={containerRef}
+			className="grid animate-in fade-in zoom-in duration-500 place-items-center"
+		>
 			<div className="grid gap-6">
 				<h1>{map.label}</h1>
 				<div className="flex gap-6 flex-wrap w-full items-center justify-start">
