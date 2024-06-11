@@ -1,10 +1,15 @@
 import { createContext, useContext, useEffect, useRef, useState } from 'react'
+import { Link } from '@remix-run/react'
 import { TooltipProvider } from '@radix-ui/react-tooltip'
 import { Map as OlMap, View } from 'ol'
 import { getCenter } from 'ol/extent'
 import ImageLayer from 'ol/layer/Image'
 import Projection from 'ol/proj/Projection'
 import Static from 'ol/source/ImageStatic'
+
+import { Button } from './ui/button.tsx'
+import { Icon } from './ui/icon.tsx'
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip.tsx'
 
 type MapContextType = {
 	map: OlMap | undefined
@@ -94,4 +99,28 @@ export function useMap() {
 	if (!context)
 		throw new Error('useMap must be used within a MapContext.Provider')
 	return context
+}
+
+export function MapBackButton({ to = '..' }: { to?: string }) {
+	return (
+		<Tooltip>
+			<TooltipTrigger asChild>
+				<Button size="icon" className="absolute z-10 bottom-0 left-0" asChild>
+					<Link to={to}>
+						<Icon name="chevron-left" />
+						<span className="sr-only">Back</span>
+					</Link>
+				</Button>
+			</TooltipTrigger>
+			<TooltipContent>Back</TooltipContent>
+		</Tooltip>
+	)
+}
+
+export function MapTitle({ children }: { children: React.ReactNode }) {
+	return (
+		<div className="absolute z-10 bg-primary text-primary-foreground top-0 left-1/2 -translate-x-1/2 px-4 py-2">
+			<h2 className="text-h5 text-center">{children}</h2>
+		</div>
+	)
 }
