@@ -248,6 +248,9 @@ model DestinationChanges {
 
   name String
 
+  x String
+  y String
+
   destination Destination @relation(fields: [destinationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   destinationId String
@@ -297,6 +300,9 @@ model GrenadeChanges {
 
   name        String
   description String?
+
+  x String
+  y String
 
   grenadeImageChanges GrenadeImageChanges[]
 
