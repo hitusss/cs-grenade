@@ -15,7 +15,7 @@ import { checkHoneypot } from '#app/utils/honeypot.server.ts'
 import { toSlug } from '#app/utils/misc.tsx'
 import { requireUserWithPermission } from '#app/utils/permissions.server.ts'
 import { redirectWithToast } from '#app/utils/toast.server.ts'
-import { MAX_SIZE, NewMapSchema } from '#app/utils/validators/map.ts'
+import { MapSchema, MAX_SIZE } from '#app/utils/validators/map.ts'
 import { MapForm } from '#app/components/map-form.tsx'
 
 export const handle: SEOHandle = {
@@ -37,7 +37,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	checkHoneypot(formData)
 
 	const submission = await parseWithZod(formData, {
-		schema: NewMapSchema.transform(async data => {
+		schema: MapSchema.transform(async data => {
 			if (data.image.size <= 0) return z.NEVER
 			if (data.logo.size <= 0) return z.NEVER
 			if (data.radar.size <= 0) return z.NEVER

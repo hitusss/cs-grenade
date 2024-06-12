@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 export const MAX_SIZE = 1024 * 1024 * 2 // 2MB
 
-export const NewMapSchema = z.object({
+export const MapSchema = z.object({
 	label: z
 		.string({
 			invalid_type_error: 'Label should be a string',
@@ -39,7 +39,7 @@ export const NewMapSchema = z.object({
 		.refine(file => file.size <= MAX_SIZE, 'Radar size must be less than 2MB'),
 })
 
-export const EditMapSchema = NewMapSchema.partial({
+export const EditMapSchema = MapSchema.partial({
 	image: true,
 	logo: true,
 	radar: true,

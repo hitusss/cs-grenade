@@ -9,7 +9,10 @@ import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
 
 import { useIsPending } from '#app/utils/misc.tsx'
-import { EditMapSchema, NewMapSchema } from '#app/utils/validators/map.ts'
+import {
+	EditMapSchema,
+	MapSchema as NewMapSchema,
+} from '#app/utils/validators/map.ts'
 
 import { ErrorList, Field, ImageField } from './forms.tsx'
 import { Button } from './ui/button.tsx'
