@@ -1,7 +1,6 @@
 import { z } from 'zod'
 
 export const DestinationSchema = z.object({
-	intent: z.enum(['create', 'update']),
 	x: z.string({
 		invalid_type_error: 'Position should be a string',
 		required_error: 'Position X is Required',
