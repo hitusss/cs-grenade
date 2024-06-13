@@ -44,11 +44,11 @@ export default function DestinationPage() {
 	const loaderData = useLoaderData<typeof loader>()
 
 	const user = useOptionalUser()
-	const hasEditDestinationOwnPermission = userHasPermission(
+	const hasUpdateDestinationOwnPermission = userHasPermission(
 		user,
 		'update:destination:own',
 	)
-	const hasEditDestinationAnyPermission = userHasPermission(
+	const hasUpdateDestinationAnyPermission = userHasPermission(
 		user,
 		'update:destination:any',
 	)
@@ -57,8 +57,8 @@ export default function DestinationPage() {
 
 	const isUserDestination = loaderData.destination.userId === user?.id
 	const canEdit =
-		hasEditDestinationAnyPermission ||
-		(isUserDestination && hasEditDestinationOwnPermission)
+		hasUpdateDestinationAnyPermission ||
+		(isUserDestination && hasUpdateDestinationOwnPermission)
 
 	return (
 		<>

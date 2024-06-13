@@ -40,7 +40,7 @@ export default function MapLayout() {
 	const containerRef = useRef<HTMLDivElement>(null)
 
 	const user = useOptionalUser()
-	const hasEditMapPermission = userHasPermission(user, 'update:map')
+	const hasUpdateMapPermission = userHasPermission(user, 'update:map')
 
 	useEffect(() => {
 		if (!containerRef.current) return
@@ -76,7 +76,7 @@ export default function MapLayout() {
 						currentValue={type}
 					/>
 
-					{hasEditMapPermission ? (
+					{hasUpdateMapPermission ? (
 						<Button asChild className="ml-auto self-end">
 							<Link to={`/map/${mapName}/edit`}>Edit Map</Link>
 						</Button>
