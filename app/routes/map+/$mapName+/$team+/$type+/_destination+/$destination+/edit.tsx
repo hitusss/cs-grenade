@@ -156,7 +156,11 @@ export default function EditDestinationPage() {
 		<>
 			<MapBackButton />
 			<DestinationForm
-				title={''}
+				title={
+					hasUpdateDestinationPermission
+						? 'Edit Destination'
+						: 'Request Destination Changes'
+				}
 				type="edit"
 				defaultValue={{
 					name: loaderData.destination.name,
