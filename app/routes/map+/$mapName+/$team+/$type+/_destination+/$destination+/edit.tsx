@@ -53,7 +53,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 		},
 	})
 
-	invariantResponse(destination, 'Destination not found')
+	invariantResponse(destination, 'Not found', { status: 404 })
 
 	if (
 		destination.userId !== userId &&
