@@ -81,12 +81,12 @@ export function GrenadeForm({
 				? {
 						images: [
 							{
-								id: undefined,
+								image: undefined,
 								description: undefined,
 							},
 						],
 					}
-				: defaultValue,
+				: { ...defaultValue },
 		onValidate({ formData }) {
 			return parseWithZod(formData, { schema: GrenadeSchema })
 		},
@@ -230,7 +230,7 @@ export function GrenadeForm({
 												/>
 												<ImageField
 													labelProps={{ children: 'Image' }}
-													inputProps={getInputProps(imageFields.id, {
+													inputProps={getInputProps(imageFields.image, {
 														type: 'file',
 													})}
 													errors={imageFields.id.errors}
