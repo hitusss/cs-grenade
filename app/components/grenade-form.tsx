@@ -49,10 +49,8 @@ type GrenadeFormProps = {
 				x: string
 				y: string
 				images: {
-					type?: string
 					id: string
 					description: string | null
-					order: string
 				}[]
 			}
 	  }
@@ -214,7 +212,7 @@ export function GrenadeForm({
 													{...getInputProps(imageFields.type, {
 														type: 'hidden',
 													})}
-													value={imageFields.type.initialValue ?? 'new'}
+													value={imageFields.id.initialValue ? 'edit' : 'new'}
 													readOnly
 												/>
 												<input
