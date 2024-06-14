@@ -38,7 +38,7 @@ type GrenadeType = {
 	)[]
 }
 
-export async function editGrenade({
+export async function updateGrenade({
 	userId,
 	isOwn,
 	id,
@@ -64,7 +64,7 @@ export async function editGrenade({
 	}
 
 	if (hasUpdateGrenadePermission) {
-		return await updateGrenade({
+		return await editGrenade({
 			id,
 			name,
 			description,
@@ -85,7 +85,7 @@ export async function editGrenade({
 	}
 }
 
-async function updateGrenade({
+async function editGrenade({
 	id,
 	name,
 	description,

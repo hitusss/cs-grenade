@@ -29,8 +29,8 @@ import { useUser } from '#app/utils/user.ts'
 import {
 	CancelEditGrenadeRequestSchema,
 	DeleteGrenadeSchema,
-	EditGrenadeSchema,
 	MAX_SIZE,
+	UpdateGrenadeSchema,
 } from '#app/utils/validators/grenade.ts'
 import { Button } from '#app/components/ui/button.tsx'
 import {
@@ -46,11 +46,11 @@ import { MapBackButton } from '#app/components/map.tsx'
 import {
 	cancelEditGrenadeRequest,
 	deleteGrenade,
-	editGrenade,
+	updateGrenade,
 } from './grenade.server.ts'
 
 const GrenadeSchema = z.discriminatedUnion('intent', [
-	EditGrenadeSchema,
+	UpdateGrenadeSchema,
 	DeleteGrenadeSchema,
 	CancelEditGrenadeRequestSchema,
 ])
@@ -131,7 +131,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 			if (data.intent === 'delete') return data
 			if (data.intent === 'cancel-edit-request') return data
 			return {
-				intent: 'edit',
+				intent: 'update',
 				x: data.x,
 				y: data.y,
 				description: data.description,
@@ -178,9 +178,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	const isOwn = grenade.userId === userId
 
 	switch (submission.value.intent) {
-		case 'edit': {
+		case 'update': {
 			const { name, description, x, y, images } = submission.value
-			return editGrenade({
+			return updateGrenade({
 				userId,
 				isOwn,
 				id: grenadeId,

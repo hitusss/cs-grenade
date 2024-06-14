@@ -78,8 +78,8 @@ export const GrenadeSchema = z.object({
 		.min(1, 'Grenade should contains at least 1 image'),
 })
 
-export const EditGrenadeSchema = GrenadeSchema.merge(
-	z.object({ intent: z.literal('edit') }),
+export const UpdateGrenadeSchema = GrenadeSchema.merge(
+	z.object({ intent: z.literal('update') }),
 )
 
 export const DeleteGrenadeSchema = z.object({
