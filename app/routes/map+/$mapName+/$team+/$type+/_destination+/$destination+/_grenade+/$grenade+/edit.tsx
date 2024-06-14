@@ -298,10 +298,8 @@ export default function EditGrenadePage() {
 					x: loaderData.grenade.x,
 					y: loaderData.grenade.y,
 					images: loaderData.grenade.images.map(i => ({
-						type: 'edit',
 						id: i.id,
 						description: i.description,
-						order: i.order,
 					})),
 				}}
 				result={actionData?.result}
