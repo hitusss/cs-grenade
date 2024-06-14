@@ -7,6 +7,7 @@ import { userHasPermission } from '#app/utils/permissions.ts'
 import { useOptionalUser } from '#app/utils/user.ts'
 import { Button } from '#app/components/ui/button.tsx'
 import { DestinationMarker } from '#app/components/destination-marker.tsx'
+import { GrenadeMarker } from '#app/components/grenade-marker.tsx'
 import { MapBackButton, MapTitle } from '#app/components/map.tsx'
 
 export async function loader({ params }: LoaderFunctionArgs) {
@@ -81,6 +82,21 @@ export default function DestinationPage() {
 				highlight
 				disabled
 			/>
+			{loaderData.destination.grenades.map(g => (
+				<GrenadeMarker
+					key={g.id}
+					to={g.id}
+					destination={{
+						x: loaderData.destination.x,
+						y: loaderData.destination.y,
+					}}
+					coords={{
+						x: g.x,
+						y: g.y,
+					}}
+					name={g.name}
+				/>
+			))}
 		</>
 	)
 }
