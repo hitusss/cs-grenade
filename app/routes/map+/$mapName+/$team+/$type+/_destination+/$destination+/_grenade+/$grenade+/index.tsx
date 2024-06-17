@@ -63,7 +63,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 	return json({ grenade })
 }
 export default function GrenadeRoute() {
-	const loaderData = useLoaderData<typeof loader>()
+	const data = useLoaderData<typeof loader>()
 	const navigate = useNavigate()
 
 	const { activeLightbox, openLightbox } = useLightbox()
@@ -78,12 +78,12 @@ export default function GrenadeRoute() {
 		'update:grenade:any',
 	)
 
-	const isUserGrenade = user?.id === loaderData.grenade.userId
+	const isUserGrenade = user?.id === data.grenade.userId
 	const canEdit =
 		hasUpdateGrenadeAnyPermission ||
 		(isUserGrenade && hasUpdateGrenadeOwnPermission)
 
-	const grenadeImages = loaderData.grenade.images.map(image => ({
+	const grenadeImages = data.grenade.images.map(image => ({
 		src: `/resources/grenade-images/${image.id}`,
 		alt: image.description ?? undefined,
 		caption: image.description ?? undefined,
@@ -92,10 +92,10 @@ export default function GrenadeRoute() {
 	return (
 		<Dialog open onOpenChange={() => !activeLightbox && navigate(-1)}>
 			<DialogContent className="max-w-5xl max-h-[90vh] overflow-auto">
-				<DialogHeader>{loaderData.grenade.name}</DialogHeader>
-				<p>{loaderData.grenade.description}</p>
+				<DialogHeader>{data.grenade.name}</DialogHeader>
+				<p>{data.grenade.description}</p>
 				<ul className="flex flex-wrap gap-4">
-					{loaderData.grenade.images.map((image, index) => (
+					{data.grenade.images.map((image, index) => (
 						<li key={image.id} className="w-48 md:w-64 space-y-1">
 							<img
 								src={`/resources/grenade-images/${image.id}`}

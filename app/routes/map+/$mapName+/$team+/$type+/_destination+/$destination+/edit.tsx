@@ -144,11 +144,11 @@ export async function action({ request, params }: ActionFunctionArgs) {
 }
 
 export default function EditDestinationRoute() {
-	const loaderData = useLoaderData<typeof loader>()
+	const data = useLoaderData<typeof loader>()
 	const actionData = useActionData<typeof action>()
 
 	const user = useUser()
-	const isUserDestination = loaderData.destination.userId === user.id
+	const isUserDestination = data.destination.userId === user.id
 	const hasUpdateDestinationPermission = userHasPermission(
 		user,
 		'update:destination',
@@ -171,9 +171,9 @@ export default function EditDestinationRoute() {
 				}
 				type="edit"
 				defaultValue={{
-					name: loaderData.destination.name,
-					x: loaderData.destination.x,
-					y: loaderData.destination.y,
+					name: data.destination.name,
+					x: data.destination.x,
+					y: data.destination.y,
 				}}
 				result={actionData?.result}
 			>

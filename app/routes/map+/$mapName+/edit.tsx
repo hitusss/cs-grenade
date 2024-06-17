@@ -155,7 +155,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 }
 
 export default function EditMapRoute() {
-	const loaderData = useLoaderData<typeof loader>()
+	const data = useLoaderData<typeof loader>()
 	const actionData = useActionData<typeof action>()
 
 	return (
@@ -164,10 +164,10 @@ export default function EditMapRoute() {
 			<MapForm
 				type="edit"
 				defaultValue={{
-					label: loaderData.map.label,
-					image: loaderData.map.image?.id,
-					logo: loaderData.map.logo?.id,
-					radar: loaderData.map.radar?.id,
+					label: data.map.label,
+					image: data.map.image?.id,
+					logo: data.map.logo?.id,
+					radar: data.map.radar?.id,
 				}}
 				result={actionData?.result}
 			/>

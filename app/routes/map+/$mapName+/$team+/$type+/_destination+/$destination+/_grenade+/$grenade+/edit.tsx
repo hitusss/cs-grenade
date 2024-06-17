@@ -229,12 +229,12 @@ export async function action({ request, params }: ActionFunctionArgs) {
 }
 
 export default function EditGrenadeRoute() {
-	const loaderData = useLoaderData<typeof loader>()
+	const data = useLoaderData<typeof loader>()
 	const actionData = useActionData<typeof action>()
 	const navigate = useNavigate()
 
 	const user = useUser()
-	const isUserDestination = loaderData.grenade.userId === user.id
+	const isUserDestination = data.grenade.userId === user.id
 	const hasUpdateDestinationPermission = userHasPermission(
 		user,
 		'update:destination',
@@ -246,7 +246,7 @@ export default function EditGrenadeRoute() {
 
 	const deleteDC = useDoubleCheck()
 
-	if (loaderData.grenade.grenadeChanges) {
+	if (data.grenade.grenadeChanges) {
 		return (
 			<Dialog open onOpenChange={() => navigate(-1)}>
 				<DialogContent>
@@ -302,11 +302,11 @@ export default function EditGrenadeRoute() {
 						: 'Request Grenade Changes'
 				}
 				defaultValue={{
-					name: loaderData.grenade.name,
-					description: loaderData.grenade.description,
-					x: loaderData.grenade.x,
-					y: loaderData.grenade.y,
-					images: loaderData.grenade.images.map(i => ({
+					name: data.grenade.name,
+					description: data.grenade.description,
+					x: data.grenade.x,
+					y: data.grenade.y,
+					images: data.grenade.images.map(i => ({
 						id: i.id,
 						description: i.description,
 					})),

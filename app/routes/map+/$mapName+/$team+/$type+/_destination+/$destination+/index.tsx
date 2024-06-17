@@ -34,7 +34,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
 }
 
 export default function DestinationRoute() {
-	const loaderData = useLoaderData<typeof loader>()
+	const data = useLoaderData<typeof loader>()
 
 	const user = useOptionalUser()
 	const hasUpdateDestinationOwnPermission = userHasPermission(
@@ -48,7 +48,7 @@ export default function DestinationRoute() {
 
 	const hasCreateGrenadePermission = userHasPermission(user, 'create:grenade')
 
-	const isUserDestination = loaderData.destination.userId === user?.id
+	const isUserDestination = data.destination.userId === user?.id
 	const canEdit =
 		hasUpdateDestinationAnyPermission ||
 		(isUserDestination && hasUpdateDestinationOwnPermission)

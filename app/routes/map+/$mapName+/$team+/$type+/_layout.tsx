@@ -135,7 +135,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
 }
 
 export default function MapLayout() {
-	const { mapName, team, type, map } = useLoaderData<typeof loader>()
+	const data = useLoaderData<typeof loader>()
 	const matches = useMatches()
 	const containerRef = useRef<HTMLDivElement>(null)
 
@@ -146,7 +146,7 @@ export default function MapLayout() {
 	if (!result.success) throw new Error(result.error.errors[0]?.message)
 	const mapHandle = result.data
 	const currentDestination = mapHandle?.currentDestination
-		? map.destinations.find(d => d.id === mapHandle.currentDestination)
+		? data.map.destinations.find(d => d.id === mapHandle.currentDestination)
 		: undefined
 
 	useEffect(() => {
@@ -160,37 +160,37 @@ export default function MapLayout() {
 			className="grid animate-in fade-in zoom-in duration-500 place-items-center"
 		>
 			<div className="grid gap-6">
-				<h1>{map.label}</h1>
+				<h1>{data.map.label}</h1>
 				<div className="flex gap-6 flex-wrap w-full items-center justify-start">
 					<MapNav
 						label="Team"
 						items={teams.map(t => ({
 							value: t,
-							to: `/map/${mapName}/${t}/${type}`,
+							to: `/map/${data.mapName}/${t}/${data.type}`,
 							label: teamLabels[t],
 							img: `/img/teams/${t}.png`,
 						}))}
-						currentValue={team}
+						currentValue={data.team}
 					/>
 					<MapNav
 						label="Grenade"
 						items={grenadeTypes.map(g => ({
 							value: g,
-							to: `/map/${mapName}/${team}/${g}`,
+							to: `/map/${data.mapName}/${data.team}/${g}`,
 							label: grenadeLabels[g],
 							img: `/img/grenades/${g}.png`,
 						}))}
-						currentValue={type}
+						currentValue={data.type}
 					/>
 
 					{hasUpdateMapPermission ? (
 						<Button asChild className="ml-auto self-end">
-							<Link to={`/map/${mapName}/edit`}>Edit Map</Link>
+							<Link to={`/map/${data.mapName}/edit`}>Edit Map</Link>
 						</Button>
 					) : null}
 				</div>
-				<Map imageId={map.radar?.id}>
-					{map.destinations
+				<Map imageId={data.map.radar?.id}>
+					{data.map.destinations
 						.filter(d =>
 							currentDestination
 								? mapHandle?.hideCurrentDestination
