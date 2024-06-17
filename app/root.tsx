@@ -20,6 +20,7 @@ import { HoneypotProvider } from 'remix-utils/honeypot/react'
 import { GeneralErrorBoundary } from './components/error-boundary.tsx'
 import { Footer } from './components/footer.tsx'
 import { Header } from './components/header.tsx'
+import { Lightbox, LightboxProvider } from './components/lightbox.tsx'
 import { EpicProgress } from './components/progress-bar.tsx'
 import { useToast } from './components/toaster.tsx'
 import { href as iconsHref } from './components/ui/icon.tsx'
@@ -238,6 +239,7 @@ function App() {
 			</div>
 			<Toaster closeButton position="top-center" theme={theme.mode} />
 			<EpicProgress />
+			<Lightbox />
 		</Document>
 	)
 }
@@ -246,7 +248,9 @@ function AppWithProviders() {
 	const data = useLoaderData<typeof loader>()
 	return (
 		<HoneypotProvider {...data.honeyProps}>
-			<App />
+			<LightboxProvider>
+				<App />
+			</LightboxProvider>
 		</HoneypotProvider>
 	)
 }
