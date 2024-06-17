@@ -143,7 +143,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	}
 }
 
-export default function EditDestinationPage() {
+export default function EditDestinationRoute() {
 	const loaderData = useLoaderData<typeof loader>()
 	const actionData = useActionData<typeof action>()
 

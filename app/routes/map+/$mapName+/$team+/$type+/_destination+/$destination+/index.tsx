@@ -33,7 +33,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
 	return json({ destination })
 }
 
-export default function DestinationPage() {
+export default function DestinationRoute() {
 	const loaderData = useLoaderData<typeof loader>()
 
 	const user = useOptionalUser()

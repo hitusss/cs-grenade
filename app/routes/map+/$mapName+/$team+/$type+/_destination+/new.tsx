@@ -84,7 +84,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	})
 }
 
-export default function NewDestinationPage() {
+export default function NewDestinationRoute() {
 	const actionData = useActionData<typeof action>()
 
 	const user = useUser()

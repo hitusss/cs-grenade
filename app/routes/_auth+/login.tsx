@@ -77,7 +77,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	})
 }
 
-export default function LoginPage() {
+export default function LoginRoute() {
 	const actionData = useActionData<typeof action>()
 	const isPending = useIsPending()
 	const [searchParams] = useSearchParams()

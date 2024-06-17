@@ -68,7 +68,7 @@ export const meta: MetaFunction = () => {
 	return [{ title: 'Reset Password | CS-Grenade' }]
 }
 
-export default function ResetPasswordPage() {
+export default function ResetPasswordRoute() {
 	const data = useLoaderData<typeof loader>()
 	const actionData = useActionData<typeof action>()
 	const isPending = useIsPending()

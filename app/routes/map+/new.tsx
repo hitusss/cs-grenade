@@ -94,7 +94,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	})
 }
 
-export default function NewMapPage() {
+export default function NewMapRoute() {
 	const actionData = useActionData<typeof action>()
 
 	return (

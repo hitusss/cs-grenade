@@ -62,7 +62,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 	return json({ grenade })
 }
-export default function GrenadePage() {
+export default function GrenadeRoute() {
 	const loaderData = useLoaderData<typeof loader>()
 	const navigate = useNavigate()
 

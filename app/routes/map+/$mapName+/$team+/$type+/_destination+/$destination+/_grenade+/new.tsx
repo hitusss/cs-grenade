@@ -133,7 +133,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	})
 }
 
-export default function NewGrenadePage() {
+export default function NewGrenadeRoute() {
 	const actionData = useActionData<typeof action>()
 
 	const user = useUser()

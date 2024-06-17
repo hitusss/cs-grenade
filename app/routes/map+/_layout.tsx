@@ -5,7 +5,7 @@ export const handle: SEOHandle = {
 	getSitemapEntries: () => null,
 }
 
-export default function MapLayout() {
+export default function MainMapLayout() {
 	return (
 		<div className="container py-12 min-h-full">
 			<Outlet />

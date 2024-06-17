@@ -4,7 +4,7 @@ import { userHasPermission } from '#app/utils/permissions.ts'
 import { useOptionalUser } from '#app/utils/user.ts'
 import { Button } from '#app/components/ui/button.tsx'
 
-export default function MapPage() {
+export default function MapRoute() {
 	const user = useOptionalUser()
 	const hasCreateDestinationPermission = userHasPermission(
 		user,

@@ -228,7 +228,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	}
 }
 
-export default function EditGrenadePage() {
+export default function EditGrenadeRoute() {
 	const loaderData = useLoaderData<typeof loader>()
 	const actionData = useActionData<typeof action>()
 	const navigate = useNavigate()
