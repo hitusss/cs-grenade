@@ -14,6 +14,14 @@ import {
 	DialogHeader,
 } from '#app/components/ui/dialog.tsx'
 
+import { type MapHandle } from '../../../../_layout.tsx'
+
+export const handle: MapHandle = {
+	map: {
+		currentDestination: true,
+	},
+}
+
 export async function loader({ request, params }: LoaderFunctionArgs) {
 	const { grenade: grenadeId } = params
 

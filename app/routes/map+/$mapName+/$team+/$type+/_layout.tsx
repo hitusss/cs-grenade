@@ -1,17 +1,100 @@
 import { useEffect, useRef } from 'react'
 import { json, type LoaderFunctionArgs } from '@remix-run/node'
-import { Link, Outlet, useLoaderData } from '@remix-run/react'
+import { Link, Outlet, useLoaderData, useMatches } from '@remix-run/react'
 import { invariantResponse } from '@epic-web/invariant'
+import { z } from 'zod'
 
 import { prisma } from '#app/utils/db.server.ts'
 import { userHasPermission } from '#app/utils/permissions.ts'
 import { useOptionalUser } from '#app/utils/user.ts'
 import { Button } from '#app/components/ui/button.tsx'
+import { DestinationMarker } from '#app/components/destination-marker.js'
+import { GrenadeMarker } from '#app/components/grenade-marker.js'
 import { MapNav } from '#app/components/map-nav.tsx'
 import { Map } from '#app/components/map.tsx'
 
 import { grenadeLabels, grenadeTypes } from '#types/grenades-types.ts'
 import { teamLabels, teams } from '#types/teams.ts'
+
+export const MapHandle = z
+	.object({
+		map: z.object({
+			currentDestination: z.boolean().optional(),
+			hideCurrentDestination: z.boolean().optional(),
+			disableAllDestinations: z.boolean().optional(),
+			currentGrenade: z.boolean().optional(),
+			hideCurrentGrenade: z.boolean().optional(),
+			disableAllGrenades: z.boolean().optional(),
+		}),
+	})
+	.superRefine(({ map }, ctx) => {
+		if (map.hideCurrentDestination && !map.currentDestination) {
+			ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				message: "You can't hide current destination if you haven't set one",
+				fatal: true,
+			})
+			return z.NEVER
+		}
+		if (map.currentGrenade && !map.currentDestination) {
+			ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				message:
+					"You can't have a current grenade if you haven't set current destination",
+				fatal: true,
+			})
+			return z.NEVER
+		}
+		if (map.hideCurrentGrenade && !map.currentGrenade) {
+			ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				message: "You can't hide current grenade if you haven't set one",
+				fatal: true,
+			})
+			return z.NEVER
+		}
+	})
+export type MapHandle = z.infer<typeof MapHandle>
+
+const MapHandleMatch = z
+	.object({
+		handle: MapHandle.optional(),
+		params: z.object({
+			destination: z.string().optional(),
+			grenade: z.string().optional(),
+		}),
+	})
+	.superRefine(({ handle, params }, ctx) => {
+		if (!handle) return
+		if (handle.map.currentDestination && !params.destination) {
+			ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				message:
+					"You can't have a current destination if you arn't on destination route",
+				fatal: true,
+			})
+			return z.NEVER
+		}
+		if (handle.map.currentGrenade && !params.grenade) {
+			ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				message:
+					"You can't have a current grenade if you aren't on grenade route",
+				fatal: true,
+			})
+			return z.NEVER
+		}
+	})
+	.transform(({ handle, params }) => {
+		if (!handle) return undefined
+		return {
+			...handle.map,
+			currentDestination: handle.map.currentDestination
+				? params.destination
+				: undefined,
+			currentGrenade: handle.map?.currentGrenade ? params.grenade : undefined,
+		}
+	})
 
 export async function loader({ params }: LoaderFunctionArgs) {
 	const { mapName, team, type } = params
@@ -27,6 +110,22 @@ export async function loader({ params }: LoaderFunctionArgs) {
 		select: {
 			label: true,
 			radar: { select: { id: true } },
+			destinations: {
+				select: {
+					id: true,
+					name: true,
+					x: true,
+					y: true,
+					grenades: {
+						select: {
+							id: true,
+							name: true,
+							x: true,
+							y: true,
+						},
+					},
+				},
+			},
 		},
 	})
 
@@ -37,10 +136,18 @@ export async function loader({ params }: LoaderFunctionArgs) {
 
 export default function MapLayout() {
 	const { mapName, team, type, map } = useLoaderData<typeof loader>()
+	const matches = useMatches()
 	const containerRef = useRef<HTMLDivElement>(null)
 
 	const user = useOptionalUser()
 	const hasUpdateMapPermission = userHasPermission(user, 'update:map')
+
+	const result = MapHandleMatch.safeParse(matches.at(-1))
+	if (!result.success) throw new Error(result.error.errors[0]?.message)
+	const mapHandle = result.data
+	const currentDestination = mapHandle?.currentDestination
+		? map.destinations.find(d => d.id === mapHandle.currentDestination)
+		: undefined
 
 	useEffect(() => {
 		if (!containerRef.current) return
@@ -83,6 +190,56 @@ export default function MapLayout() {
 					) : null}
 				</div>
 				<Map imageId={map.radar?.id}>
+					{map.destinations
+						.filter(d =>
+							currentDestination
+								? mapHandle?.hideCurrentDestination
+									? d.id !== currentDestination.id
+									: d.id === currentDestination.id
+								: true,
+						)
+						.map(d => (
+							<DestinationMarker
+								key={d.id}
+								to={d.id}
+								name={d.name}
+								count={d.grenades.length}
+								coords={{ x: d.x, y: d.y }}
+								disabled={
+									mapHandle?.disableAllDestinations ||
+									d.id === currentDestination?.id
+								}
+								highlight={d.id === currentDestination?.id}
+							/>
+						))}
+					{currentDestination?.grenades
+						.filter(g =>
+							mapHandle?.currentGrenade
+								? mapHandle?.hideCurrentGrenade
+									? g.id !== mapHandle.currentGrenade
+									: g.id === mapHandle.currentGrenade
+								: true,
+						)
+						.map(g => (
+							<GrenadeMarker
+								key={g.id}
+								to={`${currentDestination.id}/${g.id}`}
+								name={g.name}
+								destination={{
+									x: currentDestination.x,
+									y: currentDestination.y,
+								}}
+								coords={{
+									x: g.x,
+									y: g.y,
+								}}
+								disabled={
+									mapHandle?.disableAllGrenades ||
+									g.id === mapHandle?.currentGrenade
+								}
+								highlight={g.id === mapHandle?.currentGrenade}
+							/>
+						))}
 					<Outlet />
 				</Map>
 			</div>

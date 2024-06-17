@@ -6,9 +6,15 @@ import { prisma } from '#app/utils/db.server.ts'
 import { userHasPermission } from '#app/utils/permissions.ts'
 import { useOptionalUser } from '#app/utils/user.ts'
 import { Button } from '#app/components/ui/button.tsx'
-import { DestinationMarker } from '#app/components/destination-marker.tsx'
-import { GrenadeMarker } from '#app/components/grenade-marker.tsx'
-import { MapBackButton, MapTitle } from '#app/components/map.tsx'
+import { MapBackButton } from '#app/components/map.tsx'
+
+import { type MapHandle } from '../../_layout.tsx'
+
+export const handle: MapHandle = {
+	map: {
+		currentDestination: true,
+	},
+}
 
 export async function loader({ params }: LoaderFunctionArgs) {
 	const { destination: destinationId } = params
@@ -19,20 +25,6 @@ export async function loader({ params }: LoaderFunctionArgs) {
 		},
 		select: {
 			userId: true,
-			name: true,
-			x: true,
-			y: true,
-			grenades: {
-				where: {
-					verified: true,
-				},
-				select: {
-					id: true,
-					name: true,
-					x: true,
-					y: true,
-				},
-			},
 		},
 	})
 
@@ -63,7 +55,6 @@ export default function DestinationPage() {
 
 	return (
 		<>
-			<MapTitle>{loaderData.destination.name}</MapTitle>
 			<MapBackButton />
 			{canEdit || isUserDestination ? (
 				<Button className="absolute right-0 top-0 z-10" asChild>
@@ -75,28 +66,6 @@ export default function DestinationPage() {
 					{hasCreateGrenadePermission ? 'Create grenade' : 'Request grenade'}
 				</Link>
 			</Button>
-			<DestinationMarker
-				to=""
-				coords={{ x: loaderData.destination.x, y: loaderData.destination.y }}
-				name={loaderData.destination.name}
-				highlight
-				disabled
-			/>
-			{loaderData.destination.grenades.map(g => (
-				<GrenadeMarker
-					key={g.id}
-					to={g.id}
-					destination={{
-						x: loaderData.destination.x,
-						y: loaderData.destination.y,
-					}}
-					coords={{
-						x: g.x,
-						y: g.y,
-					}}
-					name={g.name}
-				/>
-			))}
 		</>
 	)
 }

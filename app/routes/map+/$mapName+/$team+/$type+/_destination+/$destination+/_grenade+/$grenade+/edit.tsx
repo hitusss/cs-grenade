@@ -43,6 +43,7 @@ import { Icon } from '#app/components/ui/icon.tsx'
 import { GrenadeForm } from '#app/components/grenade-form.tsx'
 import { MapBackButton } from '#app/components/map.tsx'
 
+import { type MapHandle } from '../../../../_layout.tsx'
 import {
 	cancelEditGrenadeRequest,
 	deleteGrenade,
@@ -54,6 +55,14 @@ const GrenadeSchema = z.discriminatedUnion('intent', [
 	DeleteGrenadeSchema,
 	CancelEditGrenadeRequestSchema,
 ])
+
+export const handle: MapHandle = {
+	map: {
+		currentDestination: true,
+		currentGrenade: true,
+		hideCurrentGrenade: true,
+	},
+}
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
 	const userId = await requireUserId(request)

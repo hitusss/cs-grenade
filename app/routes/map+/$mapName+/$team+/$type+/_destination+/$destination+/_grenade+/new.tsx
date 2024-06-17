@@ -19,6 +19,15 @@ import { Button } from '#app/components/ui/button.tsx'
 import { GrenadeForm } from '#app/components/grenade-form.tsx'
 import { MapBackButton, MapTitle } from '#app/components/map.tsx'
 
+import { type MapHandle } from '../../../_layout.tsx'
+
+export const handle: MapHandle = {
+	map: {
+		currentDestination: true,
+		disableAllGrenades: true,
+	},
+}
+
 export async function loader({ request }: LoaderFunctionArgs) {
 	await requireUserId(request)
 	return json({})

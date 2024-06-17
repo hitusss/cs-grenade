@@ -27,12 +27,20 @@ import { Icon } from '#app/components/ui/icon.tsx'
 import { DestinationForm } from '#app/components/destination-form.tsx'
 import { MapBackButton } from '#app/components/map.tsx'
 
+import { type MapHandle } from '../../_layout.tsx'
 import { deleteDestination, updateDestination } from './destination.server.ts'
 
 const DestinationSchema = z.discriminatedUnion('intent', [
 	EditDestinationSchema,
 	DeleteDestinationSchema,
 ])
+
+export const handle: MapHandle = {
+	map: {
+		currentDestination: true,
+		hideCurrentDestination: true,
+	},
+}
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
 	const userId = await requireUserId(request)
