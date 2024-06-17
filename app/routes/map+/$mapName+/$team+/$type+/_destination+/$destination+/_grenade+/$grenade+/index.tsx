@@ -87,7 +87,7 @@ export default function GrenadePage() {
 				<p>{loaderData.grenade.description}</p>
 				<ul className="flex flex-wrap gap-4">
 					{loaderData.grenade.images.map(image => (
-						<li key={image.id} className="w-48 md:w-64">
+						<li key={image.id} className="w-48 md:w-64 space-y-1">
 							<img
 								src={`/resources/grenade-images/${image.id}`}
 								className="aspect-square object-cover"
