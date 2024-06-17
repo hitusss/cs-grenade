@@ -363,3 +363,33 @@
 		@apply text-h6;
 	}
 }
+
+@layer base {
+	* {
+		--sb-track-color: hsl(var(--muted));
+		--sb-thumb-color: hsl(var(--primary));
+		--sb-size: 12px;
+		--sb-radius: 8px;
+	}
+
+	*::-webkit-scrollbar {
+		width: var(--sb-size);
+	}
+
+	*::-webkit-scrollbar-track {
+		background: var(--sb-track-color);
+		border-radius: var(--sb-radius);
+	}
+
+	*::-webkit-scrollbar-thumb {
+		background: var(--sb-thumb-color);
+		border-radius: var(--sb-radius);
+		border: 2px solid var(--sb-track-color);
+	}
+
+	@supports not selector(::-webkit-scrollbar) {
+		* {
+			scrollbar-color: var(--sb-thumb-color) var(--sb-track-color);
+		}
+	}
+}
