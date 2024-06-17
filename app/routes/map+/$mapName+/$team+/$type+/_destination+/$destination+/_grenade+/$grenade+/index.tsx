@@ -13,6 +13,7 @@ import {
 	DialogFooter,
 	DialogHeader,
 } from '#app/components/ui/dialog.tsx'
+import { useLightbox } from '#app/components/lightbox.tsx'
 
 import { type MapHandle } from '../../../../_layout.tsx'
 
@@ -65,6 +66,8 @@ export default function GrenadePage() {
 	const loaderData = useLoaderData<typeof loader>()
 	const navigate = useNavigate()
 
+	const { activeLightbox, openLightbox } = useLightbox()
+
 	const user = useOptionalUser()
 	const hasUpdateGrenadeOwnPermission = userHasPermission(
 		user,
@@ -80,17 +83,24 @@ export default function GrenadePage() {
 		hasUpdateGrenadeAnyPermission ||
 		(isUserGrenade && hasUpdateGrenadeOwnPermission)
 
+	const grenadeImages = loaderData.grenade.images.map(image => ({
+		src: `/resources/grenade-images/${image.id}`,
+		alt: image.description ?? undefined,
+		caption: image.description ?? undefined,
+	}))
+
 	return (
-		<Dialog open onOpenChange={() => navigate(-1)}>
+		<Dialog open onOpenChange={() => !activeLightbox && navigate(-1)}>
 			<DialogContent className="max-w-5xl max-h-[90vh] overflow-auto">
 				<DialogHeader>{loaderData.grenade.name}</DialogHeader>
 				<p>{loaderData.grenade.description}</p>
 				<ul className="flex flex-wrap gap-4">
-					{loaderData.grenade.images.map(image => (
+					{loaderData.grenade.images.map((image, index) => (
 						<li key={image.id} className="w-48 md:w-64 space-y-1">
 							<img
 								src={`/resources/grenade-images/${image.id}`}
-								className="aspect-square object-cover"
+								className="aspect-square object-cover cursor-pointer shadow-md"
+								onClick={() => openLightbox({ index, images: grenadeImages })}
 							/>
 							<p>{image.description}</p>
 						</li>
