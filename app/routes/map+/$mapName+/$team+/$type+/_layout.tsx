@@ -146,7 +146,7 @@ export default function MapLayout() {
 	if (!result.success) throw new Error(result.error.errors[0]?.message)
 	const mapHandle = result.data
 	const currentDestination = mapHandle?.currentDestination
-		? data.map.destinations.find(d => d.id === mapHandle.currentDestination)
+		? data.map.destinations.find((d) => d.id === mapHandle.currentDestination)
 		: undefined
 
 	useEffect(() => {
@@ -164,7 +164,7 @@ export default function MapLayout() {
 				<div className="flex gap-6 flex-wrap w-full items-center justify-start">
 					<MapNav
 						label="Team"
-						items={teams.map(t => ({
+						items={teams.map((t) => ({
 							value: t,
 							to: `/map/${data.mapName}/${t}/${data.type}`,
 							label: teamLabels[t],
@@ -174,7 +174,7 @@ export default function MapLayout() {
 					/>
 					<MapNav
 						label="Grenade"
-						items={grenadeTypes.map(g => ({
+						items={grenadeTypes.map((g) => ({
 							value: g,
 							to: `/map/${data.mapName}/${data.team}/${g}`,
 							label: grenadeLabels[g],
@@ -191,14 +191,14 @@ export default function MapLayout() {
 				</div>
 				<Map imageId={data.map.radar?.id}>
 					{data.map.destinations
-						.filter(d =>
+						.filter((d) =>
 							currentDestination
 								? mapHandle?.hideCurrentDestination
 									? d.id !== currentDestination.id
 									: d.id === currentDestination.id
 								: true,
 						)
-						.map(d => (
+						.map((d) => (
 							<DestinationMarker
 								key={d.id}
 								to={d.id}
@@ -213,14 +213,14 @@ export default function MapLayout() {
 							/>
 						))}
 					{currentDestination?.grenades
-						.filter(g =>
+						.filter((g) =>
 							mapHandle?.currentGrenade
 								? mapHandle?.hideCurrentGrenade
 									? g.id !== mapHandle.currentGrenade
 									: g.id === mapHandle.currentGrenade
 								: true,
 						)
-						.map(g => (
+						.map((g) => (
 							<GrenadeMarker
 								key={g.id}
 								to={`${currentDestination.id}/${g.id}`}

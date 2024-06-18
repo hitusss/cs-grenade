@@ -115,12 +115,12 @@ async function editGrenade({
 	await Promise.all(
 		grenade.images
 			.filter(
-				img =>
-					images.findIndex(i =>
+				(img) =>
+					images.findIndex((i) =>
 						i.type === 'new' ? false : i.data.id === img.id,
 					) === -1,
 			)
-			.map(async img => {
+			.map(async (img) => {
 				await prisma.grenadeImage.delete({
 					where: {
 						id: img.id,
@@ -140,7 +140,7 @@ async function editGrenade({
 				})
 			} else {
 				const keys = Object.keys(data) as Array<keyof typeof data>
-				keys.forEach(k => {
+				keys.forEach((k) => {
 					if (!data[k]) delete data[k]
 				})
 				await prisma.grenadeImage.update({
@@ -200,11 +200,11 @@ async function requestGrenadeChanges({
 		{ status: 400 },
 	)
 
-	const newImages = images.filter(i => i.type === 'new').map(i => i.data)
+	const newImages = images.filter((i) => i.type === 'new').map((i) => i.data)
 	const editedImages = images
 		.filter(({ type, data }) => {
 			if (type === 'new') return false
-			const prevImage = prevGrenade.images.find(img => img.id === data.id)
+			const prevImage = prevGrenade.images.find((img) => img.id === data.id)
 
 			const imageChanged = Boolean(data.blob)
 			const orderChanged = data.order !== prevImage?.order
@@ -215,13 +215,14 @@ async function requestGrenadeChanges({
 
 			return imageChanged || orderChanged || descriptionChanged
 		})
-		.map(i => i.data)
+		.map((i) => i.data)
 	const deletedImages = prevGrenade.images
 		.filter(
-			img =>
-				images.findIndex(i => i.type === 'edit' && i.data.id === img.id) === -1,
+			(img) =>
+				images.findIndex((i) => i.type === 'edit' && i.data.id === img.id) ===
+				-1,
 		)
-		.map(img => img.id)
+		.map((img) => img.id)
 
 	if (
 		name === prevGrenade.name &&
@@ -254,7 +255,7 @@ async function requestGrenadeChanges({
 	})
 
 	await Promise.all([
-		...newImages.map(async img => {
+		...newImages.map(async (img) => {
 			return await prisma.grenadeImageChanges.create({
 				data: {
 					...img,
@@ -262,7 +263,7 @@ async function requestGrenadeChanges({
 				},
 			})
 		}),
-		...editedImages.map(async img => {
+		...editedImages.map(async (img) => {
 			return await prisma.grenadeImageChanges.create({
 				data: {
 					...img,
@@ -271,7 +272,7 @@ async function requestGrenadeChanges({
 				},
 			})
 		}),
-		...deletedImages.map(async imgId => {
+		...deletedImages.map(async (imgId) => {
 			return await prisma.grenadeImageChanges.create({
 				data: {
 					delete: true,

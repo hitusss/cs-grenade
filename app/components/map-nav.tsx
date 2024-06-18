@@ -27,7 +27,7 @@ export function MapNav({
 			<p className="text-caption pl-2">{label}</p>
 			<TooltipProvider>
 				<ul className="flex gap-2 p-2 border rounded-md">
-					{items.map(i => (
+					{items.map((i) => (
 						<li key={i.value}>
 							<Tooltip>
 								<TooltipTrigger asChild>

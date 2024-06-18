@@ -37,7 +37,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	checkHoneypot(formData)
 
 	const submission = await parseWithZod(formData, {
-		schema: MapSchema.transform(async data => {
+		schema: MapSchema.transform(async (data) => {
 			if (data.image.size <= 0) return z.NEVER
 			if (data.logo.size <= 0) return z.NEVER
 			if (data.radar.size <= 0) return z.NEVER

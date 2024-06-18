@@ -20,7 +20,7 @@ export default function MapsList({
 }) {
 	return (
 		<ul className="flex flex-wrap mt-6 gap-6 px-8">
-			{maps.map(map => (
+			{maps.map((map) => (
 				<li key={map.name}>
 					<Link
 						to={`/map/${map.name}/${teams[0]}/${grenadeTypes[0]}`}

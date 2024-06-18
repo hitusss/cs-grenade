@@ -124,7 +124,7 @@ export function ThemeSwitch() {
 									onValueChange={(v: Mode) => modeControl.change(v)}
 									className="grid grid-cols-4"
 								>
-									{modes.map(mode => (
+									{modes.map((mode) => (
 										<Tooltip key={mode}>
 											<TooltipTrigger>
 												<ToggleGroupItem
@@ -153,7 +153,7 @@ export function ThemeSwitch() {
 									onValueChange={(v: Color) => colorControl.change(v)}
 									className="grid grid-cols-4"
 								>
-									{colors.map(color => (
+									{colors.map((color) => (
 										<Tooltip key={color}>
 											<TooltipTrigger>
 												<ToggleGroupItem
@@ -192,7 +192,7 @@ export function ThemeSwitch() {
 export function useOptimisticTheme() {
 	const fetchers = useFetchers()
 	const themeFetcher = fetchers.find(
-		f => f.formAction === '/resources/theme-switch',
+		(f) => f.formAction === '/resources/theme-switch',
 	)
 
 	if (themeFetcher && themeFetcher.formData) {

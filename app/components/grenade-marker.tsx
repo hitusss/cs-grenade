@@ -75,7 +75,7 @@ export function GrenadeMarker({
 						to={to}
 						aria-hidden={disabled}
 						tabIndex={disabled ? -1 : 0}
-						onClick={e => disabled && e.preventDefault()}
+						onClick={(e) => disabled && e.preventDefault()}
 						className="group outline-none"
 					>
 						<span

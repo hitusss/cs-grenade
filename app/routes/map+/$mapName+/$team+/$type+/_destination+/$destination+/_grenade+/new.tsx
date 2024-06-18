@@ -52,14 +52,14 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	checkHoneypot(formData)
 
 	const submission = await parseWithZod(formData, {
-		schema: GrenadeSchema.transform(async data => {
+		schema: GrenadeSchema.transform(async (data) => {
 			return {
 				x: data.x,
 				y: data.y,
 				description: data.description,
 				name: data.name,
 				images: await Promise.all(
-					data.images.map(async imageData =>
+					data.images.map(async (imageData) =>
 						imageData.type === 'new'
 							? {
 									type: imageData.type,
@@ -115,7 +115,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	})
 
 	await Promise.all(
-		images.map(async img => {
+		images.map(async (img) => {
 			if (img.type === 'edit') return
 			await prisma.grenadeImage.create({
 				data: {

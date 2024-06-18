@@ -97,12 +97,12 @@ function LightboxInner({
 	const canGoRight = activeIndex < images.length - 1
 	const goLeft = useCallback(() => {
 		if (canGoLeft) {
-			setActiveIndex(prev => prev - 1)
+			setActiveIndex((prev) => prev - 1)
 		}
 	}, [canGoLeft])
 	const goRight = useCallback(() => {
 		if (canGoRight) {
-			setActiveIndex(prev => prev + 1)
+			setActiveIndex((prev) => prev + 1)
 		}
 	}, [canGoRight])
 

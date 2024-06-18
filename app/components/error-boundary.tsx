@@ -19,7 +19,7 @@ type StatusHandler = (info: {
 export function GeneralErrorBoundary({
 	defaultStatusHandler = ({ error }) => <ErrorComponent error={error} />,
 	statusHandlers,
-	unexpectedErrorHandler = error => (
+	unexpectedErrorHandler = (error) => (
 		<ErrorComponent error={getErrorMessage(error)} />
 	),
 }: {

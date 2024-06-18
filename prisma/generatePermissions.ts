@@ -155,7 +155,7 @@ async function generatePermissions() {
 }
 
 generatePermissions()
-	.catch(e => {
+	.catch((e) => {
 		console.error(e)
 		process.exit(1)
 	})

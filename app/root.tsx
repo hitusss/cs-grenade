@@ -201,7 +201,7 @@ function Document({
 				/>
 				<ScrollRestoration
 					nonce={nonce}
-					getKey={location => {
+					getKey={(location) => {
 						if (location.pathname.startsWith('/users')) return '/users'
 						if (location.pathname.startsWith('/map')) return '/map'
 						return location.key

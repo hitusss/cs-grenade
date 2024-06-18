@@ -166,7 +166,7 @@ export default function SignupRoute() {
 					</StatusButton>
 				</Form>
 				<ul className="grid gap-6 border-b-2 border-t-2 border-border py-3">
-					{providerNames.map(providerName => (
+					{providerNames.map((providerName) => (
 						<li key={providerName}>
 							<ProviderConnectionForm
 								type="Signup"

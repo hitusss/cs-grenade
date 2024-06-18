@@ -14,8 +14,8 @@ export default function Index() {
 
 	const activeMaps =
 		data?.maps
-			.filter(map => map.isActive)
-			.map(map => ({
+			.filter((map) => map.isActive)
+			.map((map) => ({
 				name: map.name,
 				label: map.label,
 				isActive: true,
@@ -24,8 +24,8 @@ export default function Index() {
 			})) || []
 	const inactiveMaps =
 		data?.maps
-			.filter(map => !map.isActive)
-			.map(map => ({
+			.filter((map) => !map.isActive)
+			.map((map) => ({
 				name: map.name,
 				label: map.label,
 				isActive: false,

@@ -136,7 +136,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	checkHoneypot(formData)
 
 	const submission = await parseWithZod(formData, {
-		schema: GrenadeSchema.transform(async data => {
+		schema: GrenadeSchema.transform(async (data) => {
 			if (data.intent === 'delete') return data
 			if (data.intent === 'cancel-edit-request') return data
 			return {
@@ -146,7 +146,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 				description: data.description,
 				name: data.name,
 				images: await Promise.all(
-					data.images.map(async imageData =>
+					data.images.map(async (imageData) =>
 						imageData.type === 'new'
 							? {
 									type: imageData.type,
@@ -306,7 +306,7 @@ export default function EditGrenadeRoute() {
 					description: data.grenade.description,
 					x: data.grenade.x,
 					y: data.grenade.y,
-					images: data.grenade.images.map(i => ({
+					images: data.grenade.images.map((i) => ({
 						id: i.id,
 						description: i.description,
 					})),

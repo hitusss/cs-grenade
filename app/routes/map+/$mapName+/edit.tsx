@@ -64,7 +64,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	checkHoneypot(formData)
 
 	const submission = await parseWithZod(formData, {
-		schema: EditMapSchema.transform(async data => {
+		schema: EditMapSchema.transform(async (data) => {
 			return {
 				label: data.label,
 				image: data.image

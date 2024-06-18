@@ -15,28 +15,34 @@ export const MapSchema = z.object({
 			message: 'Image is required',
 		})
 		.refine(
-			file => ['image/jpeg', 'image/png'].includes(file.type),
+			(file) => ['image/jpeg', 'image/png'].includes(file.type),
 			'Image should be a PNG or JPG',
 		)
-		.refine(file => file.size > 0, 'Image is required')
-		.refine(file => file.size <= MAX_SIZE, 'Image size must be less than 2MB'),
+		.refine((file) => file.size > 0, 'Image is required')
+		.refine(
+			(file) => file.size <= MAX_SIZE,
+			'Image size must be less than 2MB',
+		),
 	logo: z
 		.instanceof(File, {
 			message: 'Logo is required',
 		})
 		.refine(
-			file => ['image/jpeg', 'image/png'].includes(file.type),
+			(file) => ['image/jpeg', 'image/png'].includes(file.type),
 			'Logo should be a PNG or JPG',
 		)
-		.refine(file => file.size > 0, 'Logo is required')
-		.refine(file => file.size <= MAX_SIZE, 'Logo size must be less than 2MB'),
+		.refine((file) => file.size > 0, 'Logo is required')
+		.refine((file) => file.size <= MAX_SIZE, 'Logo size must be less than 2MB'),
 	radar: z
 		.instanceof(File, {
 			message: 'Radar is required',
 		})
-		.refine(file => file.type === 'image/svg+xml', 'Radar should be a SVG')
-		.refine(file => file.size > 0, 'Radar is required')
-		.refine(file => file.size <= MAX_SIZE, 'Radar size must be less than 2MB'),
+		.refine((file) => file.type === 'image/svg+xml', 'Radar should be a SVG')
+		.refine((file) => file.size > 0, 'Radar is required')
+		.refine(
+			(file) => file.size <= MAX_SIZE,
+			'Radar size must be less than 2MB',
+		),
 })
 
 export const EditMapSchema = MapSchema.partial({

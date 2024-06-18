@@ -83,7 +83,7 @@ export default function GrenadeRoute() {
 		hasUpdateGrenadeAnyPermission ||
 		(isUserGrenade && hasUpdateGrenadeOwnPermission)
 
-	const grenadeImages = data.grenade.images.map(image => ({
+	const grenadeImages = data.grenade.images.map((image) => ({
 		src: `/resources/grenade-images/${image.id}`,
 		alt: image.description ?? undefined,
 		caption: image.description ?? undefined,

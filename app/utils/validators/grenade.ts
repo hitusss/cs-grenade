@@ -10,11 +10,14 @@ export const NewImageSchema = z.object({
 			message: 'Image is required',
 		})
 		.refine(
-			file => ['image/jpeg', 'image/png'].includes(file.type),
+			(file) => ['image/jpeg', 'image/png'].includes(file.type),
 			'Image should be a PNG or JPG',
 		)
-		.refine(file => file.size > 0, 'Image is required')
-		.refine(file => file.size <= MAX_SIZE, 'Image size must be less than 2MB'),
+		.refine((file) => file.size > 0, 'Image is required')
+		.refine(
+			(file) => file.size <= MAX_SIZE,
+			'Image size must be less than 2MB',
+		),
 	description: z
 		.string({
 			invalid_type_error: 'Description should be a string',
@@ -32,11 +35,11 @@ export const EditImageSchema = z.object({
 			message: 'Image is required',
 		})
 		.refine(
-			file => ['image/jpeg', 'image/png'].includes(file.type),
+			(file) => ['image/jpeg', 'image/png'].includes(file.type),
 			'Image should be a PNG or JPG',
 		)
-		.refine(file => file.size > 0, 'Image is required')
-		.refine(file => file.size <= MAX_SIZE, 'Image size must be less than 2MB')
+		.refine((file) => file.size > 0, 'Image is required')
+		.refine((file) => file.size <= MAX_SIZE, 'Image size must be less than 2MB')
 		.optional(),
 	description: z
 		.string({
