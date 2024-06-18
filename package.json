@@ -1,5 +1,11 @@
 {
   "name": "cs-grenade-efe0",
+  "license": "GPL-3.0-only",
+  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hitusss/cs-grenade.git"
+  },
   "private": true,
   "sideEffects": false,
   "type": "module",
