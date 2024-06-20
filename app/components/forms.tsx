@@ -244,16 +244,6 @@ export function ImageField({
 	const id = inputProps.id ?? fallbackId
 	const errorId = errors?.length ? `${id}-error` : undefined
 
-	useEffect(() => {
-		const form = document.querySelector<HTMLFormElement>(`#${inputProps.form}`)
-		if (!form) return
-		const onReset = () => {
-			setImageSrc(undefined)
-		}
-		form.addEventListener('reset', onReset)
-		return () => form.removeEventListener('reset', onReset)
-	}, [inputProps.form])
-
 	return (
 		<div>
 			<label htmlFor={id} className="relative grid gap-1">
