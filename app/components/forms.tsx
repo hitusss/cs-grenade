@@ -1,10 +1,18 @@
-import React, { useEffect, useId, useState } from 'react'
+import React, {
+	createContext,
+	useContext,
+	useEffect,
+	useId,
+	useRef,
+	useState,
+} from 'react'
 import { useInputControl } from '@conform-to/react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { REGEXP_ONLY_DIGITS_AND_CHARS, type OTPInputProps } from 'input-otp'
 
 import { cn } from '#app/utils/misc.tsx'
 
+import { Button, buttonVariants } from './ui/button.tsx'
 import { Checkbox, type CheckboxProps } from './ui/checkbox.tsx'
 import { Icon } from './ui/icon.tsx'
 import {
@@ -16,6 +24,12 @@ import {
 import { Input } from './ui/input.tsx'
 import { Label, labelVariants } from './ui/label.tsx'
 import { Textarea } from './ui/textarea.tsx'
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from './ui/tooltip.tsx'
 
 export type ListOfErrors = Array<string | null | undefined> | null | undefined
 
@@ -329,6 +343,197 @@ export function ImageField({
 				})}
 			>
 				{errorId ? <ErrorList id={errorId} errors={errors} /> : null}
+			</div>
+		</div>
+	)
+}
+
+export const MultipleImageField = {
+	Provider: MultipleImageFieldProvider,
+	Input: MultipleImageFieldInput,
+	Display: MultipleImageFieldDisplay,
+}
+
+const MultipleImageFieldContext = createContext<
+	| {
+			files: DataTransfer | undefined
+			setFiles: React.Dispatch<React.SetStateAction<DataTransfer | undefined>>
+			imagesSrc: string[]
+			setImagesSrc: React.Dispatch<React.SetStateAction<string[]>>
+			inputProps: React.InputHTMLAttributes<HTMLInputElement>
+			errors?: ListOfErrors
+			id: string
+			errorId?: string
+	  }
+	| undefined
+>(undefined)
+
+function MultipleImageFieldProvider({
+	children,
+	inputProps,
+	errors,
+}: {
+	children: React.ReactNode
+	inputProps: React.InputHTMLAttributes<HTMLInputElement>
+	errors?: ListOfErrors
+}) {
+	const [files, setFiles] = useState<DataTransfer>()
+	const [imagesSrc, setImagesSrc] = useState<string[]>([])
+
+	const fallbackId = useId()
+	const id = inputProps.id ?? fallbackId
+	const errorId = errors?.length ? `${id}-error` : undefined
+
+	return (
+		<MultipleImageFieldContext.Provider
+			value={{
+				files,
+				setFiles,
+				imagesSrc,
+				setImagesSrc,
+				inputProps,
+				errors,
+				id,
+				errorId,
+			}}
+		>
+			{children}
+		</MultipleImageFieldContext.Provider>
+	)
+}
+
+function MultipleImageFieldInput({
+	variant = 'ghost',
+	size = 'icon',
+	className,
+	...props
+}: VariantProps<typeof buttonVariants> & { className?: string }) {
+	const inputRef = useRef<HTMLInputElement>(null)
+	const context = useContext(MultipleImageFieldContext)
+	if (!context)
+		throw new Error(
+			'MultipleImageFieldInput must be used inside of MultipleImageFieldProvider',
+		)
+
+	useEffect(() => {
+		if (!inputRef.current || !context.files?.files) return
+		inputRef.current.files = context.files.files
+	}, [context.files?.files, context.files?.files?.length, context.id])
+
+	return (
+		<TooltipProvider>
+			<Tooltip>
+				<TooltipTrigger asChild>
+					<label
+						htmlFor={context.id}
+						className={cn(
+							buttonVariants({
+								variant,
+								size,
+								...props,
+							}),
+							'relative',
+							className,
+						)}
+					>
+						<input
+							ref={inputRef}
+							id={context.id}
+							aria-invalid={context.errorId ? true : undefined}
+							aria-describedby={context.errorId}
+							{...context.inputProps}
+							type="file"
+							accept="image/jpeg, image/png"
+							multiple
+							className="absolute inset-0 opacity-0"
+							onChange={(e) => {
+								if (!e.currentTarget.files?.length) {
+									return context.setFiles(undefined)
+								}
+								for (let i = 0; i < e.currentTarget.files.length; i++) {
+									const file = e.currentTarget.files?.[i]
+									if (file) {
+										const reader = new FileReader()
+										reader.onload = (event) => {
+											const img = event.target?.result?.toString()
+											if (img && context.imagesSrc.indexOf(img) === -1) {
+												context.setFiles((prev) => {
+													if (!prev) {
+														prev = new DataTransfer()
+													}
+													prev.items.add(file)
+													return prev
+												})
+												context.setImagesSrc((prev) => [...prev, img])
+											}
+										}
+										reader.readAsDataURL(file)
+									}
+								}
+							}}
+						/>
+						<Icon name="file-plus" />
+					</label>
+				</TooltipTrigger>
+				<TooltipContent>Add image</TooltipContent>
+			</Tooltip>
+		</TooltipProvider>
+	)
+}
+
+function MultipleImageFieldDisplay({
+	size = 'sm',
+	...props
+}: VariantProps<typeof imageFieldVariants>) {
+	const context = useContext(MultipleImageFieldContext)
+	if (!context)
+		throw new Error(
+			'MultipleImageFieldDisplay must be used inside of MultipleImageFieldProvider',
+		)
+
+	return (
+		<div className="flex flex-col gap-2">
+			<ul className="flex flex-wrap gap-2">
+				{context.imagesSrc.map((img, index) => (
+					<li key={img} className="relative p-4">
+						<img
+							src={img}
+							className={imageFieldVariants({ size, ...props })}
+							alt=""
+						/>
+						<TooltipProvider>
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<Button
+										type="button"
+										variant="destructive"
+										size="icon"
+										className="absolute right-0 top-0 size-7 rounded-full"
+										onClick={() => {
+											context.setFiles((prev) => {
+												prev?.items.remove(index)
+												return prev
+											})
+											context.setImagesSrc((prev) => {
+												prev.splice(index, 1)
+												return [...prev]
+											})
+										}}
+									>
+										<Icon name="x" />
+									</Button>
+								</TooltipTrigger>
+								<TooltipContent>Remove image</TooltipContent>
+							</Tooltip>
+						</TooltipProvider>
+					</li>
+				))}
+			</ul>
+
+			<div className="h-auto min-h-[32px] pb-3 pt-1">
+				{context.errorId ? (
+					<ErrorList id={context.errorId} errors={context.errors} />
+				) : null}
 			</div>
 		</div>
 	)
