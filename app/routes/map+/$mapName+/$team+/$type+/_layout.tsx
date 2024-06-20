@@ -151,7 +151,7 @@ export default function MapLayout() {
 
 	useEffect(() => {
 		if (!containerRef.current) return
-		containerRef.current.scrollIntoView()
+		containerRef.current.scrollIntoView({ block: 'center' })
 	}, [])
 
 	return (
