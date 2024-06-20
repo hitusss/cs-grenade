@@ -159,27 +159,8 @@ export default function PhotoRoute() {
 					fullRounded
 				/>
 				<div className="flex gap-4">
-					<StatusButton
-						name="intent"
-						value="submit"
-						type="submit"
-						className="peer-invalid:hidden"
-						status={
-							pendingIntent === 'submit'
-								? 'pending'
-								: lastSubmissionIntent === 'submit'
-									? form.status ?? 'idle'
-									: 'idle'
-						}
-					>
-						Save Photo
-					</StatusButton>
-					<Button
-						variant="destructive"
-						className="peer-invalid:hidden"
-						type="reset"
-					>
-						<Icon name="trash">Reset</Icon>
+					<Button variant="ghost" className="peer-invalid:hidden" type="reset">
+						Reset
 					</Button>
 					{data.user.image?.id ? (
 						<StatusButton
@@ -205,6 +186,21 @@ export default function PhotoRoute() {
 							</Icon>
 						</StatusButton>
 					) : null}
+					<StatusButton
+						name="intent"
+						value="submit"
+						type="submit"
+						className="peer-invalid:hidden"
+						status={
+							pendingIntent === 'submit'
+								? 'pending'
+								: lastSubmissionIntent === 'submit'
+									? form.status ?? 'idle'
+									: 'idle'
+						}
+					>
+						Save Photo
+					</StatusButton>
 				</div>
 				<ErrorList errors={form.errors} />
 			</Form>
