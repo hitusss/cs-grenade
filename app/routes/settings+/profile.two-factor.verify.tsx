@@ -162,13 +162,13 @@ export default function TwoFactorRoute() {
 				</p>
 				<div className="p-3">
 					<pre
-						className="whitespace-pre-wrap break-all text-xs"
+						className="whitespace-pre-wrap break-all text-body-xs"
 						aria-label="One-time Password URI"
 					>
 						{data.otpUri}
 					</pre>
 				</div>
-				<p className="text-xs">
+				<p className="text-body-xs">
 					Once you've added the account, enter the code from your authenticator
 					app below. Once you enable 2FA, you will need to enter a code from
 					your authenticator app every time you log in or perform important

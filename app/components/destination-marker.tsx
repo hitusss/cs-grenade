@@ -68,7 +68,7 @@ export function DestinationMarker({
 					>
 						<span
 							className={cn(
-								'grid size-7 place-items-center ring-offset-background rounded-full border-2 p-1 text-xs leading-none transition-all duration-300 animate-in zoom-in group-focus-visible:outline-none group-focus-visible:ring-2 group-focus-visible:ring-ring group-focus-visible:ring-offset-2',
+								'grid size-7 place-items-center ring-offset-background rounded-full border-2 p-1 text-body-xs leading-none transition-all duration-300 animate-in zoom-in group-focus-visible:outline-none group-focus-visible:ring-2 group-focus-visible:ring-ring group-focus-visible:ring-offset-2',
 								highlight
 									? 'bg-primary/75 text-primary-foreground'
 									: 'bg-white/75 text-black',
