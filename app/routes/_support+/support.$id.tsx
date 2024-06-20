@@ -20,7 +20,7 @@ import { z } from 'zod'
 
 import { requireUserId } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
-import { checkHoneypot } from '#app/utils/honeypot.server.js'
+import { checkHoneypot } from '#app/utils/honeypot.server.ts'
 import { useDoubleCheck, useIsPending } from '#app/utils/misc.tsx'
 import { unauthorized } from '#app/utils/permissions.server.ts'
 import { useUser } from '#app/utils/user.ts'
