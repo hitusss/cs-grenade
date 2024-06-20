@@ -143,12 +143,33 @@ async function editGrenade({
 				keys.forEach((k) => {
 					if (!data[k]) delete data[k]
 				})
-				await prisma.grenadeImage.update({
-					where: {
-						id: data.id,
-					},
-					data,
-				})
+				if (data.blob && data.contentType) {
+					const oldImg = await prisma.grenadeImage.delete({
+						where: {
+							id: data.id,
+						},
+						select: {
+							order: true,
+							description: true,
+						},
+					})
+					await prisma.grenadeImage.create({
+						data: {
+							blob: data.blob,
+							contentType: data.contentType,
+							order: data.order || oldImg.order,
+							description: data.description || oldImg.description,
+							grenadeId: id,
+						},
+					})
+				} else {
+					await prisma.grenadeImage.update({
+						where: {
+							id: data.id,
+						},
+						data,
+					})
+				}
 			}
 		}),
 	)
