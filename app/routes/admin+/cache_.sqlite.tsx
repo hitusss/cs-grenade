@@ -2,7 +2,7 @@ import { json, redirect, type ActionFunctionArgs } from '@remix-run/node'
 import { z } from 'zod'
 
 import { cache } from '#app/utils/cache.server.ts'
-import { getInstanceInfo } from '#app/utils/litefs.server'
+import { getInstanceInfo } from '#app/utils/litefs.server.ts'
 
 export async function action({ request }: ActionFunctionArgs) {
 	const { currentIsPrimary, primaryInstance } = await getInstanceInfo()

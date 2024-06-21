@@ -29,7 +29,7 @@ import {
 import { useDebounce, useDoubleCheck } from '#app/utils/misc.tsx'
 import { requireUserWithRole } from '#app/utils/permissions.server.ts'
 import { Button } from '#app/components/ui/button.tsx'
-import { GeneralErrorBoundary } from '#app/components/error-boundary'
+import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { Field } from '#app/components/forms.tsx'
 
 export const handle: SEOHandle = {

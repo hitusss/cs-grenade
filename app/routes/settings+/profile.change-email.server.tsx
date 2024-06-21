@@ -11,7 +11,7 @@ import {
 	type VerifyFunctionArgs,
 } from '#app/routes/_auth+/verify.server.ts'
 
-import { newEmailAddressSessionKey } from './profile.change-email'
+import { newEmailAddressSessionKey } from './profile.change-email.tsx'
 
 export async function handleVerification({
 	request,

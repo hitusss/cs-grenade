@@ -40,7 +40,7 @@ import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { AuthLayout } from '#app/components/auth-layout.tsx'
 import { CheckboxField, ErrorList, Field } from '#app/components/forms.tsx'
 
-import { onboardingEmailSessionKey } from './onboarding'
+import { onboardingEmailSessionKey } from './onboarding.tsx'
 
 export const providerIdKey = 'providerId'
 export const prefilledProfileKey = 'prefilledProfile'

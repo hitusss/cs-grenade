@@ -1,5 +1,5 @@
 import { cn } from '#app/utils/misc.tsx'
-import { getUserImgSrc } from '#app/utils/user.js'
+import { getUserImgSrc } from '#app/utils/user.ts'
 
 import { useLightbox } from './lightbox.tsx'
 
