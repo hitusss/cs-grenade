@@ -31,7 +31,6 @@ import { requireUserWithRole } from '#app/utils/permissions.server.ts'
 import { Button } from '#app/components/ui/button.tsx'
 import { GeneralErrorBoundary } from '#app/components/error-boundary'
 import { Field } from '#app/components/forms.tsx'
-import { Spacer } from '#app/components/spacer.tsx'
 
 export const handle: SEOHandle = {
 	getSitemapEntries: () => null,
@@ -106,10 +105,9 @@ export default function CacheAdminRoute() {
 	return (
 		<div className="container">
 			<h1>Cache Admin</h1>
-			<Spacer size="2xs" />
 			<Form
 				method="get"
-				className="flex flex-col gap-4"
+				className="flex flex-col gap-4 mt-12"
 				onChange={(e) => handleFormChange(e.currentTarget)}
 			>
 				<div className="flex-1">
@@ -171,8 +169,7 @@ export default function CacheAdminRoute() {
 					</select>
 				</div>
 			</Form>
-			<Spacer size="2xs" />
-			<div className="flex flex-col gap-4">
+			<div className="flex flex-col gap-4 mt-12">
 				<h2>LRU Cache:</h2>
 				{data.cacheKeys.lru.map((key) => (
 					<CacheKeyRow
@@ -183,8 +180,7 @@ export default function CacheAdminRoute() {
 					/>
 				))}
 			</div>
-			<Spacer size="3xs" />
-			<div className="flex flex-col gap-4">
+			<div className="flex flex-col gap-4 mt-8">
 				<h2>SQLite Cache:</h2>
 				{data.cacheKeys.sqlite.map((key) => (
 					<CacheKeyRow

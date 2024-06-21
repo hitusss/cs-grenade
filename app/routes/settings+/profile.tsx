@@ -9,7 +9,6 @@ import { prisma } from '#app/utils/db.server.ts'
 import { cn } from '#app/utils/misc.tsx'
 import { useUser } from '#app/utils/user.ts'
 import { Icon } from '#app/components/ui/icon.tsx'
-import { Spacer } from '#app/components/spacer.tsx'
 
 export const BreadcrumbHandle = z.object({ breadcrumb: z.any() })
 export type BreadcrumbHandle = z.infer<typeof BreadcrumbHandle>
@@ -72,8 +71,7 @@ export default function EditUserProfile() {
 					))}
 				</ul>
 			</div>
-			<Spacer size="xs" />
-			<main className="mx-auto bg-muted px-6 py-8 md:container md:rounded-3xl">
+			<main className="mx-auto mt-16 bg-muted px-6 py-8 md:container md:rounded-3xl">
 				<Outlet />
 			</main>
 		</div>
