@@ -1,6 +1,3 @@
-import { Spacer } from './spacer'
-import { Card } from './ui/card'
-
 export function AuthLayout({
 	title,
 	subtitle,
@@ -12,14 +9,13 @@ export function AuthLayout({
 }) {
 	return (
 		<div className="min-h-full pb-32 pt-20 grid place-content-center">
-			<Card className="max-w-lg w-full py-12 px-4">
+			<div className="max-w-lg w-full rounded-lg border py-12 px-6">
 				<div className="flex flex-col gap-3 text-center break-words">
 					<h1>{title}</h1>
 					<p className="text-muted-foreground">{subtitle}</p>
 				</div>
-				<Spacer size="xs" />
-				<div className="grid gap-6 px-8">{children}</div>
-			</Card>
+				<div className="grid gap-6 px-8 mt-16">{children}</div>
+			</div>
 		</div>
 	)
 }
