@@ -60,6 +60,10 @@ async function requireOnboardingEmail(request: Request) {
 	return email
 }
 
+export const meta: MetaFunction = () => {
+	return [{ title: 'Setup CS-Grenade Account' }]
+}
+
 export async function loader({ request }: LoaderFunctionArgs) {
 	const email = await requireOnboardingEmail(request)
 	return json({ email })
@@ -124,10 +128,6 @@ export async function action({ request }: ActionFunctionArgs) {
 		{ title: 'Welcome', description: 'Thanks for signing up!' },
 		{ headers },
 	)
-}
-
-export const meta: MetaFunction = () => {
-	return [{ title: 'Setup CS-Grenade Account' }]
 }
 
 export default function OnboardingRoute() {

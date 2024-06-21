@@ -31,6 +31,10 @@ const SignupSchema = z.object({
 	email: EmailSchema,
 })
 
+export const meta: MetaFunction = () => {
+	return [{ title: 'Sign Up | CS-Grenade' }]
+}
+
 export async function action({ request }: ActionFunctionArgs) {
 	const formData = await request.formData()
 
@@ -112,10 +116,6 @@ export function SignupEmail({
 			</E.Container>
 		</E.Html>
 	)
-}
-
-export const meta: MetaFunction = () => {
-	return [{ title: 'Sign Up | CS-Grenade' }]
 }
 
 export default function SignupRoute() {

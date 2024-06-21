@@ -84,6 +84,10 @@ async function requireData({
 	}
 }
 
+export const meta: MetaFunction = () => {
+	return [{ title: 'Setup CS-Grenade Account' }]
+}
+
 export async function loader({ request, params }: LoaderFunctionArgs) {
 	const { email } = await requireData({ request, params })
 	const connectionSession = await connectionSessionStorage.getSession(
@@ -174,10 +178,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
 		{ title: 'Welcome', description: 'Thanks for signing up!' },
 		{ headers },
 	)
-}
-
-export const meta: MetaFunction = () => {
-	return [{ title: 'Setup CS-Grenade Account' }]
 }
 
 export default function OnboardingProviderRoute() {

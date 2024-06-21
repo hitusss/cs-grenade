@@ -26,6 +26,10 @@ const ForgotPasswordSchema = z.object({
 	usernameOrEmail: z.union([EmailSchema, UsernameSchema]),
 })
 
+export const meta: MetaFunction = () => {
+	return [{ title: 'Password Recovery for CS-Grenade' }]
+}
+
 export async function action({ request }: ActionFunctionArgs) {
 	const formData = await request.formData()
 	checkHoneypot(formData)
@@ -114,10 +118,6 @@ function ForgotPasswordEmail({
 			</E.Container>
 		</E.Html>
 	)
-}
-
-export const meta: MetaFunction = () => {
-	return [{ title: 'Password Recovery for CS-Grenade' }]
 }
 
 export default function ForgotPasswordRoute() {

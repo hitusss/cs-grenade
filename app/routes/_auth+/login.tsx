@@ -32,6 +32,10 @@ const LoginFormSchema = z.object({
 	remember: z.boolean().optional(),
 })
 
+export const meta: MetaFunction = () => {
+	return [{ title: 'Login to CS-Grenade' }]
+}
+
 export async function loader({ request }: LoaderFunctionArgs) {
 	await requireAnonymous(request)
 	return json({})
@@ -180,10 +184,6 @@ export default function LoginRoute() {
 			</>
 		</AuthLayout>
 	)
-}
-
-export const meta: MetaFunction = () => {
-	return [{ title: 'Login to CS-Grenade' }]
 }
 
 export function ErrorBoundary() {

@@ -36,6 +36,10 @@ async function requireResetPasswordUsername(request: Request) {
 	return resetPasswordUsername
 }
 
+export const meta: MetaFunction = () => {
+	return [{ title: 'Reset Password | CS-Grenade' }]
+}
+
 export async function loader({ request }: LoaderFunctionArgs) {
 	const resetPasswordUsername = await requireResetPasswordUsername(request)
 	return json({ resetPasswordUsername })
@@ -62,10 +66,6 @@ export async function action({ request }: ActionFunctionArgs) {
 			'set-cookie': await verifySessionStorage.destroySession(verifySession),
 		},
 	})
-}
-
-export const meta: MetaFunction = () => {
-	return [{ title: 'Reset Password | CS-Grenade' }]
 }
 
 export default function ResetPasswordRoute() {
