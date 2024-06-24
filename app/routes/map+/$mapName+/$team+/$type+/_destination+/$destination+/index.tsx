@@ -22,6 +22,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
 	const destination = await prisma.destination.findUnique({
 		where: {
 			id: destinationId,
+			verified: true,
 		},
 		select: {
 			userId: true,

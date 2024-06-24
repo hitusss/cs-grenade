@@ -31,6 +31,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 	const grenade = await prisma.grenade.findUnique({
 		where: {
 			id: grenadeId,
+			verified: true,
 		},
 		select: {
 			name: true,

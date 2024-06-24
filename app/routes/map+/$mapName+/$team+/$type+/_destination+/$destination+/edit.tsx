@@ -51,7 +51,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 	invariantResponse(destinationId, 'Destination ID is required')
 
 	const destination = await prisma.destination.findUnique({
-		where: { id: destinationId },
+		where: { id: destinationId, verified: true },
 		select: {
 			id: true,
 			name: true,

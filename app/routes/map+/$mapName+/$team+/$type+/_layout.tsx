@@ -111,12 +111,18 @@ export async function loader({ params }: LoaderFunctionArgs) {
 			label: true,
 			radar: { select: { id: true } },
 			destinations: {
+				where: {
+					verified: true,
+				},
 				select: {
 					id: true,
 					name: true,
 					x: true,
 					y: true,
 					grenades: {
+						where: {
+							verified: true,
+						},
 						select: {
 							id: true,
 							name: true,

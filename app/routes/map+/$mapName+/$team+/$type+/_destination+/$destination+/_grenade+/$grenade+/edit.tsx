@@ -73,7 +73,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 	invariantResponse(grenadeId, 'Grenade ID is required')
 
 	const grenade = await prisma.grenade.findUnique({
-		where: { id: grenadeId },
+		where: { id: grenadeId, verified: true },
 		select: {
 			id: true,
 			name: true,
