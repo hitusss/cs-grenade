@@ -336,14 +336,13 @@ export default function SupportRoute() {
 								/>
 
 								<div className="flex gap-2 py-2">
-									<MultipleImageField.Input className="size-16" />
+									<MultipleImageField.Input />
 
 									<TooltipProvider>
 										<Tooltip>
 											<TooltipTrigger asChild>
 												<Button
 													size="icon"
-													className="size-16"
 													type="submit"
 													name="intent"
 													value="new-message"
