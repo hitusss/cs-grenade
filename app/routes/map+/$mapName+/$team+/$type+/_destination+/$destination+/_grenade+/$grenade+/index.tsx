@@ -1,10 +1,13 @@
 import { json, type LoaderFunctionArgs } from '@remix-run/node'
-import { Link, useLoaderData, useNavigate } from '@remix-run/react'
+import { Form, Link, useLoaderData, useNavigate } from '@remix-run/react'
 import { invariantResponse } from '@epic-web/invariant'
 
-import { getUserId } from '#app/utils/auth.server.ts'
+import { getUserId, requireUserId } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
+import { useDoubleCheck } from '#app/utils/misc.tsx'
+import { unauthorized } from '#app/utils/permissions.server.ts'
 import { userHasPermission } from '#app/utils/permissions.ts'
+import { redirectWithToast } from '#app/utils/toast.server.ts'
 import { useOptionalUser } from '#app/utils/user.ts'
 import { Button } from '#app/components/ui/button.tsx'
 import {
@@ -31,9 +34,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 	const grenade = await prisma.grenade.findUnique({
 		where: {
 			id: grenadeId,
-			verified: true,
 		},
 		select: {
+			verified: true,
 			name: true,
 			description: true,
 			images: {
@@ -61,11 +64,54 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 	invariantResponse(grenade, 'Not found', { status: 404 })
 
+	if (!grenade.verified && userId !== grenade.userId) {
+		throw unauthorized({
+			message: 'You are not allowed to view this grenade',
+		})
+	}
+
 	return json({ grenade })
 }
+
+export async function action({ request, params }: LoaderFunctionArgs) {
+	const { grenade: grenadeId } = params
+	const userId = await requireUserId(request)
+
+	const grenade = await prisma.grenade.findUnique({
+		where: {
+			id: grenadeId,
+		},
+		select: {
+			userId: true,
+		},
+	})
+
+	invariantResponse(grenade, 'Not found', { status: 404 })
+	if (grenade.userId !== userId) {
+		throw unauthorized({
+			message: 'You are not allowed to perform this action',
+		})
+	}
+
+	await prisma.grenade.delete({
+		where: {
+			id: grenadeId,
+			verified: false,
+		},
+	})
+
+	return await redirectWithToast(`..`, {
+		title: `Grenade request cancelled`,
+		description: ``,
+		type: 'success',
+	})
+}
+
 export default function GrenadeRoute() {
 	const data = useLoaderData<typeof loader>()
 	const navigate = useNavigate()
+
+	const cancelDC = useDoubleCheck()
 
 	const { activeLightbox, openLightbox } = useLightbox()
 
@@ -108,7 +154,21 @@ export default function GrenadeRoute() {
 					))}
 				</ul>
 				<DialogFooter>
-					{canEdit ? (
+					{!data.grenade.verified ? (
+						<Form method="POST">
+							<Button
+								variant="destructive"
+								{...cancelDC.getButtonProps({
+									type: 'submit',
+									name: 'intent',
+									value: 'cancel',
+								})}
+							>
+								{cancelDC.doubleCheck ? 'Are you sure?' : 'Cancel request'}
+							</Button>
+						</Form>
+					) : null}
+					{data.grenade.verified && canEdit ? (
 						<Button>
 							<Link to="edit">Edit</Link>
 						</Button>
