@@ -281,7 +281,7 @@ export default function SupportRoute() {
 					</Form>
 				) : null}
 			</div>
-			<div className="flex flex-col flex-1 gap-6 overflow-hidden px-4">
+			<div className="flex flex-col flex-1 gap-6 overflow-hidden px-1 md:px-4">
 				<div
 					id="asd"
 					ref={messagesContainer}
@@ -323,7 +323,7 @@ export default function SupportRoute() {
 										...getTextareaProps(fields.message),
 										autoFocus: true,
 										placeholder: 'Type here...',
-										className: 'resize-none',
+										className: 'resize-none min-h-[52px]',
 										onKeyDown: (e) => {
 											if (e.key === 'Enter' && !e.shiftKey) {
 												e.preventDefault()
