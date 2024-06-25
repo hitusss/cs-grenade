@@ -3,13 +3,13 @@ import { default as defaultConfig } from '@epic-web/config/prettier'
 /** @type {import("prettier").Options} */
 export default {
 	...defaultConfig,
-	plugins: [...defaultConfig.plugins, '@ianvs/prettier-plugin-sort-imports'],
+	plugins: ['@ianvs/prettier-plugin-sort-imports', ...defaultConfig.plugins],
 	importOrder: [
 		'^(react/(.*)$)|^(react$)',
 		'^(@remix-run/(.*)$)|^(@remix-run$)',
 		'<THIRD_PARTY_MODULES>',
 		'',
-		'^#types$',
+		'^#types/(.*)$',
 		'^#app/utils/(.*)$',
 		'^#app/components/ui/(.*)$',
 		'^#app/components/(.*)$',
