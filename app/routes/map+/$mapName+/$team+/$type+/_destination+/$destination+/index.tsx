@@ -124,7 +124,7 @@ export default function DestinationRoute() {
 							name: 'intent',
 							value: 'cancel',
 						})}
-						className="absolute z-10 bottom-0 right-0"
+						className="absolute bottom-0 right-0 z-10"
 					>
 						{cancelDC.doubleCheck ? 'Are you sure?' : 'Cancel request'}
 					</Button>
@@ -136,7 +136,7 @@ export default function DestinationRoute() {
 							<Link to="edit">{canEdit ? 'Edit' : 'Request changes'}</Link>
 						</Button>
 					) : null}
-					<Button className="absolute z-10 bottom-0 right-0" asChild>
+					<Button className="absolute bottom-0 right-0 z-10" asChild>
 						<Link to="new">
 							{hasCreateGrenadePermission
 								? 'Create grenade'

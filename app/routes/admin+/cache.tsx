@@ -107,7 +107,7 @@ export default function CacheAdminRoute() {
 			<h1>Cache Admin</h1>
 			<Form
 				method="get"
-				className="flex flex-col gap-4 mt-12"
+				className="mt-12 flex flex-col gap-4"
 				onChange={(e) => handleFormChange(e.currentTarget)}
 			>
 				<div className="flex-1">
@@ -169,7 +169,7 @@ export default function CacheAdminRoute() {
 					</select>
 				</div>
 			</Form>
-			<div className="flex flex-col gap-4 mt-12">
+			<div className="mt-12 flex flex-col gap-4">
 				<h2>LRU Cache:</h2>
 				{data.cacheKeys.lru.map((key) => (
 					<CacheKeyRow
@@ -180,7 +180,7 @@ export default function CacheAdminRoute() {
 					/>
 				))}
 			</div>
-			<div className="flex flex-col gap-4 mt-8">
+			<div className="mt-8 flex flex-col gap-4">
 				<h2>SQLite Cache:</h2>
 				{data.cacheKeys.sqlite.map((key) => (
 					<CacheKeyRow

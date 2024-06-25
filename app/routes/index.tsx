@@ -35,7 +35,7 @@ export default function Index() {
 
 	return (
 		<div className="container">
-			<div className="flex justify-between items-center">
+			<div className="flex items-center justify-between">
 				<h1>Maps</h1>
 				{hasCreateMapPermission ? (
 					<Button asChild>

@@ -100,7 +100,7 @@ export function DestinationForm({
 			) : null}
 			{coords && !open ? (
 				<Button
-					className="absolute z-10 bottom-0 left-1/2 -translate-x-1/2"
+					className="absolute bottom-0 left-1/2 z-10 -translate-x-1/2"
 					onClick={() => setOpen(true)}
 				>
 					Open Form

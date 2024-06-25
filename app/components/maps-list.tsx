@@ -1,9 +1,8 @@
 import { Link } from '@remix-run/react'
 
-import { cn } from '#app/utils/misc.tsx'
-
 import { grenadeTypes } from '#types/grenades-types.ts'
 import { teams } from '#types/teams.ts'
+import { cn } from '#app/utils/misc.tsx'
 
 import { Card, CardTitle } from './ui/card.tsx'
 
@@ -19,7 +18,7 @@ export default function MapsList({
 	}>
 }) {
 	return (
-		<ul className="flex flex-wrap mt-6 gap-6 px-8">
+		<ul className="mt-6 flex flex-wrap gap-6 px-8">
 			{maps.map((map) => (
 				<li key={map.name}>
 					<Link
@@ -35,13 +34,13 @@ export default function MapsList({
 						>
 							<img
 								src={`/resources/map-images/${map.imageId}`}
-								className="absolute h-full w-full object-cover -z-10 brightness-75 duration-500 transition-all group-hover:blur-sm group-hover:brightness-50 group-hover:scale-150"
+								className="absolute -z-10 h-full w-full object-cover brightness-75 transition-all duration-500 group-hover:scale-150 group-hover:blur-sm group-hover:brightness-50"
 							/>
 							<img
 								src={`/resources/map-logos/${map.logoId}`}
 								className="transition-all duration-500 group-hover:scale-75"
 							/>
-							<CardTitle className="text-center text-white transition-all duration-500 group-hover:scale-125 group-hover:-translate-y-1/2">
+							<CardTitle className="text-center text-white transition-all duration-500 group-hover:-translate-y-1/2 group-hover:scale-125">
 								{map.label}
 							</CardTitle>
 						</Card>

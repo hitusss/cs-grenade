@@ -7,7 +7,7 @@ export const handle: SEOHandle = {
 
 export default function MainMapLayout() {
 	return (
-		<div className="container py-12 min-h-full">
+		<div className="container min-h-full py-12">
 			<Outlet />
 		</div>
 	)

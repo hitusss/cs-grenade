@@ -60,13 +60,13 @@ export default function MainSupportRoute() {
 		<div className="container flex h-[90vh] py-4 lg:py-8">
 			<div
 				className={cn(
-					'max-w-96 h-full px-4 border-r relative transition-all pt-12',
+					'relative h-full max-w-96 border-r px-4 pt-12 transition-all',
 					isOpen ? 'w-[calc(100%)]' : 'w-12',
 				)}
 			>
 				<Button
 					size="icon"
-					className="absolute top-2 right-2"
+					className="absolute right-2 top-2"
 					onClick={() => setIsOpen((prev) => !prev)}
 				>
 					<Icon
@@ -77,15 +77,15 @@ export default function MainSupportRoute() {
 				</Button>
 				<aside
 					className={cn(
-						'flex flex-col h-full gap-4 transition-all',
-						isOpen ? 'w-[calc(100%)] opacity-100' : 'w-0 opacity-0 hidden',
+						'flex h-full flex-col gap-4 transition-all',
+						isOpen ? 'w-[calc(100%)] opacity-100' : 'hidden w-0 opacity-0',
 					)}
 					style={{
 						transitionBehavior: 'allow-discrete',
 					}}
 				>
 					<h1>Support</h1>
-					<p className="text-caption mt-12">Tickets</p>
+					<p className="mt-12 text-caption">Tickets</p>
 					<Button className="w-full" asChild>
 						<Link to="new">
 							<Icon name="plus"> New ticket </Icon>
@@ -96,12 +96,12 @@ export default function MainSupportRoute() {
 							<li key={ticket.id}>
 								<Button
 									variant={ticket.open ? 'default' : 'secondary'}
-									className="w-full justify-start h-auto"
+									className="h-auto w-full justify-start"
 									asChild
 								>
 									<Link to={`${ticket.id}`}>
-										<div className="flex flex-col gap-2 p-2 w-full">
-											<div className="flex gap-2 justify-between">
+										<div className="flex w-full flex-col gap-2 p-2">
+											<div className="flex justify-between gap-2">
 												<p className="text-caption">{ticket.title}</p>
 												{ticket.messages.length > 0 ? (
 													<span className="mt-2 grid size-3 animate-pulse place-items-center rounded-full bg-destructive text-body-xs text-destructive-foreground" />
@@ -119,9 +119,9 @@ export default function MainSupportRoute() {
 					</ul>
 				</aside>
 			</div>
-			<div className="flex-1 w-full h-full grid">
+			<div className="grid h-full w-full flex-1">
 				{location.pathname === '/support' ? (
-					<div className="grid place-content-center w-full h-full">
+					<div className="grid h-full w-full place-content-center">
 						<p className="text-caption">
 							Select any ticket to see the details.
 						</p>

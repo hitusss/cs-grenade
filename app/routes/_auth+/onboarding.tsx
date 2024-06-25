@@ -218,7 +218,7 @@ export default function OnboardingRoute() {
 				<ErrorList errors={form.errors} id={form.errorId} />
 
 				<StatusButton
-					className="w-full mt-4"
+					className="mt-4 w-full"
 					status={isPending ? 'pending' : form.status ?? 'idle'}
 					type="submit"
 					disabled={isPending}

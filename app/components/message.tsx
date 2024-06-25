@@ -34,7 +34,7 @@ export function Message({
 
 	return (
 		<div
-			className={cn('flex max-w-[95%] sm:max-w-[80%] shrink-0 flex-col', {
+			className={cn('flex max-w-[95%] shrink-0 flex-col sm:max-w-[80%]', {
 				'self-end': align === 'end',
 			})}
 		>

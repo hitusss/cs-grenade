@@ -149,7 +149,7 @@ function LightboxInner({
 							size="icon"
 							disabled={!canGoLeft}
 							onClick={goLeft}
-							className="rounded-full shrink-0"
+							className="shrink-0 rounded-full"
 						>
 							<Icon name="chevron-left" />
 							<span className="sr-only">previous image</span>
@@ -157,14 +157,14 @@ function LightboxInner({
 					) : (
 						<div />
 					)}
-					<div className="flex flex-col gap-2 w-full h-full justify-center items-center py-6 lg:py-12">
+					<div className="flex h-full w-full flex-col items-center justify-center gap-2 py-6 lg:py-12">
 						<img
 							src={images[activeIndex]?.src}
 							alt={images[activeIndex]?.alt}
 							className="max-h-full max-w-full object-contain"
 						/>
 						{images[activeIndex]?.caption ? (
-							<p className="text-caption text-center">
+							<p className="text-center text-caption">
 								{images[activeIndex]?.caption}
 							</p>
 						) : null}
@@ -175,7 +175,7 @@ function LightboxInner({
 							size="icon"
 							disabled={!canGoRight}
 							onClick={goRight}
-							className="rounded-full shrink-0"
+							className="shrink-0 rounded-full"
 						>
 							<Icon name="chevron-right" />
 							<span className="sr-only">next image</span>

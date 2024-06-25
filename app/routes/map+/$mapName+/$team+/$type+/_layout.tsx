@@ -4,6 +4,8 @@ import { Link, Outlet, useLoaderData, useMatches } from '@remix-run/react'
 import { invariantResponse } from '@epic-web/invariant'
 import { z } from 'zod'
 
+import { grenadeLabels, grenadeTypes } from '#types/grenades-types.ts'
+import { teamLabels, teams } from '#types/teams.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { userHasPermission } from '#app/utils/permissions.ts'
 import { useOptionalUser } from '#app/utils/user.ts'
@@ -12,9 +14,6 @@ import { DestinationMarker } from '#app/components/destination-marker.tsx'
 import { GrenadeMarker } from '#app/components/grenade-marker.tsx'
 import { MapNav } from '#app/components/map-nav.tsx'
 import { Map } from '#app/components/map.tsx'
-
-import { grenadeLabels, grenadeTypes } from '#types/grenades-types.ts'
-import { teamLabels, teams } from '#types/teams.ts'
 
 export const MapHandle = z
 	.object({
@@ -163,11 +162,11 @@ export default function MapLayout() {
 	return (
 		<div
 			ref={containerRef}
-			className="grid animate-in fade-in zoom-in duration-500 place-items-center"
+			className="grid place-items-center duration-500 animate-in fade-in zoom-in"
 		>
 			<div className="grid gap-6">
 				<h1>{data.map.label}</h1>
-				<div className="flex gap-6 flex-wrap w-full items-center justify-start">
+				<div className="flex w-full flex-wrap items-center justify-start gap-6">
 					<MapNav
 						label="Team"
 						items={teams.map((t) => ({

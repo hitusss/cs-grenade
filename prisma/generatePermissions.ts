@@ -1,5 +1,3 @@
-import { prisma } from '#app/utils/db.server.ts'
-
 import {
 	accesses,
 	actions,
@@ -8,6 +6,7 @@ import {
 	type Action,
 	type Entity,
 } from '#types/permissions.ts'
+import { prisma } from '#app/utils/db.server.ts'
 
 type PermissionArray = Array<{ entity: Entity; action: Action; access: Access }>
 

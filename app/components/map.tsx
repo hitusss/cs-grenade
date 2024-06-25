@@ -85,7 +85,7 @@ export function Map({
 			<TooltipProvider delayDuration={0}>
 				<div
 					ref={mapRef}
-					className="relative isolate aspect-square w-full sm:h-[75vw] sm:max-h-[75vh] sm:w-[75vh] sm:max-w-[75vw] rounded-xl border-8 border-primary bg-primary [&_a]:rounded-none [&_a]:shadow-none [&_button]:rounded-none [&_button]:shadow-none"
+					className="relative isolate aspect-square w-full rounded-xl border-8 border-primary bg-primary sm:h-[75vw] sm:max-h-[75vh] sm:w-[75vh] sm:max-w-[75vw] [&_a]:rounded-none [&_a]:shadow-none [&_button]:rounded-none [&_button]:shadow-none"
 				>
 					{children}
 				</div>
@@ -105,7 +105,7 @@ export function MapBackButton({ to = '..' }: { to?: string }) {
 	return (
 		<Tooltip>
 			<TooltipTrigger asChild>
-				<Button size="icon" className="absolute z-10 bottom-0 left-0" asChild>
+				<Button size="icon" className="absolute bottom-0 left-0 z-10" asChild>
 					<Link to={to}>
 						<Icon name="chevron-left" />
 						<span className="sr-only">Back</span>
@@ -119,8 +119,8 @@ export function MapBackButton({ to = '..' }: { to?: string }) {
 
 export function MapTitle({ children }: { children: React.ReactNode }) {
 	return (
-		<div className="absolute z-10 bg-primary text-primary-foreground top-0 left-1/2 -translate-x-1/2 px-4 py-2">
-			<h2 className="text-h5 text-center">{children}</h2>
+		<div className="absolute left-1/2 top-0 z-10 -translate-x-1/2 bg-primary px-4 py-2 text-primary-foreground">
+			<h2 className="text-center text-h5">{children}</h2>
 		</div>
 	)
 }

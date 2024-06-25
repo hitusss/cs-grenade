@@ -24,9 +24,9 @@ export function MapNav({
 }) {
 	return (
 		<div>
-			<p className="text-caption pl-2">{label}</p>
+			<p className="pl-2 text-caption">{label}</p>
 			<TooltipProvider>
-				<ul className="flex gap-2 p-2 border rounded-md">
+				<ul className="flex gap-2 rounded-md border p-2">
 					{items.map((i) => (
 						<li key={i.value}>
 							<Tooltip>

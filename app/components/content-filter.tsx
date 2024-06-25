@@ -1,10 +1,9 @@
 import { useReducer } from 'react'
 import { useRouteLoaderData } from '@remix-run/react'
 
-import { type loader as rootLoader } from '#app/root.tsx'
-
 import { grenadeLabels, grenadeTypes } from '#types/grenades-types.ts'
 import { teamLabels, teams } from '#types/teams.ts'
+import { type loader as rootLoader } from '#app/root.tsx'
 
 import {
 	Accordion,

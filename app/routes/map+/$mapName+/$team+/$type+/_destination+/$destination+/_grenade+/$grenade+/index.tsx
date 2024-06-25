@@ -138,15 +138,15 @@ export default function GrenadeRoute() {
 
 	return (
 		<Dialog open onOpenChange={() => !activeLightbox && navigate(-1)}>
-			<DialogContent className="max-w-5xl max-h-[90vh] overflow-auto">
+			<DialogContent className="max-h-[90vh] max-w-5xl overflow-auto">
 				<DialogHeader>{data.grenade.name}</DialogHeader>
 				<p>{data.grenade.description}</p>
 				<ul className="flex flex-wrap gap-4">
 					{data.grenade.images.map((image, index) => (
-						<li key={image.id} className="w-48 md:w-64 space-y-1">
+						<li key={image.id} className="w-48 space-y-1 md:w-64">
 							<img
 								src={`/resources/grenade-images/${image.id}`}
-								className="aspect-square object-cover cursor-pointer shadow-md"
+								className="aspect-square cursor-pointer object-cover shadow-md"
 								onClick={() => openLightbox({ index, images: grenadeImages })}
 							/>
 							<p>{image.description}</p>

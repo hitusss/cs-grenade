@@ -262,8 +262,8 @@ export default function SupportRoute() {
 	}, [data.ticket.messages.length])
 
 	return (
-		<div className="flex flex-col gap-12 w-full h-full overflow-hidden">
-			<div className="flex gap-6 items-center justify-between flex-wrap py-4 px-2 border-b">
+		<div className="flex h-full w-full flex-col gap-12 overflow-hidden">
+			<div className="flex flex-wrap items-center justify-between gap-6 border-b px-2 py-4">
 				<h2>{data.ticket.title}</h2>
 				{data.ticket.open ? (
 					<Form method="POST" encType="multipart/form-data">
@@ -281,11 +281,11 @@ export default function SupportRoute() {
 					</Form>
 				) : null}
 			</div>
-			<div className="flex flex-col flex-1 gap-6 overflow-hidden px-1 md:px-4">
+			<div className="flex flex-1 flex-col gap-6 overflow-hidden px-1 md:px-4">
 				<div
 					id="asd"
 					ref={messagesContainer}
-					className="overflow-y-auto flex-1 flex flex-col gap-2 overscroll-contain"
+					className="flex flex-1 flex-col gap-2 overflow-y-auto overscroll-contain"
 				>
 					{data.ticket.messages.map((msg) => (
 						<Message

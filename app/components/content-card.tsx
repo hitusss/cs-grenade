@@ -34,7 +34,7 @@ export function ContentCard({
 				{fields.map((f) => (
 					<div
 						key={f.label}
-						className="flex items-center justify-between gap-2 w-full flex-wrap"
+						className="flex w-full flex-wrap items-center justify-between gap-2"
 					>
 						<p className="text-body-sm">{f.label}</p>
 						<div className="flex items-center gap-1">

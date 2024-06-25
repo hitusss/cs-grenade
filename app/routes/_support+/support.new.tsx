@@ -123,7 +123,7 @@ export default function NewSupportRoute() {
 	const isPending = useIsPending()
 
 	return (
-		<div className="grid grid-rows-[auto_1fr] gap-12 justify-center">
+		<div className="grid grid-rows-[auto_1fr] justify-center gap-12">
 			<h2>Create a new support ticket</h2>
 			<Form method="POST" encType="multipart/form-data" {...getFormProps(form)}>
 				<MultipleImageField.Provider

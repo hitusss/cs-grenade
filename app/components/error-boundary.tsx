@@ -36,7 +36,7 @@ export function GeneralErrorBoundary({
 	}
 
 	return (
-		<div className="container h-full grid place-items-center p-20">
+		<div className="container grid h-full place-items-center p-20">
 			{isRouteErrorResponse(error)
 				? (statusHandlers?.[error.status] ?? defaultStatusHandler)({
 						error,
@@ -65,7 +65,7 @@ export function ErrorComponent({
 	}
 }) {
 	return (
-		<div className="grid gap-6 max-w-xl">
+		<div className="grid max-w-xl gap-6">
 			<div className="grid gap-3">
 				<h1>{heading}</h1>
 				<pre className="whitespace-pre-wrap break-all text-body-md">

@@ -100,7 +100,7 @@ export function MapForm({ type, defaultValue, result }: MapFormProps) {
 					}
 				/>
 			</div>
-			<div className="flex gap-4 mt-4 [&>*]:flex-1">
+			<div className="mt-4 flex gap-4 [&>*]:flex-1">
 				<StatusButton
 					type="submit"
 					status={isPending ? 'pending' : form.status ?? 'idle'}

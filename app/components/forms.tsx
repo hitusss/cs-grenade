@@ -267,8 +267,8 @@ export function ImageField({
 				{imageSrc || existingImage ? (
 					<span
 						className={cn(
-							'bg-primary rounded-full p-2 size-10 grid place-content-center absolute z-10 cursor-pointer',
-							fullRounded ? 'right-0 bottom-0' : '-right-5 -bottom-5',
+							'absolute z-10 grid size-10 cursor-pointer place-content-center rounded-full bg-primary p-2',
+							fullRounded ? 'bottom-0 right-0' : '-bottom-5 -right-5',
 						)}
 					>
 						<Icon name="pencil" />

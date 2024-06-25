@@ -57,7 +57,7 @@ export default function ProfileRoute() {
 
 	return (
 		<div className="container mb-48 mt-36 flex flex-col items-center justify-center">
-			<div className="container flex flex-col items-center border rounded-lg p-12">
+			<div className="container flex flex-col items-center rounded-lg border p-12">
 				<div className="relative w-52">
 					<div className="absolute -top-40">
 						<div className="relative">
@@ -70,7 +70,7 @@ export default function ProfileRoute() {
 					</div>
 				</div>
 
-				<div className="flex flex-col items-center mt-16">
+				<div className="mt-16 flex flex-col items-center">
 					<div className="flex flex-wrap items-center justify-center gap-4">
 						<h1 className="text-center">{userDisplayName}</h1>
 					</div>
@@ -136,7 +136,7 @@ export default function ProfileRoute() {
 			</div>
 
 			{!location.pathname.endsWith(params.username as string) ? (
-				<div className="container grid border rounded-lg p-12 mt-2">
+				<div className="container mt-2 grid rounded-lg border p-12">
 					<Outlet />
 				</div>
 			) : null}

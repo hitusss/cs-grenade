@@ -159,7 +159,7 @@ export default function EditMapRoute() {
 	const actionData = useActionData<typeof action>()
 
 	return (
-		<div className="max-w-2xl mx-auto">
+		<div className="mx-auto max-w-2xl">
 			<h1>Edit Map</h1>
 			<MapForm
 				type="edit"

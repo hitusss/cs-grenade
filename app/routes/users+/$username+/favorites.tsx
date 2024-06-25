@@ -2,15 +2,14 @@ import { json, type LoaderFunctionArgs } from '@remix-run/node'
 import { Link, useLoaderData } from '@remix-run/react'
 import { invariantResponse } from '@epic-web/invariant'
 
+import { grenadeLabels, type GrenadeType } from '#types/grenades-types.ts'
+import { teamLabels, type TeamType } from '#types/teams.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { ContentCard } from '#app/components/content-card.tsx'
 import {
 	ContentFilter,
 	useContentFiler,
 } from '#app/components/content-filter.tsx'
-
-import { grenadeLabels, type GrenadeType } from '#types/grenades-types.ts'
-import { teamLabels, type TeamType } from '#types/teams.ts'
 
 export async function loader({ params }: LoaderFunctionArgs) {
 	const { username } = params
@@ -81,7 +80,7 @@ export default function UserFavoritesRoute() {
 				dispatch={dispatch}
 				hideFilter={{ verified: true }}
 			/>
-			<ul className="flex gap-4 flex-wrap mt-6">
+			<ul className="mt-6 flex flex-wrap gap-4">
 				{favorites.map((f) => (
 					<li key={f.id}>
 						<Link

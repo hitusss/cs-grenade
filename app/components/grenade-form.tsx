@@ -125,14 +125,14 @@ export function GrenadeForm({
 			) : null}
 			{coords && !open ? (
 				<Button
-					className="absolute z-10 bottom-0 left-1/2 -translate-x-1/2"
+					className="absolute bottom-0 left-1/2 z-10 -translate-x-1/2"
 					onClick={() => setOpen(true)}
 				>
 					Open Form
 				</Button>
 			) : null}
 			<Dialog open={open} onOpenChange={setOpen}>
-				<DialogContent className="max-w-2xl max-h-[90vh] overflow-auto">
+				<DialogContent className="max-h-[90vh] max-w-2xl overflow-auto">
 					<DialogHeader>
 						<DialogTitle>{title}</DialogTitle>
 					</DialogHeader>
@@ -207,7 +207,7 @@ export function GrenadeForm({
 													</TooltipContent>
 												</Tooltip>
 											</div>
-											<fieldset className="relative flex flex-1 flex-wrap gap-4 items-end">
+											<fieldset className="relative flex flex-1 flex-wrap items-end gap-4">
 												<input
 													{...getInputProps(imageFields.type, {
 														type: 'hidden',
@@ -245,7 +245,7 @@ export function GrenadeForm({
 														rows: 4,
 													}}
 													errors={imageFields.description.errors}
-													className="flex-1 min-w-44"
+													className="min-w-44 flex-1"
 												/>
 												<Tooltip>
 													<TooltipTrigger asChild>
