@@ -5,7 +5,6 @@ import { z } from 'zod'
 
 import { requireUserId } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
-import { ensurePrimary } from '#app/utils/litefs.server.ts'
 import { getDomainUrl } from '#app/utils/misc.tsx'
 import { redirectWithToast } from '#app/utils/toast.server.ts'
 import { generateTOTP, verifyTOTP } from '#app/utils/totp.server.ts'
@@ -169,10 +168,6 @@ export async function validateRequest(
 			{ status: submission.status === 'error' ? 400 : 200 },
 		)
 	}
-
-	// this code path could be part of a loader (GET request), so we need to make
-	// sure we're running on primary because we're about to make writes.
-	await ensurePrimary()
 
 	const { value: submissionValue } = submission
 
