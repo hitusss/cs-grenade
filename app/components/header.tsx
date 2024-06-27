@@ -2,6 +2,7 @@ import { useRef } from 'react'
 import { Form, Link, useSubmit } from '@remix-run/react'
 
 import { getUserImgSrc, useOptionalUser, useUser } from '#app/utils/user.ts'
+import { Notifications } from '#app/routes/resources+/notifications.tsx'
 import { ThemeSwitch } from '#app/routes/resources+/theme-switch.tsx'
 
 import { Logo } from './logo.tsx'
@@ -25,10 +26,13 @@ export function Header() {
 					<Logo className="size-12" />
 					<span className="sr-only">Home</span>
 				</Link>
-				<div className="flex items-center gap-10">
+				<div className="flex items-center gap-6">
 					<ThemeSwitch />
 					{user ? (
-						<UserDropdown />
+						<>
+							<Notifications />
+							<UserDropdown />
+						</>
 					) : (
 						<Button asChild variant="default" size="lg">
 							<Link to="/login">Log In</Link>
