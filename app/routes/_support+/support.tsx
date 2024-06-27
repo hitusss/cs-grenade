@@ -95,8 +95,17 @@ export default function MainSupportRoute() {
 						{data.tickets.map((ticket) => (
 							<li key={ticket.id}>
 								<Button
-									variant={ticket.open ? 'default' : 'secondary'}
-									className="h-auto w-full justify-start"
+									variant={
+										ticket.open
+											? location.pathname === `/support/${ticket.id}`
+												? 'default'
+												: 'secondary'
+											: 'secondary'
+									}
+									className={cn(
+										'h-auto w-full justify-start',
+										!ticket.open && 'opacity-25',
+									)}
 									asChild
 								>
 									<Link to={`${ticket.id}`}>
