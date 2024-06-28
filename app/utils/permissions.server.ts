@@ -1,6 +1,6 @@
 import { json } from '@remix-run/node'
 
-import { type PermissionString } from '#types/permissions.ts'
+import { type PermissionString, type Role } from '#types/permissions.ts'
 
 import { requireUserId } from './auth.server.ts'
 import { prisma } from './db.server.ts'
@@ -71,15 +71,23 @@ export async function requireUserWithPermission(
 	return user.id
 }
 
-export async function requireUserWithRole(request: Request, name: string) {
+export async function requireUserWithRole(
+	request: Request,
+	roles: Role | Role[],
+) {
 	const userId = await requireUserId(request)
 	const user = await prisma.user.findFirst({
 		select: { id: true },
-		where: { id: userId, roles: { some: { name } } },
+		where: {
+			id: userId,
+			roles: {
+				some: { name: typeof roles === 'string' ? roles : { in: roles } },
+			},
+		},
 	})
 	if (!user) {
 		throw unauthorized({
-			message: `Unauthorized: required role: ${name}`,
+			message: `Unauthorized: required role: ${typeof roles === 'string' ? roles : roles.join(', ')}`,
 			requiredRole: name,
 		})
 	}

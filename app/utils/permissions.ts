@@ -3,6 +3,7 @@ import {
 	type Action,
 	type Entity,
 	type PermissionString,
+	type Role,
 } from '#types/permissions.ts'
 
 import { type useUser } from './user.ts'
@@ -38,8 +39,10 @@ export function userHasPermission(
 
 export function userHasRole(
 	user: Pick<ReturnType<typeof useUser>, 'roles'> | null,
-	role: string,
+	roles: Role | Role[],
 ) {
 	if (!user) return false
-	return user.roles.some((r) => r.name === role)
+	return user.roles.some((r) =>
+		typeof roles === 'string' ? r.name === roles : roles.includes(r.name),
+	)
 }
