@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import {
 	json,
 	redirect,
@@ -29,15 +30,24 @@ import {
 import { useDebounce, useDoubleCheck } from '#app/utils/misc.tsx'
 import { requireUserWithRole } from '#app/utils/permissions.server.ts'
 import { Button } from '#app/components/ui/button.tsx'
+import { Icon } from '#app/components/ui/icon.tsx'
+import { Input } from '#app/components/ui/input.tsx'
+import { Label } from '#app/components/ui/label.tsx'
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '#app/components/ui/select.tsx'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
-import { Field } from '#app/components/forms.tsx'
 
 export const handle: SEOHandle = {
 	getSitemapEntries: () => null,
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
-	await requireUserWithRole(request, 'admin')
+	await requireUserWithRole(request, ['admin', 'superadmin'])
 	const searchParams = new URL(request.url).searchParams
 	const query = searchParams.get('query')
 	if (query === '') {
@@ -98,100 +108,106 @@ export default function CacheAdminRoute() {
 	const limit = searchParams.get('limit') ?? '100'
 	const instance = searchParams.get('instance') ?? data.instance
 
+	const [selectedInstance, setSelectedInstance] = useState<string>(instance)
+
 	const handleFormChange = useDebounce((form: HTMLFormElement) => {
 		submit(form)
 	}, 400)
 
 	return (
-		<div className="container">
-			<h1>Cache Admin</h1>
+		<>
+			<h2>Cache Admin</h2>
 			<Form
 				method="get"
-				className="mt-12 flex flex-col gap-4"
+				className="flex flex-col gap-4"
 				onChange={(e) => handleFormChange(e.currentTarget)}
 			>
 				<div className="flex-1">
-					<div className="flex flex-1 gap-4">
-						<button
-							type="submit"
-							className="flex h-16 items-center justify-center"
-						>
-							🔎
-						</button>
-						<Field
-							className="flex-1"
-							labelProps={{ children: 'Search' }}
-							inputProps={{
-								type: 'search',
-								name: 'query',
-								defaultValue: query,
-							}}
-						/>
-						<div className="flex h-16 w-14 items-center text-body-md font-medium text-muted-foreground">
-							<span title="Total results shown">
-								{data.cacheKeys.sqlite.length + data.cacheKeys.lru.length}
-							</span>
+					<div className="flex flex-1 items-end">
+						<div>
+							<Label>Search</Label>
+							<Input type="search" name="query" defaultValue={query} />
 						</div>
+						<Button variant="outline" size="icon" type="submit">
+							<Icon name="search" />
+						</Button>
 					</div>
 				</div>
-				<div className="flex flex-wrap items-center gap-4">
-					<Field
-						labelProps={{
-							children: 'Limit',
-						}}
-						inputProps={{
-							name: 'limit',
-							defaultValue: limit,
-							type: 'number',
-							step: '1',
-							min: '1',
-							max: '10000',
-							placeholder: 'results limit',
-						}}
-					/>
-					<select name="instance" defaultValue={instance}>
-						{Object.entries(data.instances).map(([inst, region]) => (
-							<option key={inst} value={inst}>
-								{[
-									inst,
-									`(${region})`,
-									inst === data.currentInstanceInfo.currentInstance
-										? '(current)'
-										: '',
-									inst === data.currentInstanceInfo.primaryInstance
-										? ' (primary)'
-										: '',
-								]
-									.filter(Boolean)
-									.join(' ')}
-							</option>
-						))}
-					</select>
+				<div className="flex flex-wrap gap-4">
+					<div>
+						<Label>Limit</Label>
+						<Input
+							type="number"
+							name="limit"
+							defaultValue={limit}
+							step="1"
+							min="1"
+							max="10000"
+							placeholder="Results limit"
+						/>
+					</div>
+					<div>
+						<input
+							type="hidden"
+							name="instance"
+							value={selectedInstance}
+							readOnly
+						/>
+						<Label>Instance</Label>
+						<Select
+							onValueChange={setSelectedInstance}
+							value={selectedInstance}
+						>
+							<SelectTrigger className="w-56">
+								<SelectValue placeholder="Instance" />
+							</SelectTrigger>
+							<SelectContent>
+								{Object.entries(data.instances).map(([inst, region]) => (
+									<SelectItem key={inst} value={inst}>
+										{[
+											inst,
+											`(${region})`,
+											inst === data.currentInstanceInfo.currentInstance
+												? '(current)'
+												: '',
+											inst === data.currentInstanceInfo.primaryInstance
+												? ' (primary)'
+												: '',
+										]
+											.filter(Boolean)
+											.join(' ')}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+					</div>
 				</div>
 			</Form>
-			<div className="mt-12 flex flex-col gap-4">
+			<div className="flex h-full flex-col gap-4 overflow-hidden">
 				<h2>LRU Cache:</h2>
-				{data.cacheKeys.lru.map((key) => (
-					<CacheKeyRow
-						key={key}
-						cacheKey={key}
-						instance={instance}
-						type="lru"
-					/>
-				))}
-			</div>
-			<div className="mt-8 flex flex-col gap-4">
+				<ul className="flex flex-col gap-2 overflow-y-auto overscroll-contain">
+					{data.cacheKeys.lru.map((key) => (
+						<CacheKeyRow
+							key={key}
+							cacheKey={key}
+							instance={instance}
+							type="lru"
+						/>
+					))}
+				</ul>
 				<h2>SQLite Cache:</h2>
-				{data.cacheKeys.sqlite.map((key) => (
-					<CacheKeyRow
-						key={key}
-						cacheKey={key}
-						instance={instance}
-						type="sqlite"
-					/>
-				))}
+				<ul className="flex flex-col gap-2 overflow-y-auto overscroll-contain">
+					{data.cacheKeys.sqlite.map((key) => (
+						<CacheKeyRow
+							key={key}
+							cacheKey={key}
+							instance={instance}
+							type="sqlite"
+						/>
+					))}
+				</ul>
 			</div>
-		</div>
+		</>
 	)
 }
 
@@ -209,7 +225,7 @@ function CacheKeyRow({
 	const encodedKey = encodeURIComponent(cacheKey)
 	const valuePage = `/admin/cache/${type}/${encodedKey}?instance=${instance}`
 	return (
-		<div className="flex items-center gap-2 font-mono">
+		<li className="flex items-center gap-2 font-mono">
 			<fetcher.Form method="POST">
 				<input type="hidden" name="cacheKey" value={cacheKey} />
 				<input type="hidden" name="instance" value={instance} />
@@ -229,7 +245,7 @@ function CacheKeyRow({
 			<Link reloadDocument to={valuePage}>
 				{cacheKey}
 			</Link>
-		</div>
+		</li>
 	)
 }
 
