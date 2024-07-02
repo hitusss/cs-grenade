@@ -285,3 +285,12 @@ export async function downloadFile(url: string, retries: number = 0) {
 		return downloadFile(url, retries + 1)
 	}
 }
+
+export function range(start: number, end: number) {
+	let length = end - start + 1
+	/*
+  	Create an array of certain length and set the elements within it from
+    start value to end value.
+  */
+	return Array.from({ length }, (_, idx) => idx + start)
+}
