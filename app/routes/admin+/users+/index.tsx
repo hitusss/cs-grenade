@@ -211,7 +211,30 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		orderBy[sort.id] = sort.desc ? 'desc' : 'asc'
 	})
 
-	const total = await prisma.user.count()
+	const total = await prisma.user.count({
+		where: {
+			OR: query
+				? [
+						{
+							email: {
+								contains: query,
+							},
+						},
+						{
+							username: {
+								contains: query,
+							},
+						},
+						{
+							name: {
+								contains: query,
+							},
+						},
+					]
+				: undefined,
+			roles: role ? { some: { name: role } } : undefined,
+		},
+	})
 	const users = await prisma.user.findMany({
 		where: {
 			OR: query
