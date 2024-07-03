@@ -7,10 +7,8 @@ import { teamLabels, type TeamType } from '#types/teams.ts'
 import { getUserId } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { ContentCard } from '#app/components/content-card.tsx'
-import {
-	ContentFilter,
-	useContentFiler,
-} from '#app/components/content-filter.tsx'
+import { ContentFilter } from '#app/components/content-filter.tsx'
+import { Pagination } from '#app/components/pagination.tsx'
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
 	const { username } = params
@@ -25,10 +23,34 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 	const userId = await getUserId(request)
 
+	const searchParams = new URL(request.url).searchParams
+
+	const page = Number(searchParams.get('page') ?? 1)
+	const perPage = Number(searchParams.get('perPage') ?? 25)
+
+	const map = searchParams.get('map') ?? undefined
+	const team = searchParams.get('team') ?? undefined
+	const type = searchParams.get('type') ?? undefined
+	const spVerified = searchParams.get('verified')
+	const verified =
+		spVerified === 'true' ? true : spVerified === 'false' ? false : undefined
+
+	const total = await prisma.destination.count({
+		where: {
+			userId: user.id,
+			verified: user.id === userId ? verified : true,
+			map: map ? { name: map } : undefined,
+			team,
+			type,
+		},
+	})
 	const destinations = await prisma.destination.findMany({
 		where: {
 			userId: user.id,
-			verified: user.id === userId ? undefined : true,
+			verified: user.id === userId ? verified : true,
+			map: map ? { name: map } : undefined,
+			team,
+			type,
 		},
 		select: {
 			id: true,
@@ -48,41 +70,20 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 			type: true,
 			team: true,
 		},
+		skip: page * perPage - perPage,
+		take: perPage,
 	})
 
-	return json({ destinations, isOwn: user.id === userId })
+	return json({ destinations, total, isOwn: user.id === userId })
 }
 export default function UserDestinationsRoute() {
 	const data = useLoaderData<typeof loader>()
 
-	const { state, dispatch } = useContentFiler()
-
-	const destinations = data.destinations.filter((d) => {
-		if (Boolean(state.map) && d.map.label !== state.map) {
-			return false
-		}
-		if (Boolean(state.team) && d.team !== state.team) {
-			return false
-		}
-		if (Boolean(state.grenade) && d.type !== state.grenade) {
-			return false
-		}
-		if (Boolean(state.verified) && d.verified !== Boolean(state.verified)) {
-			return false
-		}
-		return true
-	})
-
 	return (
 		<div>
-			<ContentFilter
-				state={state}
-				dispatch={dispatch}
-				hideFilter={{ verified: !data.isOwn }}
-			/>
-
-			<ul className="mt-6 flex flex-wrap gap-4">
-				{destinations.map((d) => (
+			<ContentFilter hideFilter={{ verified: !data.isOwn }} />
+			<ul className="my-6 flex flex-wrap justify-center gap-4">
+				{data.destinations.map((d) => (
 					<li key={d.id}>
 						<Link to={`/map/${d.map.name}/${d.team}/${d.type}/${d.id}`}>
 							<ContentCard
@@ -100,6 +101,7 @@ export default function UserDestinationsRoute() {
 									},
 									{
 										label: 'Type',
+										img: `/img/grenades/${d.type}.png`,
 										value: grenadeLabels[d.type as GrenadeType],
 									},
 								]}
@@ -108,6 +110,7 @@ export default function UserDestinationsRoute() {
 					</li>
 				))}
 			</ul>
+			<Pagination total={data.total} />
 		</div>
 	)
 }

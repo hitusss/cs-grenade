@@ -6,20 +6,44 @@ import { grenadeLabels, type GrenadeType } from '#types/grenades-types.ts'
 import { teamLabels, type TeamType } from '#types/teams.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { ContentCard } from '#app/components/content-card.tsx'
-import {
-	ContentFilter,
-	useContentFiler,
-} from '#app/components/content-filter.tsx'
+import { ContentFilter } from '#app/components/content-filter.tsx'
+import { Pagination } from '#app/components/pagination.tsx'
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ request, params }: LoaderFunctionArgs) {
 	const { username } = params
 
 	invariantResponse(username, 'Username is required')
 
+	const searchParams = new URL(request.url).searchParams
+
+	const page = Number(searchParams.get('page') ?? 1)
+	const perPage = Number(searchParams.get('perPage') ?? 25)
+
+	const map = searchParams.get('map') ?? undefined
+	const team = searchParams.get('team') ?? undefined
+	const type = searchParams.get('type') ?? undefined
+
+	const total = await prisma.favorite.count({
+		where: {
+			user: {
+				username,
+			},
+			grenade: {
+				map: map ? { name: map } : undefined,
+				team,
+				type,
+			},
+		},
+	})
 	const favorites = await prisma.favorite.findMany({
 		where: {
 			user: {
 				username,
+			},
+			grenade: {
+				map: map ? { name: map } : undefined,
+				team,
+				type,
 			},
 		},
 		select: {
@@ -49,38 +73,21 @@ export async function loader({ params }: LoaderFunctionArgs) {
 				},
 			},
 		},
+		skip: page * perPage - perPage,
+		take: perPage,
 	})
 
-	return json({ favorites })
+	return json({ favorites, total })
 }
 export default function UserFavoritesRoute() {
 	const data = useLoaderData<typeof loader>()
 
-	const { state, dispatch } = useContentFiler()
-
-	const favorites = data.favorites
-		.filter((f) => {
-			if (Boolean(state.map) && f.grenade.map.label !== state.map) {
-				return false
-			}
-			if (Boolean(state.team) && f.grenade.team !== state.team) {
-				return false
-			}
-			if (Boolean(state.grenade) && f.grenade.type !== state.grenade) {
-				return false
-			}
-			return true
-		})
-		.map((f) => f.grenade)
+	const favorites = data.favorites.map((f) => f.grenade)
 
 	return (
 		<div>
-			<ContentFilter
-				state={state}
-				dispatch={dispatch}
-				hideFilter={{ verified: true }}
-			/>
-			<ul className="mt-6 flex flex-wrap gap-4">
+			<ContentFilter hideFilter={{ verified: true }} />
+			<ul className="my-6 flex flex-wrap justify-center gap-4">
 				{favorites.map((f) => (
 					<li key={f.id}>
 						<Link
@@ -101,6 +108,7 @@ export default function UserFavoritesRoute() {
 									},
 									{
 										label: 'Type',
+										img: `/img/grenades/${f.type}.png`,
 										value: grenadeLabels[f.type as GrenadeType],
 									},
 									{
@@ -113,6 +121,7 @@ export default function UserFavoritesRoute() {
 					</li>
 				))}
 			</ul>
+			<Pagination total={data.total} />
 		</div>
 	)
 }
