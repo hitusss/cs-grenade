@@ -1,4 +1,4 @@
-import { EventEmitter } from 'events'
+import { EventEmitter } from 'node:events'
 import { type LoaderFunctionArgs } from '@remix-run/node'
 import { invariantResponse } from '@epic-web/invariant'
 import { eventStream } from 'remix-utils/sse/server'
