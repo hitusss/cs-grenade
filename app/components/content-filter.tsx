@@ -1,5 +1,8 @@
-import { useReducer } from 'react'
-import { useRouteLoaderData } from '@remix-run/react'
+import {
+	useNavigate,
+	useRouteLoaderData,
+	useSearchParams,
+} from '@remix-run/react'
 
 import { grenadeLabels, grenadeTypes } from '#types/grenades-types.ts'
 import { teamLabels, teams } from '#types/teams.ts'
@@ -21,88 +24,7 @@ import {
 	SelectValue,
 } from './ui/select.tsx'
 
-type FilterState = {
-	map?: string
-	team?: string
-	grenade?: string
-	verified?: string
-}
-
-type FilterSetMap = {
-	type: 'SET_MAP'
-	payload: FilterState['map']
-}
-type FilterSetTeam = {
-	type: 'SET_TEAM'
-	payload: FilterState['team']
-}
-type FilterSetGrenade = {
-	type: 'SET_GRENADE'
-	payload: FilterState['grenade']
-}
-type FilterSetVerified = {
-	type: 'SET_VERIFIED'
-	payload: FilterState['verified']
-}
-type FilterReset = {
-	type: 'RESET'
-}
-
-type FilterAction =
-	| FilterSetMap
-	| FilterSetTeam
-	| FilterSetGrenade
-	| FilterSetVerified
-	| FilterReset
-
-const initialFilterState: FilterState = {
-	map: undefined,
-	team: undefined,
-	grenade: undefined,
-	verified: undefined,
-}
-
-function filterReducer(state: FilterState, action: FilterAction) {
-	switch (action.type) {
-		case 'SET_MAP': {
-			return {
-				...state,
-				map: action.payload,
-			}
-		}
-		case 'SET_TEAM': {
-			return {
-				...state,
-				team: action.payload,
-			}
-		}
-		case 'SET_GRENADE': {
-			return {
-				...state,
-				grenade: action.payload,
-			}
-		}
-		case 'SET_VERIFIED': {
-			return {
-				...state,
-				verified: action.payload,
-			}
-		}
-		case 'RESET': {
-			return initialFilterState
-		}
-		default: {
-			throw new Error(`Unhandled action`)
-		}
-	}
-}
-
-export function useContentFiler() {
-	const [state, dispatch] = useReducer(filterReducer, initialFilterState)
-	return { state, dispatch }
-}
-
-type ContentFilterProps = ReturnType<typeof useContentFiler> & {
+type ContentFilterProps = {
 	hideFilter?: {
 		map?: boolean
 		team?: boolean
@@ -111,12 +33,46 @@ type ContentFilterProps = ReturnType<typeof useContentFiler> & {
 	}
 }
 
-export function ContentFilter({
-	state,
-	dispatch,
-	hideFilter,
-}: ContentFilterProps) {
+export function ContentFilter({ hideFilter }: ContentFilterProps) {
 	const data = useRouteLoaderData<typeof rootLoader>('root')
+	const navigate = useNavigate()
+	const [searchParams, setSearchParams] = useSearchParams()
+
+	const map = searchParams.get('map') ?? ''
+	const team = searchParams.get('team') ?? ''
+	const grenade = searchParams.get('grenade') ?? ''
+	const verified = searchParams.get('verified') ?? ''
+
+	const handleFilterChange = (key: string, value: string) => {
+		setSearchParams((prev) => {
+			prev.set(key, value)
+			prev.delete('page')
+			return prev
+		})
+		navigate({ search: searchParams.toString() })
+	}
+
+	const handleFilterDelete = (key: string) => {
+		setSearchParams((prev) => {
+			prev.delete(key)
+			prev.delete('page')
+			return prev
+		})
+		navigate({ search: searchParams.toString() })
+	}
+
+	const handleFIlterReset = () => {
+		setSearchParams((prev) => {
+			prev.delete('map')
+			prev.delete('team')
+			prev.delete('grenade')
+			prev.delete('verified')
+			prev.delete('page')
+			return prev
+		})
+		navigate({ search: searchParams.toString() })
+	}
+
 	return (
 		<Accordion type="single" collapsible>
 			<AccordionItem value="filters">
@@ -125,13 +81,8 @@ export function ContentFilter({
 					<div className="flex flex-wrap gap-4 [&>*]:w-full md:[&>*]:w-64">
 						{hideFilter?.map ? null : (
 							<Select
-								value={state.map ?? ''}
-								onValueChange={(v) =>
-									dispatch({
-										type: 'SET_MAP',
-										payload: v,
-									})
-								}
+								value={map}
+								onValueChange={(v) => handleFilterChange('map', v)}
 							>
 								<div className="flex">
 									<SelectTrigger>
@@ -140,10 +91,8 @@ export function ContentFilter({
 									<Button
 										variant="ghost"
 										size="icon"
-										disabled={!state.map}
-										onClick={() =>
-											dispatch({ type: 'SET_MAP', payload: undefined })
-										}
+										disabled={!map}
+										onClick={() => handleFilterDelete('map')}
 									>
 										<Icon name="x" />
 										<span className="sr-only">clean map</span>
@@ -167,13 +116,8 @@ export function ContentFilter({
 						)}
 						{hideFilter?.team ? null : (
 							<Select
-								value={state.team ?? ''}
-								onValueChange={(v) =>
-									dispatch({
-										type: 'SET_TEAM',
-										payload: v,
-									})
-								}
+								value={team}
+								onValueChange={(v) => handleFilterChange('team', v)}
 							>
 								<div className="flex">
 									<SelectTrigger>
@@ -182,10 +126,8 @@ export function ContentFilter({
 									<Button
 										variant="ghost"
 										size="icon"
-										disabled={!state.team}
-										onClick={() =>
-											dispatch({ type: 'SET_TEAM', payload: undefined })
-										}
+										disabled={!team}
+										onClick={() => handleFilterDelete('team')}
 									>
 										<Icon name="x" />
 										<span className="sr-only">clear team</span>
@@ -209,13 +151,8 @@ export function ContentFilter({
 						)}
 						{hideFilter?.grenade ? null : (
 							<Select
-								value={state.grenade ?? ''}
-								onValueChange={(v) =>
-									dispatch({
-										type: 'SET_GRENADE',
-										payload: v,
-									})
-								}
+								value={grenade}
+								onValueChange={(v) => handleFilterChange('grenade', v)}
 							>
 								<div className="flex">
 									<SelectTrigger>
@@ -224,10 +161,8 @@ export function ContentFilter({
 									<Button
 										variant="ghost"
 										size="icon"
-										disabled={!state.grenade}
-										onClick={() =>
-											dispatch({ type: 'SET_GRENADE', payload: undefined })
-										}
+										disabled={!grenade}
+										onClick={() => handleFilterDelete('grenade')}
 									>
 										<Icon name="x" />
 										<span className="sr-only">clear grenade</span>
@@ -251,13 +186,8 @@ export function ContentFilter({
 						)}
 						{hideFilter?.verified ? null : (
 							<Select
-								value={state.verified ?? ''}
-								onValueChange={(v) =>
-									dispatch({
-										type: 'SET_VERIFIED',
-										payload: v,
-									})
-								}
+								value={verified}
+								onValueChange={(v) => handleFilterChange('verified', v)}
 							>
 								<div className="flex">
 									<SelectTrigger>
@@ -266,10 +196,8 @@ export function ContentFilter({
 									<Button
 										variant="ghost"
 										size="icon"
-										disabled={!state.verified}
-										onClick={() =>
-											dispatch({ type: 'SET_VERIFIED', payload: undefined })
-										}
+										disabled={!verified}
+										onClick={() => handleFilterDelete('verified')}
 									>
 										<Icon name="x" />
 										<span className="sr-only">clear verified</span>
@@ -286,7 +214,7 @@ export function ContentFilter({
 						variant="ghost"
 						className="self-end"
 						onClick={() => {
-							dispatch({ type: 'RESET' })
+							handleFIlterReset()
 						}}
 					>
 						Reset
