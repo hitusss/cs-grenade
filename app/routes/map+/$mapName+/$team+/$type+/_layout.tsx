@@ -111,6 +111,8 @@ export async function loader({ params }: LoaderFunctionArgs) {
 			radar: { select: { id: true } },
 			destinations: {
 				where: {
+					team,
+					type,
 					verified: true,
 				},
 				select: {
@@ -120,6 +122,8 @@ export async function loader({ params }: LoaderFunctionArgs) {
 					y: true,
 					grenades: {
 						where: {
+							team,
+							type,
 							verified: true,
 						},
 						select: {
