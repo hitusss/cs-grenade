@@ -19,7 +19,9 @@ import { Icon } from './ui/icon.tsx'
 import {
 	Select,
 	SelectContent,
+	SelectGroup,
 	SelectItem,
+	SelectLabel,
 	SelectTrigger,
 	SelectValue,
 } from './ui/select.tsx'
@@ -37,6 +39,9 @@ export function ContentFilter({ hideFilter }: ContentFilterProps) {
 	const data = useRouteLoaderData<typeof rootLoader>('root')
 	const navigate = useNavigate()
 	const [searchParams, setSearchParams] = useSearchParams()
+
+	const activeMaps = data?.maps.filter((m) => m.isActive) ?? []
+	const inactiveMaps = data?.maps.filter((m) => !m.isActive) ?? []
 
 	const map = searchParams.get('map') ?? ''
 	const team = searchParams.get('team') ?? ''
@@ -99,18 +104,38 @@ export function ContentFilter({ hideFilter }: ContentFilterProps) {
 									</Button>
 								</div>
 								<SelectContent>
-									{data?.maps.map((m) => (
-										<SelectItem key={m.label} value={m.label}>
-											<div className="flex items-center gap-2 truncate text-body-xs">
-												<img
-													src={`/resources/map-logos/${m.logo?.id}`}
-													alt=""
-													className="size-4"
-												/>
-												{m.label}
-											</div>
-										</SelectItem>
-									))}
+									<SelectGroup>
+										<SelectLabel>Active</SelectLabel>
+										{activeMaps.map((m) => (
+											<SelectItem key={m.label} value={m.name}>
+												<div className="flex items-center gap-2 truncate text-body-xs">
+													<img
+														src={`/resources/map-logos/${m.logo?.id}`}
+														alt=""
+														className="size-4"
+													/>
+													{m.label}
+												</div>
+											</SelectItem>
+										))}
+									</SelectGroup>
+									{inactiveMaps.length > 0 ? (
+										<SelectGroup>
+											<SelectLabel>Inactive</SelectLabel>
+											{inactiveMaps.map((m) => (
+												<SelectItem key={m.label} value={m.name}>
+													<div className="flex items-center gap-2 truncate text-body-xs">
+														<img
+															src={`/resources/map-logos/${m.logo?.id}`}
+															alt=""
+															className="size-4"
+														/>
+														{m.label}
+													</div>
+												</SelectItem>
+											))}
+										</SelectGroup>
+									) : null}
 								</SelectContent>
 							</Select>
 						)}
