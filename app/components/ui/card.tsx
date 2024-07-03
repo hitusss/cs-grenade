@@ -12,7 +12,7 @@ const cardVariants = cva('rounded-lg border shadow-sm', {
 		size: {
 			default: 'p-1',
 			base: 'h-64 w-52',
-			lg: 'h-72 w-56',
+			lg: 'h-80 w-64',
 		},
 	},
 	defaultVariants: {
