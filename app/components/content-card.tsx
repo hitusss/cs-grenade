@@ -34,18 +34,18 @@ export function ContentCard({
 				{fields.map((f) => (
 					<div
 						key={f.label}
-						className="flex w-full flex-wrap items-center justify-between gap-2"
+						className="flex w-full flex-wrap items-center justify-between gap-1"
 					>
-						<p className="text-body-sm">{f.label}</p>
+						<p className="text-body-xs">{f.label}</p>
 						<div className="flex items-center gap-1">
 							{f.img ? (
 								<img
 									src={f.img}
 									alt=""
-									className={cn('size-5', !verified && 'opacity-75')}
+									className={cn('size-4', !verified && 'opacity-75')}
 								/>
 							) : null}
-							<p className="text-body-sm font-semibold">{f.value}</p>
+							<p className="text-body-xs font-semibold">{f.value}</p>
 						</div>
 					</div>
 				))}
