@@ -22,5 +22,5 @@ export async function notify({
 		},
 	})
 
-	emitter.emit(`/notifications/${userId}`)
+	emitter.emit(`notifications/${userId}`)
 }
