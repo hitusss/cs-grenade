@@ -40,6 +40,8 @@ import {
 } from '#app/components/forms.tsx'
 import { Message } from '#app/components/message.tsx'
 
+import { emitter } from '../events.$.tsx'
+
 const NewTicketMessageSchema = TicketMessageSchema.merge(
 	z.object({
 		intent: z.literal('new-message'),
@@ -105,6 +107,22 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 		throw unauthorized({
 			message: 'You are not authorized to view this ticket',
 		})
+	}
+
+	const updated = await prisma.ticketMessage.updateMany({
+		where: {
+			ticketId: ticket.id,
+			userId: {
+				not: userId,
+			},
+			seen: false,
+		},
+		data: {
+			seen: true,
+		},
+	})
+	if (updated.count > 0) {
+		emitter.emit(`support/${userId}`)
 	}
 
 	return json({ ticket })

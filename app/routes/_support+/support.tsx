@@ -1,10 +1,18 @@
 import { useEffect, useLayoutEffect, useState } from 'react'
 import { json, type LoaderFunctionArgs } from '@remix-run/node'
-import { Link, Outlet, useLoaderData, useLocation } from '@remix-run/react'
+import {
+	Link,
+	Outlet,
+	useLoaderData,
+	useLocation,
+	useRevalidator,
+} from '@remix-run/react'
+import { useEventSource } from 'remix-utils/sse/react'
 
 import { requireUserId } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { cn } from '#app/utils/misc.tsx'
+import { useUser } from '#app/utils/user.ts'
 import { Button } from '#app/components/ui/button.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
 
@@ -43,8 +51,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export default function MainSupportRoute() {
 	const data = useLoaderData<typeof loader>()
 	const location = useLocation()
+	const { revalidate } = useRevalidator()
 
 	const [isOpen, setIsOpen] = useState(false)
+
+	const user = useUser()
+	const shouldRevalidate = useEventSource(`/events/support/${user.id}`)
 
 	useLayoutEffect(() => {
 		const lsValue = window.localStorage.getItem('support-sidebar')
@@ -55,6 +67,10 @@ export default function MainSupportRoute() {
 	useEffect(() => {
 		window.localStorage.setItem('support-sidebar', JSON.stringify(isOpen))
 	}, [isOpen])
+
+	useEffect(() => {
+		revalidate()
+	}, [shouldRevalidate])
 
 	return (
 		<div className="container flex h-[90vh] py-4 lg:py-8">
