@@ -30,7 +30,7 @@ type ContentFilterProps = {
 	hideFilter?: {
 		map?: boolean
 		team?: boolean
-		grenade?: boolean
+		type?: boolean
 		verified?: boolean
 	}
 }
@@ -45,7 +45,7 @@ export function ContentFilter({ hideFilter }: ContentFilterProps) {
 
 	const map = searchParams.get('map') ?? ''
 	const team = searchParams.get('team') ?? ''
-	const grenade = searchParams.get('grenade') ?? ''
+	const type = searchParams.get('type') ?? ''
 	const verified = searchParams.get('verified') ?? ''
 
 	const handleFilterChange = (key: string, value: string) => {
@@ -70,7 +70,7 @@ export function ContentFilter({ hideFilter }: ContentFilterProps) {
 		setSearchParams((prev) => {
 			prev.delete('map')
 			prev.delete('team')
-			prev.delete('grenade')
+			prev.delete('type')
 			prev.delete('verified')
 			prev.delete('page')
 			return prev
@@ -174,23 +174,23 @@ export function ContentFilter({ hideFilter }: ContentFilterProps) {
 								</SelectContent>
 							</Select>
 						)}
-						{hideFilter?.grenade ? null : (
+						{hideFilter?.type ? null : (
 							<Select
-								value={grenade}
-								onValueChange={(v) => handleFilterChange('grenade', v)}
+								value={type}
+								onValueChange={(v) => handleFilterChange('type', v)}
 							>
 								<div className="flex">
 									<SelectTrigger>
-										<SelectValue placeholder="Grenade" />
+										<SelectValue placeholder="Grenade type" />
 									</SelectTrigger>
 									<Button
 										variant="ghost"
 										size="icon"
-										disabled={!grenade}
-										onClick={() => handleFilterDelete('grenade')}
+										disabled={!type}
+										onClick={() => handleFilterDelete('type')}
 									>
 										<Icon name="x" />
-										<span className="sr-only">clear grenade</span>
+										<span className="sr-only">clear grenade type</span>
 									</Button>
 								</div>
 								<SelectContent>
