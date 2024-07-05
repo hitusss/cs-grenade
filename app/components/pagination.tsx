@@ -125,6 +125,7 @@ export function Pagination({
 				onValueChange={(value) => {
 					setSearchParams((prev) => {
 						prev.set('perPage', value)
+						prev.delete('page')
 						return prev
 					})
 					navigate({ search: searchParams.toString() })
