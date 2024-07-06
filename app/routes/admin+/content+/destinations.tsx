@@ -198,7 +198,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	const sortResult = SortSchema.safeParse(JSON.parse(sort))
 	if (!sortResult.success) {
 		searchParams.delete('sort')
-		return redirect(`/admin/users?${searchParams.toString()}`)
+		return redirect(`/admin/content/destinations?${searchParams.toString()}`)
 	}
 	const orderBy: Record<
 		string,
