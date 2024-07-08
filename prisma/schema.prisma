@@ -390,7 +390,8 @@ model TicketMessage {
   message String
   images  TicketImage[]
 
-  seen Boolean @default(false)
+  isAdmin Boolean @default(false)
+  seen    Boolean @default(false)
 
   ticket   Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   ticketId String
