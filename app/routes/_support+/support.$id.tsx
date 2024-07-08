@@ -1,4 +1,3 @@
-import { useEffect, useRef } from 'react'
 import {
 	json,
 	unstable_createMemoryUploadHandler,
@@ -7,15 +6,8 @@ import {
 	type LoaderFunctionArgs,
 } from '@remix-run/node'
 import { Form, useActionData, useLoaderData } from '@remix-run/react'
-import {
-	getFormProps,
-	getInputProps,
-	getTextareaProps,
-	useForm,
-} from '@conform-to/react'
-import { getZodConstraint, parseWithZod } from '@conform-to/zod'
+import { parseWithZod } from '@conform-to/zod'
 import { invariantResponse } from '@epic-web/invariant'
-import { HoneypotInputs } from 'remix-utils/honeypot/react'
 import { z } from 'zod'
 
 import { requireUserId } from '#app/utils/auth.server.ts'
@@ -23,22 +15,10 @@ import { prisma } from '#app/utils/db.server.ts'
 import { checkHoneypot } from '#app/utils/honeypot.server.ts'
 import { useDoubleCheck, useIsPending } from '#app/utils/misc.tsx'
 import { unauthorized } from '#app/utils/permissions.server.ts'
-import { useUser } from '#app/utils/user.ts'
 import { MAX_SIZE, TicketMessageSchema } from '#app/utils/validators/support.ts'
 import { Button } from '#app/components/ui/button.tsx'
-import { Icon } from '#app/components/ui/icon.tsx'
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipProvider,
-	TooltipTrigger,
-} from '#app/components/ui/tooltip.tsx'
-import {
-	ErrorList,
-	MultipleImageField,
-	TextareaField,
-} from '#app/components/forms.tsx'
-import { Message } from '#app/components/message.tsx'
+import { MessageForm } from '#app/components/message-form.tsx'
+import { Message, MessageContainer } from '#app/components/message.tsx'
 
 import { emitter } from '../events.$.tsx'
 
@@ -244,42 +224,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
 export default function SupportRoute() {
 	const data = useLoaderData<typeof loader>()
 	const actionData = useActionData<typeof action>()
-	const messagesContainer = useRef<HTMLDivElement>(null)
-	const sendRef = useRef<HTMLButtonElement>(null)
-
-	const [form, fields] = useForm({
-		id: 'new-message',
-		constraint: getZodConstraint(TicketMessageSchema),
-		lastResult: actionData?.result,
-		shouldRevalidate: 'onBlur',
-		onValidate({ formData }) {
-			return parseWithZod(formData, { schema: TicketMessageSchema })
-		},
-	})
-
-	const user = useUser()
 
 	const closeDC = useDoubleCheck()
 	const isPending = useIsPending()
-
-	useEffect(() => {
-		if (!messagesContainer.current) return
-		messagesContainer.current.scrollTop = messagesContainer.current.scrollHeight
-	}, [])
-
-	useEffect(() => {
-		if (!messagesContainer.current) return
-
-		if (
-			messagesContainer.current.scrollHeight -
-				messagesContainer.current.clientHeight -
-				messagesContainer.current.scrollTop <
-			128
-		) {
-			messagesContainer.current.scrollTop =
-				messagesContainer.current.scrollHeight
-		}
-	}, [data.ticket.messages.length])
 
 	return (
 		<div className="flex h-full w-full flex-col gap-12 overflow-hidden">
@@ -302,15 +249,10 @@ export default function SupportRoute() {
 				) : null}
 			</div>
 			<div className="flex flex-1 flex-col gap-6 overflow-hidden px-1 md:px-4">
-				<div
-					id="asd"
-					ref={messagesContainer}
-					className="flex flex-1 flex-col gap-2 overflow-y-auto overscroll-contain"
-				>
+				<MessageContainer messagesCount={data.ticket.messages.length}>
 					{data.ticket.messages.map((msg) => (
 						<Message
 							key={msg.id}
-							align={msg.user.id === user.id ? 'end' : 'start'}
 							align={msg.isAdmin ? 'start' : 'end'}
 							message={msg.message}
 							images={msg.images}
@@ -318,72 +260,8 @@ export default function SupportRoute() {
 							date={new Date(msg.createdAt)}
 						/>
 					))}
-				</div>
-
-				{data.ticket.open ? (
-					<Form
-						method="POST"
-						encType="multipart/form-data"
-						{...getFormProps(form)}
-						className="w-full"
-					>
-						<MultipleImageField.Provider
-							inputProps={{
-								...getInputProps(fields.images, { type: 'file' }),
-								required: false,
-								defaultValue: undefined,
-							}}
-							errors={fields.images.errors}
-						>
-							<div className="flex w-full gap-2">
-								<HoneypotInputs />
-
-								<TextareaField
-									labelProps={{}}
-									textareaProps={{
-										...getTextareaProps(fields.message),
-										autoFocus: true,
-										placeholder: 'Type here...',
-										className: 'resize-none min-h-[52px]',
-										onKeyDown: (e) => {
-											if (e.key === 'Enter' && !e.shiftKey) {
-												e.preventDefault()
-												sendRef.current?.click()
-											}
-										},
-									}}
-									errors={fields.message.errors}
-									className="flex-1"
-								/>
-
-								<div className="flex gap-2 py-2">
-									<MultipleImageField.Input />
-
-									<TooltipProvider>
-										<Tooltip>
-											<TooltipTrigger asChild>
-												<Button
-													size="icon"
-													type="submit"
-													name="intent"
-													value="new-message"
-													disabled={isPending}
-													ref={sendRef}
-												>
-													<Icon name="send" />
-												</Button>
-											</TooltipTrigger>
-											<TooltipContent>Send message</TooltipContent>
-										</Tooltip>
-									</TooltipProvider>
-								</div>
-							</div>
-							<MultipleImageField.Display />
-
-							<ErrorList errors={form.errors} />
-						</MultipleImageField.Provider>
-					</Form>
-				) : null}
+				</MessageContainer>
+				{data.ticket.open ? <MessageForm result={actionData?.result} /> : null}
 			</div>
 		</div>
 	)
