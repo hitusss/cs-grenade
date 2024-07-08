@@ -1,3 +1,5 @@
+import { useEffect, useRef } from 'react'
+
 import { cn } from '#app/utils/misc.tsx'
 import { getUserImgSrc } from '#app/utils/user.ts'
 
@@ -87,6 +89,44 @@ export function Message({
 					{date.toLocaleString()}
 				</span>
 			) : null}
+		</div>
+	)
+}
+
+export function MessageContainer({
+	children,
+	messagesCount,
+}: {
+	children: React.ReactNode
+	messagesCount: number
+}) {
+	const messagesContainer = useRef<HTMLDivElement>(null)
+
+	useEffect(() => {
+		if (!messagesContainer.current) return
+		messagesContainer.current.scrollTop = messagesContainer.current.scrollHeight
+	}, [])
+
+	useEffect(() => {
+		if (!messagesContainer.current) return
+
+		if (
+			messagesContainer.current.scrollHeight -
+				messagesContainer.current.clientHeight -
+				messagesContainer.current.scrollTop <
+			128
+		) {
+			messagesContainer.current.scrollTop =
+				messagesContainer.current.scrollHeight
+		}
+	}, [messagesCount])
+
+	return (
+		<div
+			ref={messagesContainer}
+			className="flex flex-1 flex-col gap-2 overflow-y-auto overscroll-contain"
+		>
+			{children}
 		</div>
 	)
 }
