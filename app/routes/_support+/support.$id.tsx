@@ -87,6 +87,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 						select: {
 							id: true,
 							username: true,
+							name: true,
 							image: {
 								select: {
 									id: true,
