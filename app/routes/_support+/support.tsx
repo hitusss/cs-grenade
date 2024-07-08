@@ -24,20 +24,19 @@ export async function loader({ request }: LoaderFunctionArgs) {
 			userId,
 		},
 		select: {
+			_count: {
+				select: {
+					messages: {
+						where: {
+							isAdmin: true,
+							seen: false,
+						},
+					},
+				},
+			},
 			id: true,
 			title: true,
 			open: true,
-			messages: {
-				where: {
-					userId: {
-						not: userId,
-					},
-					seen: false,
-				},
-				select: {
-					id: true,
-				},
-			},
 			updatedAt: true,
 		},
 		orderBy: {
@@ -128,7 +127,7 @@ export default function MainSupportRoute() {
 										<div className="flex w-full flex-col gap-2 p-2">
 											<div className="flex justify-between gap-2">
 												<p className="text-caption">{ticket.title}</p>
-												{ticket.messages.length > 0 ? (
+												{ticket._count.messages > 0 ? (
 													<span className="mt-2 grid size-3 animate-pulse place-items-center rounded-full bg-destructive text-body-xs text-destructive-foreground" />
 												) : null}
 											</div>
