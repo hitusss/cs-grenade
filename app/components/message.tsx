@@ -12,6 +12,7 @@ type MessageProps = {
 	user: {
 		id: string
 		username: string
+		name: string | null
 		image: {
 			id: string
 		} | null
@@ -52,7 +53,7 @@ export function Message({
 							'text-end': align === 'end',
 						})}
 					>
-						{user.username}
+						{user.name ?? user.username}
 					</p>
 					<div className="max-w-full break-words rounded-md bg-secondary px-6 py-3 text-secondary-foreground">
 						{message}
