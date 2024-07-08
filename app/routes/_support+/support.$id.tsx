@@ -82,6 +82,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 						},
 						select: { id: true },
 					},
+					isAdmin: true,
 					seen: true,
 					user: {
 						select: {
@@ -310,6 +311,7 @@ export default function SupportRoute() {
 						<Message
 							key={msg.id}
 							align={msg.user.id === user.id ? 'end' : 'start'}
+							align={msg.isAdmin ? 'start' : 'end'}
 							message={msg.message}
 							images={msg.images}
 							user={msg.user}
