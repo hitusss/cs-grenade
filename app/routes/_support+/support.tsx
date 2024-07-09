@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { json, type LoaderFunctionArgs } from '@remix-run/node'
 import {
 	Link,
@@ -57,7 +57,7 @@ export default function MainSupportRoute() {
 	const user = useUser()
 	const shouldRevalidate = useEventSource(`/events/support/${user.id}`)
 
-	useLayoutEffect(() => {
+	useEffect(() => {
 		const lsValue = window.localStorage.getItem('support-sidebar')
 		if (!lsValue) return setIsOpen(true)
 		setIsOpen(lsValue === 'true')

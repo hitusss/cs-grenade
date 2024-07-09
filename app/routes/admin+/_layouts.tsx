@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { json, type LoaderFunctionArgs } from '@remix-run/node'
 import { Link, Outlet, useLocation } from '@remix-run/react'
 
@@ -24,7 +24,7 @@ export default function AdminLayout() {
 
 	const isAdmin = hasAdminRole || hasSuperadminRole
 
-	useLayoutEffect(() => {
+	useEffect(() => {
 		const lsValue = window.localStorage.getItem('admin-sidebar')
 		if (!lsValue) return setIsOpen(true)
 		setIsOpen(lsValue === 'true')
