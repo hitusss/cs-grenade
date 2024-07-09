@@ -2,13 +2,15 @@ import { json, redirect, type LoaderFunctionArgs } from '@remix-run/node'
 import { Link, useLoaderData } from '@remix-run/react'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { type Prisma } from '@prisma/client'
+import { DropdownMenuGroup } from '@radix-ui/react-dropdown-menu'
 import { type ColumnDef } from '@tanstack/react-table'
 
 import { grenadeTypes } from '#types/grenades-types.ts'
 import { teams } from '#types/teams.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { requireUserWithRole } from '#app/utils/permissions.server.ts'
-import { getUserImgSrc } from '#app/utils/user.ts'
+import { userHasPermission } from '#app/utils/permissions.ts'
+import { getUserImgSrc, useUser } from '#app/utils/user.ts'
 import { Button } from '#app/components/ui/button.tsx'
 import {
 	DropdownMenu,
@@ -103,6 +105,9 @@ const columns: ColumnDef<{
 	{
 		id: 'actions',
 		cell: ({ row }) => {
+			const user = useUser()
+			const hasUpdateMapPermission = userHasPermission(user, 'update:map')
+
 			return (
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
@@ -132,6 +137,20 @@ const columns: ColumnDef<{
 								<Icon name="arrow-right" />
 							</Link>
 						</DropdownMenuItem>
+						{hasUpdateMapPermission ? (
+							<DropdownMenuGroup>
+								<DropdownMenuLabel>Menage</DropdownMenuLabel>
+								<DropdownMenuSeparator />
+								<DropdownMenuItem>
+									<Link
+										to={`/map/${row.original.name}/edit`}
+										className="flex items-center gap-2"
+									>
+										Edit map
+									</Link>
+								</DropdownMenuItem>
+							</DropdownMenuGroup>
+						) : null}
 					</DropdownMenuContent>
 				</DropdownMenu>
 			)

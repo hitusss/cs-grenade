@@ -1,15 +1,12 @@
 import { useEffect, useRef } from 'react'
 import { json, type LoaderFunctionArgs } from '@remix-run/node'
-import { Link, Outlet, useLoaderData, useMatches } from '@remix-run/react'
+import { Outlet, useLoaderData, useMatches } from '@remix-run/react'
 import { invariantResponse } from '@epic-web/invariant'
 import { z } from 'zod'
 
 import { grenadeLabels, grenadeTypes } from '#types/grenades-types.ts'
 import { teamLabels, teams } from '#types/teams.ts'
 import { prisma } from '#app/utils/db.server.ts'
-import { userHasPermission } from '#app/utils/permissions.ts'
-import { useOptionalUser } from '#app/utils/user.ts'
-import { Button } from '#app/components/ui/button.tsx'
 import { DestinationMarker } from '#app/components/destination-marker.tsx'
 import { GrenadeMarker } from '#app/components/grenade-marker.tsx'
 import { MapNav } from '#app/components/map-nav.tsx'
@@ -148,9 +145,6 @@ export default function MapLayout() {
 	const matches = useMatches()
 	const containerRef = useRef<HTMLDivElement>(null)
 
-	const user = useOptionalUser()
-	const hasUpdateMapPermission = userHasPermission(user, 'update:map')
-
 	const result = MapHandleMatch.safeParse(matches.at(-1))
 	if (!result.success) throw new Error(result.error.errors[0]?.message)
 	const mapHandle = result.data
@@ -191,12 +185,6 @@ export default function MapLayout() {
 						}))}
 						currentValue={data.type}
 					/>
-
-					{hasUpdateMapPermission ? (
-						<Button asChild className="ml-auto self-end">
-							<Link to={`/map/${data.mapName}/edit`}>Edit Map</Link>
-						</Button>
-					) : null}
 				</div>
 				<Map imageId={data.map.radar?.id}>
 					{data.map.destinations
