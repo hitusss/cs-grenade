@@ -37,9 +37,13 @@ export function Message({
 
 	return (
 		<div
-			className={cn('flex max-w-[95%] shrink-0 flex-col sm:max-w-[80%]', {
-				'self-end': align === 'end',
-			})}
+			className={cn(
+				'flex w-auto max-w-[95%] shrink-0 flex-col sm:max-w-[80%]',
+				{
+					'self-start': align === 'start',
+					'self-end': align === 'end',
+				},
+			)}
 		>
 			<div className="flex gap-2">
 				<img
