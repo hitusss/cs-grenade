@@ -1,14 +1,24 @@
-import { json, redirect, type LoaderFunctionArgs } from '@remix-run/node'
-import { Link, useLoaderData } from '@remix-run/react'
+import {
+	json,
+	redirect,
+	type ActionFunctionArgs,
+	type LoaderFunctionArgs,
+} from '@remix-run/node'
+import { Link, useLoaderData, useSubmit } from '@remix-run/react'
+import { parseWithZod } from '@conform-to/zod'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { type Prisma } from '@prisma/client'
 import { DropdownMenuGroup } from '@radix-ui/react-dropdown-menu'
 import { type ColumnDef } from '@tanstack/react-table'
+import { z } from 'zod'
 
 import { grenadeTypes } from '#types/grenades-types.ts'
 import { teams } from '#types/teams.ts'
 import { prisma } from '#app/utils/db.server.ts'
-import { requireUserWithRole } from '#app/utils/permissions.server.ts'
+import {
+	requireUserWithPermission,
+	requireUserWithRole,
+} from '#app/utils/permissions.server.ts'
 import { userHasPermission } from '#app/utils/permissions.ts'
 import { getUserImgSrc, useUser } from '#app/utils/user.ts'
 import { Button } from '#app/components/ui/button.tsx'
@@ -27,6 +37,14 @@ import {
 	SortSchema,
 } from '#app/components/data-table.tsx'
 import { Pagination } from '#app/components/pagination.tsx'
+
+const ToggleActiveIntent = z.object({
+	mapName: z.string(),
+	isActive: z.enum(['true', 'false']),
+	intent: z.literal('toggleActive'),
+})
+
+const MapSchema = z.discriminatedUnion('intent', [ToggleActiveIntent])
 
 const columns: ColumnDef<{
 	name: string
@@ -105,6 +123,8 @@ const columns: ColumnDef<{
 	{
 		id: 'actions',
 		cell: ({ row }) => {
+			const submit = useSubmit()
+
 			const user = useUser()
 			const hasUpdateMapPermission = userHasPermission(user, 'update:map')
 
@@ -148,6 +168,17 @@ const columns: ColumnDef<{
 									>
 										Edit map
 									</Link>
+								</DropdownMenuItem>
+								<DropdownMenuItem
+									onClick={() => {
+										const formData = new FormData()
+										formData.append('intent', 'toggleActive')
+										formData.append('mapName', row.original.name)
+										formData.append('isActive', String(row.original.isActive))
+										submit(formData, { method: 'post' })
+									}}
+								>
+									Toggle Active
 								</DropdownMenuItem>
 							</DropdownMenuGroup>
 						) : null}
@@ -218,6 +249,47 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	})
 
 	return json({ maps, total })
+}
+
+export async function action({ request }: ActionFunctionArgs) {
+	const formData = await request.formData()
+
+	const submission = await parseWithZod(formData, {
+		schema: MapSchema,
+		async: true,
+	})
+	if (submission.status !== 'success') {
+		return json(
+			{ result: submission.reply() },
+			{
+				status: submission.status === 'error' ? 400 : 200,
+			},
+		)
+	}
+
+	switch (submission.value.intent) {
+		case 'toggleActive': {
+			await requireUserWithPermission(request, 'update:map')
+			const isActive = submission.value.isActive === 'true'
+			await prisma.map.update({
+				where: { name: submission.value.mapName },
+				data: { isActive: !isActive },
+			})
+			return json({ result: submission.reply() })
+		}
+		default: {
+			return json(
+				{
+					result: submission.reply({
+						formErrors: ['Invalid intent'],
+					}),
+				},
+				{
+					status: 400,
+				},
+			)
+		}
+	}
 }
 
 export default function MapsAdminRoute() {
