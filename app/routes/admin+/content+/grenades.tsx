@@ -1,5 +1,6 @@
 import { json, redirect, type LoaderFunctionArgs } from '@remix-run/node'
 import { Link, useLoaderData } from '@remix-run/react'
+import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { type Prisma } from '@prisma/client'
 import { type ColumnDef } from '@tanstack/react-table'
 
@@ -190,6 +191,10 @@ const columns: ColumnDef<{
 		enableHiding: false,
 	},
 ]
+
+export const handle: SEOHandle = {
+	getSitemapEntries: () => null,
+}
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	await requireUserWithRole(request, ['moderator', 'admin', 'superadmin'])

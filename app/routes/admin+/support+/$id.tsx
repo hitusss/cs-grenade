@@ -8,6 +8,7 @@ import {
 import { Form, useActionData, useLoaderData } from '@remix-run/react'
 import { parseWithZod } from '@conform-to/zod'
 import { invariantResponse } from '@epic-web/invariant'
+import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { z } from 'zod'
 
 import { prisma } from '#app/utils/db.server.ts'
@@ -34,6 +35,10 @@ const TicketSchema = z.discriminatedUnion('intent', [
 	NewTicketMessageSchema,
 	TicketCloseSchema,
 ])
+
+export const handle: SEOHandle = {
+	getSitemapEntries: () => null,
+}
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
 	await requireUserWithRole(request, ['moderator', 'admin', 'superadmin'])

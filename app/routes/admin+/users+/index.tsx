@@ -12,6 +12,7 @@ import {
 	useSubmit,
 } from '@remix-run/react'
 import { parseWithZod } from '@conform-to/zod'
+import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { type Prisma } from '@prisma/client'
 import { type ColumnDef } from '@tanstack/react-table'
 import { z } from 'zod'
@@ -182,6 +183,10 @@ const columns: ColumnDef<{
 		enableHiding: false,
 	},
 ]
+
+export const handle: SEOHandle = {
+	getSitemapEntries: () => null,
+}
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	await requireUserWithRole(request, ['admin', 'superadmin'])
