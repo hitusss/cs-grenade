@@ -1,13 +1,20 @@
 import { json, redirect, type LoaderFunctionArgs } from '@remix-run/node'
-import { Link, useLoaderData } from '@remix-run/react'
+import {
+	Link,
+	useLoaderData,
+	useNavigate,
+	useSearchParams,
+} from '@remix-run/react'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { type ColumnDef } from '@tanstack/react-table'
 import { z } from 'zod'
 
 import { prisma } from '#app/utils/db.server.ts'
+import { useDebounce } from '#app/utils/misc.tsx'
 import { requireUserWithRole } from '#app/utils/permissions.server.ts'
 import { getUserImgSrc } from '#app/utils/user.ts'
 import { Icon } from '#app/components/ui/icon.tsx'
+import { Input } from '#app/components/ui/input.tsx'
 import {
 	DataTable,
 	DataTableColumnHeader,
@@ -126,6 +133,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 	const searchParams = new URL(request.url).searchParams
 
+	const query = searchParams.get('query') ?? ''
+
 	const page = Number(searchParams.get('page') ?? 1)
 	const perPage = Number(searchParams.get('perPage') ?? 25)
 
@@ -191,9 +200,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
 			LEFT JOIN User ON Ticket.userId = User.id
 			LEFT JOIN UserImage ON User.id = UserImage.userId
 			${orderBy.length > 0 ? `ORDER BY ${orderBy.join(', ')}` : ''}
-			LIMIT $1
-			OFFSET $2;
+			WHERE Ticket.title LIKE $1
+			LIMIT $2
+			OFFSET $3;
 		`,
+		`%${query}%`,
 		perPage,
 		page * perPage - perPage,
 	)
@@ -207,10 +218,35 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export default function SupportAdminRoute() {
 	const data = useLoaderData<typeof loader>()
+	const navigate = useNavigate()
+	const [searchParams, setSearchParams] = useSearchParams()
+
+	const query = searchParams.get('query') ?? ''
+
+	const handleQueryChange = useDebounce((value: string) => {
+		setSearchParams((prev) => {
+			if (value === '') {
+				prev.delete('query')
+			} else {
+				prev.set('query', value)
+			}
+			prev.delete('page')
+			return prev
+		})
+		navigate({ search: searchParams.toString() })
+	}, 400)
 
 	return (
 		<>
 			<h1>Support</h1>
+			<Input
+				type="search"
+				name="query"
+				placeholder="Search..."
+				defaultValue={query}
+				onChange={(e) => handleQueryChange(e.target.value)}
+				className="max-w-64"
+			/>
 			<DataTable columns={columns} data={data.tickets} />
 			<Pagination total={data.total} />
 		</>
