@@ -19,6 +19,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 	const page = Number(searchParams.get('page') ?? 1)
 	const perPage = Number(searchParams.get('perPage') ?? 25)
 
+	const query = searchParams.get('query') ?? undefined
 	const map = searchParams.get('map') ?? undefined
 	const team = searchParams.get('team') ?? undefined
 	const type = searchParams.get('type') ?? undefined
@@ -29,6 +30,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 				username,
 			},
 			grenade: {
+				name: {
+					contains: query,
+				},
 				map: map ? { name: map } : undefined,
 				team,
 				type,
@@ -41,6 +45,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 				username,
 			},
 			grenade: {
+				name: {
+					contains: query,
+				},
 				map: map ? { name: map } : undefined,
 				team,
 				type,

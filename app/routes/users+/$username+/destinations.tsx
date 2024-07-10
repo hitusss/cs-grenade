@@ -28,6 +28,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 	const page = Number(searchParams.get('page') ?? 1)
 	const perPage = Number(searchParams.get('perPage') ?? 25)
 
+	const query = searchParams.get('query') ?? undefined
 	const map = searchParams.get('map') ?? undefined
 	const team = searchParams.get('team') ?? undefined
 	const type = searchParams.get('type') ?? undefined
@@ -38,6 +39,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 	const total = await prisma.destination.count({
 		where: {
 			userId: user.id,
+			name: {
+				contains: query,
+			},
 			verified: user.id === userId ? verified : true,
 			map: map ? { name: map } : undefined,
 			team,
@@ -47,6 +51,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 	const destinations = await prisma.destination.findMany({
 		where: {
 			userId: user.id,
+			name: {
+				contains: query,
+			},
 			verified: user.id === userId ? verified : true,
 			map: map ? { name: map } : undefined,
 			team,
