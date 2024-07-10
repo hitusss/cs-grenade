@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import {
 	json,
 	unstable_createMemoryUploadHandler,
@@ -5,10 +6,16 @@ import {
 	type ActionFunctionArgs,
 	type LoaderFunctionArgs,
 } from '@remix-run/node'
-import { Form, useActionData, useLoaderData } from '@remix-run/react'
+import {
+	Form,
+	useActionData,
+	useLoaderData,
+	useRevalidator,
+} from '@remix-run/react'
 import { parseWithZod } from '@conform-to/zod'
 import { invariantResponse } from '@epic-web/invariant'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
+import { useEventSource } from 'remix-utils/sse/react'
 import { z } from 'zod'
 
 import { prisma } from '#app/utils/db.server.ts'
@@ -20,6 +27,7 @@ import { MAX_SIZE, TicketMessageSchema } from '#app/utils/validators/support.ts'
 import { Button } from '#app/components/ui/button.tsx'
 import { MessageForm } from '#app/components/message-form.tsx'
 import { Message, MessageContainer } from '#app/components/message.tsx'
+import { emitter } from '#app/routes/events.$.tsx'
 
 const NewTicketMessageSchema = TicketMessageSchema.merge(
 	z.object({
@@ -111,6 +119,13 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	const { id } = params
 
 	invariantResponse(id, 'Ticket id is required', { status: 400 })
+
+	const ticket = await prisma.ticket.findUnique({
+		where: { id },
+		select: { userId: true },
+	})
+
+	invariantResponse(ticket, 'Not found', { status: 404 })
 
 	const formData = await unstable_parseMultipartFormData(
 		request,
@@ -205,6 +220,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
 		}
 	}
 
+	emitter.emit(`support/${ticket.userId}`)
+	emitter.emit(`support/ticket/${id}`)
+
 	return json(
 		{ result: submission.reply({ resetForm: true }) },
 		{
@@ -216,9 +234,17 @@ export async function action({ request, params }: ActionFunctionArgs) {
 export default function SupportTicketAdminRoute() {
 	const data = useLoaderData<typeof loader>()
 	const actionData = useActionData<typeof action>()
+	const { revalidate } = useRevalidator()
+	const shouldRevalidate = useEventSource(
+		`/events/support/ticket/${data.ticket.id}`,
+	)
 
 	const closeDC = useDoubleCheck()
 	const isPending = useIsPending()
+
+	useEffect(() => {
+		revalidate()
+	}, [shouldRevalidate])
 
 	return (
 		<>

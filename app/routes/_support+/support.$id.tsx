@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import {
 	json,
 	unstable_createMemoryUploadHandler,
@@ -5,9 +6,15 @@ import {
 	type ActionFunctionArgs,
 	type LoaderFunctionArgs,
 } from '@remix-run/node'
-import { Form, useActionData, useLoaderData } from '@remix-run/react'
+import {
+	Form,
+	useActionData,
+	useLoaderData,
+	useRevalidator,
+} from '@remix-run/react'
 import { parseWithZod } from '@conform-to/zod'
 import { invariantResponse } from '@epic-web/invariant'
+import { useEventSource } from 'remix-utils/sse/react'
 import { z } from 'zod'
 
 import { requireUserId } from '#app/utils/auth.server.ts'
@@ -213,6 +220,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
 		}
 	}
 
+	emitter.emit(`support/${ticket.userId}`)
+	emitter.emit(`support/ticket/${id}`)
+
 	return json(
 		{ result: submission.reply({ resetForm: true }) },
 		{
@@ -224,9 +234,17 @@ export async function action({ request, params }: ActionFunctionArgs) {
 export default function SupportRoute() {
 	const data = useLoaderData<typeof loader>()
 	const actionData = useActionData<typeof action>()
+	const { revalidate } = useRevalidator()
+	const shouldRevalidate = useEventSource(
+		`/events/support/ticket/${data.ticket.id}`,
+	)
 
 	const closeDC = useDoubleCheck()
 	const isPending = useIsPending()
+
+	useEffect(() => {
+		revalidate()
+	}, [shouldRevalidate])
 
 	return (
 		<div className="flex h-full w-full flex-col gap-12 overflow-hidden">
