@@ -1,9 +1,8 @@
-import { EventEmitter } from 'node:events'
 import { type LoaderFunctionArgs } from '@remix-run/node'
 import { invariantResponse } from '@epic-web/invariant'
 import { eventStream } from 'remix-utils/sse/server'
 
-export const emitter = new EventEmitter()
+import { emitter } from '#app/utils/event.server.ts'
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
 	const event = params['*']

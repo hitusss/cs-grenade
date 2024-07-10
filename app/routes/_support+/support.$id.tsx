@@ -19,6 +19,7 @@ import { z } from 'zod'
 
 import { requireUserId } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
+import { emitter } from '#app/utils/event.server.ts'
 import { checkHoneypot } from '#app/utils/honeypot.server.ts'
 import { useDoubleCheck, useIsPending } from '#app/utils/misc.tsx'
 import { unauthorized } from '#app/utils/permissions.server.ts'
@@ -26,8 +27,6 @@ import { MAX_SIZE, TicketMessageSchema } from '#app/utils/validators/support.ts'
 import { Button } from '#app/components/ui/button.tsx'
 import { MessageForm } from '#app/components/message-form.tsx'
 import { Message, MessageContainer } from '#app/components/message.tsx'
-
-import { emitter } from '../events.$.tsx'
 
 const NewTicketMessageSchema = TicketMessageSchema.merge(
 	z.object({

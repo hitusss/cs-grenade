@@ -1,6 +1,5 @@
-import { emitter } from '#app/routes/events.$.ts'
-
 import { prisma } from './db.server.ts'
+import { emitter } from './event.server.ts'
 
 export async function notify({
 	userId,
