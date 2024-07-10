@@ -22,6 +22,7 @@ import { prisma } from '#app/utils/db.server.ts'
 import { emitter } from '#app/utils/event.server.ts'
 import { checkHoneypot } from '#app/utils/honeypot.server.ts'
 import { useDoubleCheck, useIsPending } from '#app/utils/misc.tsx'
+import { notify } from '#app/utils/notifications.server.js'
 import { requireUserWithRole } from '#app/utils/permissions.server.ts'
 import { getUserImgSrc } from '#app/utils/user.ts'
 import { MAX_SIZE, TicketMessageSchema } from '#app/utils/validators/support.ts'
@@ -122,7 +123,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
 	const ticket = await prisma.ticket.findUnique({
 		where: { id },
-		select: { userId: true },
+		select: { title: true, userId: true },
 	})
 
 	invariantResponse(ticket, 'Not found', { status: 404 })
@@ -209,12 +210,25 @@ export async function action({ request, params }: ActionFunctionArgs) {
 					seen: true,
 				},
 			})
+
+			notify({
+				userId: ticket.userId,
+				title: 'Ticket Message',
+				description: `New message in ticket: ${ticket.title}`,
+				redirectTo: `/support/${id}`,
+			})
 			break
 		}
 		case 'close': {
 			await prisma.ticket.update({
 				where: { id },
 				data: { open: false },
+			})
+			notify({
+				userId: ticket.userId,
+				title: 'Ticket Closed',
+				description: `Ticket closed: ${ticket.title}`,
+				redirectTo: `/support/${id}`,
 			})
 			break
 		}
