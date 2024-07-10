@@ -6,6 +6,7 @@ import {
 
 import { grenadeLabels, grenadeTypes } from '#types/grenades-types.ts'
 import { teamLabels, teams } from '#types/teams.ts'
+import { useDebounce } from '#app/utils/misc.tsx'
 import { type loader as rootLoader } from '#app/root.tsx'
 
 import {
@@ -16,6 +17,7 @@ import {
 } from './ui/accordion.tsx'
 import { Button } from './ui/button.tsx'
 import { Icon } from './ui/icon.tsx'
+import { Input } from './ui/input.tsx'
 import {
 	Select,
 	SelectContent,
@@ -28,6 +30,7 @@ import {
 
 type ContentFilterProps = {
 	hideFilter?: {
+		query?: boolean
 		map?: boolean
 		team?: boolean
 		type?: boolean
@@ -43,6 +46,7 @@ export function ContentFilter({ hideFilter }: ContentFilterProps) {
 	const activeMaps = data?.maps.filter((m) => m.isActive) ?? []
 	const inactiveMaps = data?.maps.filter((m) => !m.isActive) ?? []
 
+	const query = searchParams.get('query') ?? ''
 	const map = searchParams.get('map') ?? ''
 	const team = searchParams.get('team') ?? ''
 	const type = searchParams.get('type') ?? ''
@@ -68,6 +72,7 @@ export function ContentFilter({ hideFilter }: ContentFilterProps) {
 
 	const handleFIlterReset = () => {
 		setSearchParams((prev) => {
+			prev.delete('query')
 			prev.delete('map')
 			prev.delete('team')
 			prev.delete('type')
@@ -78,12 +83,28 @@ export function ContentFilter({ hideFilter }: ContentFilterProps) {
 		navigate({ search: searchParams.toString() })
 	}
 
+	const handleQueryChange = useDebounce((value: string) => {
+		if (value === '') {
+			return handleFilterDelete('query')
+		}
+		handleFilterChange('query', value)
+	}, 400)
+
 	return (
 		<Accordion type="single" collapsible>
 			<AccordionItem value="filters">
 				<AccordionTrigger>Filters</AccordionTrigger>
 				<AccordionContent className="flex flex-col gap-4 p-2">
 					<div className="flex flex-wrap gap-4 [&>*]:w-full md:[&>*]:w-64">
+						{hideFilter?.query ? null : (
+							<Input
+								type="search"
+								name="query"
+								placeholder="Search"
+								defaultValue={query}
+								onChange={(e) => handleQueryChange(e.currentTarget.value)}
+							/>
+						)}
 						{hideFilter?.map ? null : (
 							<Select
 								value={map}
