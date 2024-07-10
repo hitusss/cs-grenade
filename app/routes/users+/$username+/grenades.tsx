@@ -1,4 +1,4 @@
-import { json, redirect, type LoaderFunctionArgs } from '@remix-run/node'
+import { json, type LoaderFunctionArgs } from '@remix-run/node'
 import { Link, useLoaderData } from '@remix-run/react'
 import { invariantResponse } from '@epic-web/invariant'
 
