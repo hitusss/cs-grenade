@@ -201,6 +201,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 	const searchParams = new URL(request.url).searchParams
 
+	const query = searchParams.get('query') ?? undefined
 	const map = searchParams.get('map') ?? undefined
 	const team = searchParams.get('team') ?? undefined
 	const type = searchParams.get('type') ?? undefined
@@ -249,6 +250,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 	const total = await prisma.grenade.count({
 		where: {
+			name: {
+				contains: query,
+			},
 			map: map ? { name: map } : undefined,
 			team,
 			type,
@@ -257,6 +261,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	})
 	const grenades = await prisma.grenade.findMany({
 		where: {
+			name: {
+				contains: query,
+			},
 			map: map ? { name: map } : undefined,
 			team,
 			type,
