@@ -73,6 +73,53 @@ export function createAdminRole() {
 	permissions.push({ entity: 'grenade', action: 'update', access: 'own' })
 	permissions.push({ entity: 'grenade', action: 'delete', access: 'own' })
 
+	permissions.push({
+		entity: 'review-destination-request',
+		action: 'create',
+		access: 'any',
+	})
+	permissions.push({
+		entity: 'review-destination-request',
+		action: 'read',
+		access: 'any',
+	})
+	permissions.push({
+		entity: 'review-destination-request',
+		action: 'update',
+		access: 'any',
+	})
+	permissions.push({
+		entity: 'review-destination-request',
+		action: 'delete',
+		access: 'any',
+	})
+
+	permissions.push({
+		entity: 'review-grenade-request',
+		action: 'create',
+		access: 'any',
+	})
+	permissions.push({
+		entity: 'review-grenade-request',
+		action: 'read',
+		access: 'any',
+	})
+	permissions.push({
+		entity: 'review-grenade-request',
+		action: 'update',
+		access: 'any',
+	})
+	permissions.push({
+		entity: 'review-grenade-request',
+		action: 'delete',
+		access: 'any',
+	})
+
+	permissions.push({ entity: 'support', action: 'create', access: 'any' })
+	permissions.push({ entity: 'support', action: 'read', access: 'any' })
+	permissions.push({ entity: 'support', action: 'update', access: 'any' })
+	permissions.push({ entity: 'support', action: 'delete', access: 'any' })
+
 	permissions.push({ entity: 'user', action: 'create', access: 'any' })
 	permissions.push({ entity: 'user', action: 'read', access: 'any' })
 	permissions.push({ entity: 'user', action: 'update', access: 'any' })
@@ -84,17 +131,64 @@ export function createAdminRole() {
 export function createModeratorRole() {
 	const permissions: PermissionArray = []
 
-	permissions.push({ entity: 'map', action: 'read', access: 'any' })
+	permissions.push({ entity: 'map', action: 'read', access: 'own' })
 
 	permissions.push({ entity: 'destination', action: 'create', access: 'own' })
-	permissions.push({ entity: 'destination', action: 'read', access: 'any' })
+	permissions.push({ entity: 'destination', action: 'read', access: 'own' })
 	permissions.push({ entity: 'destination', action: 'update', access: 'own' })
 	permissions.push({ entity: 'destination', action: 'delete', access: 'own' })
 
 	permissions.push({ entity: 'grenade', action: 'create', access: 'own' })
-	permissions.push({ entity: 'grenade', action: 'read', access: 'any' })
+	permissions.push({ entity: 'grenade', action: 'read', access: 'own' })
 	permissions.push({ entity: 'grenade', action: 'update', access: 'own' })
 	permissions.push({ entity: 'grenade', action: 'delete', access: 'own' })
+
+	permissions.push({
+		entity: 'review-destination-request',
+		action: 'create',
+		access: 'any',
+	})
+	permissions.push({
+		entity: 'review-destination-request',
+		action: 'read',
+		access: 'any',
+	})
+	permissions.push({
+		entity: 'review-destination-request',
+		action: 'update',
+		access: 'any',
+	})
+	permissions.push({
+		entity: 'review-destination-request',
+		action: 'delete',
+		access: 'any',
+	})
+
+	permissions.push({
+		entity: 'review-grenade-request',
+		action: 'create',
+		access: 'any',
+	})
+	permissions.push({
+		entity: 'review-grenade-request',
+		action: 'read',
+		access: 'any',
+	})
+	permissions.push({
+		entity: 'review-grenade-request',
+		action: 'update',
+		access: 'any',
+	})
+	permissions.push({
+		entity: 'review-grenade-request',
+		action: 'delete',
+		access: 'any',
+	})
+
+	permissions.push({ entity: 'support', action: 'create', access: 'any' })
+	permissions.push({ entity: 'support', action: 'read', access: 'any' })
+	permissions.push({ entity: 'support', action: 'update', access: 'any' })
+	permissions.push({ entity: 'support', action: 'delete', access: 'any' })
 
 	permissions.push({ entity: 'user', action: 'create', access: 'own' })
 	permissions.push({ entity: 'user', action: 'read', access: 'own' })
@@ -104,14 +198,47 @@ export function createModeratorRole() {
 	createRole('moderator', permissions)
 }
 
+export function createUserPlusRole() {
+	const permissions: PermissionArray = []
+
+	permissions.push({ entity: 'map', action: 'read', access: 'own' })
+
+	permissions.push({ entity: 'destination', action: 'create', access: 'own' })
+	permissions.push({ entity: 'destination', action: 'read', access: 'own' })
+	permissions.push({ entity: 'destination', action: 'update', access: 'own' })
+	permissions.push({ entity: 'destination', action: 'delete', access: 'own' })
+
+	permissions.push({ entity: 'grenade', action: 'create', access: 'own' })
+	permissions.push({ entity: 'grenade', action: 'read', access: 'own' })
+	permissions.push({ entity: 'grenade', action: 'update', access: 'own' })
+	permissions.push({ entity: 'grenade', action: 'delete', access: 'own' })
+
+	permissions.push({ entity: 'support', action: 'create', access: 'own' })
+	permissions.push({ entity: 'support', action: 'read', access: 'own' })
+	permissions.push({ entity: 'support', action: 'update', access: 'own' })
+	permissions.push({ entity: 'support', action: 'delete', access: 'own' })
+
+	permissions.push({ entity: 'user', action: 'create', access: 'own' })
+	permissions.push({ entity: 'user', action: 'read', access: 'own' })
+	permissions.push({ entity: 'user', action: 'update', access: 'own' })
+	permissions.push({ entity: 'user', action: 'delete', access: 'own' })
+
+	createRole('userplus', permissions)
+}
+
 export function createUserRole() {
 	const permissions: PermissionArray = []
 
-	permissions.push({ entity: 'map', action: 'read', access: 'any' })
+	permissions.push({ entity: 'map', action: 'read', access: 'own' })
 
 	permissions.push({ entity: 'destination', action: 'read', access: 'any' })
 
 	permissions.push({ entity: 'grenade', action: 'read', access: 'any' })
+
+	permissions.push({ entity: 'support', action: 'create', access: 'own' })
+	permissions.push({ entity: 'support', action: 'read', access: 'own' })
+	permissions.push({ entity: 'support', action: 'update', access: 'own' })
+	permissions.push({ entity: 'support', action: 'delete', access: 'own' })
 
 	permissions.push({ entity: 'user', action: 'create', access: 'own' })
 	permissions.push({ entity: 'user', action: 'read', access: 'own' })
@@ -145,6 +272,10 @@ async function generatePermissions() {
 	console.time('📦 Created the moderator role...')
 	createModeratorRole()
 	console.timeEnd('📦 Created the moderator role...')
+
+	console.time('📦 Created the user plus role...')
+	createUserPlusRole()
+	console.timeEnd('📦 Created the user plus role...')
 
 	console.time('📦 Created the user role...')
 	createUserRole()

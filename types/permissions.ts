@@ -1,4 +1,12 @@
-export const entities = ['user', 'map', 'destination', 'grenade'] as const
+export const entities = [
+	'user',
+	'support',
+	'map',
+	'destination',
+	'grenade',
+	'review-destination-request',
+	'review-grenade-request',
+] as const
 export const actions = ['create', 'read', 'update', 'delete'] as const
 export const accesses = ['own', 'any'] as const
 
@@ -10,5 +18,11 @@ export type PermissionString =
 	| `${Action}:${Entity}`
 	| `${Action}:${Entity}:${Access}`
 
-export const roles = ['user', 'moderator', 'admin', 'superadmin'] as const
+export const roles = [
+	'user',
+	'userplus',
+	'moderator',
+	'admin',
+	'superadmin',
+] as const
 export type Role = (typeof roles)[number]
