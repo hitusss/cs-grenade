@@ -23,7 +23,7 @@ import { emitter } from '#app/utils/event.server.ts'
 import { checkHoneypot } from '#app/utils/honeypot.server.ts'
 import { useDoubleCheck, useIsPending } from '#app/utils/misc.tsx'
 import { notify } from '#app/utils/notifications.server.js'
-import { requireUserWithRole } from '#app/utils/permissions.server.ts'
+import { requireUserWithPermission } from '#app/utils/permissions.server.ts'
 import { getUserImgSrc } from '#app/utils/user.ts'
 import { MAX_SIZE, TicketMessageSchema } from '#app/utils/validators/support.ts'
 import { Button } from '#app/components/ui/button.tsx'
@@ -50,7 +50,7 @@ export const handle: SEOHandle = {
 }
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-	await requireUserWithRole(request, ['moderator', 'admin', 'superadmin'])
+	await requireUserWithPermission(request, 'read:support:any')
 
 	const { id } = params
 
@@ -111,11 +111,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
-	const userId = await requireUserWithRole(request, [
-		'moderator',
-		'admin',
-		'superadmin',
-	])
+	const userId = await requireUserWithPermission(request, 'read:support:any')
 
 	const { id } = params
 
@@ -166,6 +162,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
 	switch (submission.value.intent) {
 		case 'new-message': {
+			await requireUserWithPermission(request, 'update:support:any')
 			const { message, images } = submission.value
 			const msg = await prisma.ticketMessage.create({
 				data: {
@@ -220,6 +217,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 			break
 		}
 		case 'close': {
+			await requireUserWithPermission(request, 'update:support:any')
 			await prisma.ticket.update({
 				where: { id },
 				data: { open: false },

@@ -4,7 +4,7 @@ import { Link, Outlet, useLocation } from '@remix-run/react'
 
 import { cn } from '#app/utils/misc.tsx'
 import { requireUserWithRole } from '#app/utils/permissions.server.ts'
-import { userHasRole } from '#app/utils/permissions.ts'
+import { userHasPermission, userHasRole } from '#app/utils/permissions.ts'
 import { useUser } from '#app/utils/user.js'
 import { Button } from '#app/components/ui/button.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
@@ -19,10 +19,20 @@ export default function AdminLayout() {
 	const [isOpen, setIsOpen] = useState(false)
 
 	const user = useUser()
-	const hasAdminRole = userHasRole(user, 'admin')
-	const hasSuperadminRole = userHasRole(user, 'superadmin')
 
-	const isAdmin = hasAdminRole || hasSuperadminRole
+	const hasReadUserAnyPermission = userHasPermission(user, 'read:user:any')
+	const hasReadSupportAnyPermission = userHasPermission(
+		user,
+		'read:support:any',
+	)
+	const hasReadReviewDestinationRequestAnyPermission = userHasPermission(
+		user,
+		'read:review-destination-request:any',
+	)
+	const hasReadReviewGrenadeRequestAnyPermission = userHasPermission(
+		user,
+		'read:review-grenade-request:any',
+	)
 
 	useEffect(() => {
 		const lsValue = window.localStorage.getItem('admin-sidebar')
@@ -65,7 +75,7 @@ export default function AdminLayout() {
 					<h1>Admin</h1>
 					<ul className="mt-6 flex h-full flex-col justify-center gap-4 overflow-y-auto">
 						{/* Users	 */}
-						<SidebarGroup title="Users" permission={isAdmin}>
+						<SidebarGroup title="Users" permission={hasReadUserAnyPermission}>
 							<SidebarLink
 								to="users"
 								isActive={location.pathname === '/admin/users'}
@@ -95,7 +105,10 @@ export default function AdminLayout() {
 							</SidebarLink>
 						</SidebarGroup>
 						{/* Support */}
-						<SidebarGroup title="Support">
+						<SidebarGroup
+							title="Support"
+							permission={hasReadSupportAnyPermission}
+						>
 							<SidebarLink
 								to="support"
 								isActive={/\/admin\/support/.test(location.pathname)}
@@ -104,10 +117,17 @@ export default function AdminLayout() {
 							</SidebarLink>
 						</SidebarGroup>
 						{/* Requests */}
-						<SidebarGroup title="Requests">
+						<SidebarGroup
+							title="Requests"
+							permission={
+								hasReadReviewDestinationRequestAnyPermission ||
+								hasReadReviewGrenadeRequestAnyPermission
+							}
+						>
 							<SidebarLink
 								to="requests/destinations"
 								isActive={location.pathname === '/admin/requests/destinations'}
+								permission={hasReadReviewDestinationRequestAnyPermission}
 							>
 								Destinations
 							</SidebarLink>
@@ -116,12 +136,14 @@ export default function AdminLayout() {
 								isActive={
 									location.pathname === '/admin/requests/destinations-changes'
 								}
+								permission={hasReadReviewDestinationRequestAnyPermission}
 							>
 								Destinations Changes
 							</SidebarLink>
 							<SidebarLink
 								to="requests/grenades"
 								isActive={location.pathname === '/admin/requests/grenades'}
+								permission={hasReadReviewGrenadeRequestAnyPermission}
 							>
 								Grenades
 							</SidebarLink>
@@ -130,12 +152,16 @@ export default function AdminLayout() {
 								isActive={
 									location.pathname === '/admin/requests/grenades-changes'
 								}
+								permission={hasReadReviewGrenadeRequestAnyPermission}
 							>
 								Grenades Changes
 							</SidebarLink>
 						</SidebarGroup>
 						{/* Cache */}
-						<SidebarGroup title="Cache" permission={isAdmin}>
+						<SidebarGroup
+							title="Cache"
+							permission={userHasRole(user, 'superadmin')}
+						>
 							<SidebarLink
 								to="cache"
 								isActive={location.pathname === '/admin/cache'}

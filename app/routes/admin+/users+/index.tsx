@@ -20,8 +20,11 @@ import { z } from 'zod'
 import { roles } from '#types/permissions.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { useDebounce } from '#app/utils/misc.tsx'
-import { requireUserWithRole } from '#app/utils/permissions.server.ts'
-import { userHasRole } from '#app/utils/permissions.ts'
+import {
+	requireUserWithPermission,
+	requireUserWithRole,
+} from '#app/utils/permissions.server.ts'
+import { userHasPermission, userHasRole } from '#app/utils/permissions.ts'
 import { getUserImgSrc, useUser } from '#app/utils/user.ts'
 import { Badge } from '#app/components/ui/badge.js'
 import { Button } from '#app/components/ui/button.tsx'
@@ -131,6 +134,10 @@ const columns: ColumnDef<{
 			const submit = useSubmit()
 			const user = useUser()
 			const isSuperadmin = userHasRole(user, 'superadmin')
+			const hasUpdateUserAnyPermission = userHasPermission(
+				user,
+				'update:user:any',
+			)
 
 			return (
 				<DropdownMenu>
@@ -153,28 +160,30 @@ const columns: ColumnDef<{
 							</Link>
 						</DropdownMenuItem>
 						<DropdownMenuSeparator />
-						<DropdownMenuGroup>
-							<DropdownMenuLabel>Toggle Groups</DropdownMenuLabel>
-							{roles.map((role) => (
-								<DropdownMenuCheckboxItem
-									key={role}
-									checked={row.original.roles.some((r) => r.name === role)}
-									onCheckedChange={(value) => {
-										const formData = new FormData()
-										formData.append('intent', 'toggleRole')
-										formData.append('userId', row.original.id)
-										formData.append('role', role)
-										formData.append('value', String(value))
+						{hasUpdateUserAnyPermission ? (
+							<DropdownMenuGroup>
+								<DropdownMenuLabel>Toggle Groups</DropdownMenuLabel>
+								{roles.map((role) => (
+									<DropdownMenuCheckboxItem
+										key={role}
+										checked={row.original.roles.some((r) => r.name === role)}
+										onCheckedChange={(value) => {
+											const formData = new FormData()
+											formData.append('intent', 'toggleRole')
+											formData.append('userId', row.original.id)
+											formData.append('role', role)
+											formData.append('value', String(value))
 
-										submit(formData, { method: 'post' })
-									}}
-									className="capitalize"
-									disabled={role === 'superadmin' && !isSuperadmin}
-								>
-									{role}
-								</DropdownMenuCheckboxItem>
-							))}
-						</DropdownMenuGroup>
+											submit(formData, { method: 'post' })
+										}}
+										className="capitalize"
+										disabled={role === 'superadmin' && !isSuperadmin}
+									>
+										{role}
+									</DropdownMenuCheckboxItem>
+								))}
+							</DropdownMenuGroup>
+						) : null}
 					</DropdownMenuContent>
 				</DropdownMenu>
 			)
@@ -189,7 +198,7 @@ export const handle: SEOHandle = {
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
-	await requireUserWithRole(request, ['admin', 'superadmin'])
+	await requireUserWithPermission(request, 'read:user:any')
 	const searchParams = new URL(request.url).searchParams
 	const query = searchParams.get('query')
 	if (query === '') {
@@ -288,7 +297,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
-	await requireUserWithRole(request, ['admin', 'superadmin'])
+	await requireUserWithPermission(request, 'read:user:any')
 
 	const formData = await request.formData()
 
@@ -307,6 +316,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
 	switch (submission.value.intent) {
 		case 'toggleRole': {
+			await requireUserWithPermission(request, 'update:user:any')
 			const { userId, role, value } = submission.value
 			const booleanValue = value === 'true'
 
