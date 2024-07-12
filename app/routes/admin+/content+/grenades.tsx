@@ -316,7 +316,7 @@ export default function GrenadesAdminRoute() {
 
 	return (
 		<>
-			<h1>Grenades</h1>
+			<h2>Grenades</h2>
 			<ContentFilter />
 			<DataTable columns={columns} data={data.grenades} />
 			<Pagination total={data.total} />

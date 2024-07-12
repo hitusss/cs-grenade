@@ -262,7 +262,7 @@ export default function SupportTicketAdminRoute() {
 		<>
 			<div className="flex flex-wrap justify-between gap-2 border-b pb-6">
 				<div>
-					<h1>{data.ticket.title}</h1>
+					<h2>{data.ticket.title}</h2>
 					<div className="mt-2 flex items-center gap-2 font-semibold">
 						<img
 							src={getUserImgSrc(data.ticket.user.image?.id)}

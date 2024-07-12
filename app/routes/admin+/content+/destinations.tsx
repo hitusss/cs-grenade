@@ -293,7 +293,7 @@ export default function DestinationsAdminRoute() {
 
 	return (
 		<>
-			<h1>Destinations</h1>
+			<h2>Destinations</h2>
 			<ContentFilter />
 			<DataTable columns={columns} data={data.destinations} />
 			<Pagination total={data.total} />

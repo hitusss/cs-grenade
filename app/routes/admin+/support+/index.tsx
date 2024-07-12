@@ -238,7 +238,7 @@ export default function SupportAdminRoute() {
 
 	return (
 		<>
-			<h1>Support</h1>
+			<h2>Support</h2>
 			<Input
 				type="search"
 				name="query"

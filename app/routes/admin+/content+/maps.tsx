@@ -297,7 +297,7 @@ export default function MapsAdminRoute() {
 
 	return (
 		<>
-			<h1>Maps</h1>
+			<h2>Maps</h2>
 			<DataTable columns={columns} data={data.maps} />
 			<Pagination total={data.total} />
 		</>

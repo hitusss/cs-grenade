@@ -279,7 +279,7 @@ export default function DestinationsAdminRoute() {
 
 	return (
 		<>
-			<h1>Destination Requests</h1>
+			<h2>Destination Requests</h2>
 			<ContentFilter hideFilter={{ verified: true }} />
 			<DataTable columns={columns} data={data.destinations} />
 			<Pagination total={data.total} />
