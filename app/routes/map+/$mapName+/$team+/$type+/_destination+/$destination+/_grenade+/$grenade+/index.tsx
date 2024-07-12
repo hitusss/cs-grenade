@@ -169,7 +169,7 @@ export default function GrenadeRoute() {
 						</Form>
 					) : null}
 					{data.grenade.verified && canEdit ? (
-						<Button>
+						<Button asChild>
 							<Link to="edit">Edit</Link>
 						</Button>
 					) : null}

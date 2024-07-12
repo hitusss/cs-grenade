@@ -165,7 +165,7 @@ const columns: ColumnDef<{
 					<DropdownMenuContent align="end">
 						<DropdownMenuLabel>Actions</DropdownMenuLabel>
 						<DropdownMenuSeparator />
-						<DropdownMenuItem>
+						<DropdownMenuItem asChild>
 							<Link
 								to={`/map/${row.original.map.name}/${row.original.team}/${row.original.type}/${row.original.destination.id}/${row.original.id}`}
 								className="flex items-center gap-2"
@@ -174,7 +174,7 @@ const columns: ColumnDef<{
 								<Icon name="arrow-right" />
 							</Link>
 						</DropdownMenuItem>
-						<DropdownMenuItem>
+						<DropdownMenuItem asChild>
 							<Link
 								to={`/users/${row.original.user.username}`}
 								className="flex items-center gap-2"

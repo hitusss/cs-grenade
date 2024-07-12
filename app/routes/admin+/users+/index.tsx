@@ -150,7 +150,7 @@ const columns: ColumnDef<{
 					<DropdownMenuContent align="end">
 						<DropdownMenuLabel>Actions</DropdownMenuLabel>
 						<DropdownMenuSeparator />
-						<DropdownMenuItem>
+						<DropdownMenuItem asChild>
 							<Link
 								to={`/users/${row.original.username}`}
 								className="flex items-center gap-2"
