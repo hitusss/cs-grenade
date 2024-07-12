@@ -1,4 +1,8 @@
-import { json, type LoaderFunctionArgs } from '@remix-run/node'
+import {
+	json,
+	type ActionFunctionArgs,
+	type LoaderFunctionArgs,
+} from '@remix-run/node'
 import { Form, useLoaderData, useSearchParams } from '@remix-run/react'
 import { invariantResponse } from '@epic-web/invariant'
 
@@ -47,7 +51,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 	return json({ destination })
 }
 
-export async function action({ request, params }: LoaderFunctionArgs) {
+export async function action({ request, params }: ActionFunctionArgs) {
 	await requireUserWithPermission(
 		request,
 		'create:review-destination-request:any',
