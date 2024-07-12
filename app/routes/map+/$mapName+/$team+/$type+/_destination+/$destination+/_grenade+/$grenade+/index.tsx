@@ -137,7 +137,7 @@ export default function GrenadeRoute() {
 	}))
 
 	return (
-		<Dialog open onOpenChange={() => !activeLightbox && navigate(-1)}>
+		<Dialog open onOpenChange={() => !activeLightbox && navigate('..')}>
 			<DialogContent className="max-h-[90vh] max-w-5xl overflow-auto">
 				<DialogHeader>{data.grenade.name}</DialogHeader>
 				<p>{data.grenade.description}</p>
