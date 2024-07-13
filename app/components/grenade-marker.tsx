@@ -25,6 +25,7 @@ type GrenadeMarkerProps = {
 	name: string
 	highlight?: boolean
 	disabled?: boolean
+	className?: string
 }
 
 export function GrenadeMarker({
@@ -34,6 +35,7 @@ export function GrenadeMarker({
 	name,
 	highlight,
 	disabled,
+	className,
 }: GrenadeMarkerProps) {
 	const { map } = useMap()
 	const grenadeRef = useRef<HTMLAnchorElement>(null)
@@ -83,6 +85,7 @@ export function GrenadeMarker({
 								'block size-5 rounded-full border-2 ring-offset-background transition-all duration-300 animate-in zoom-in group-focus-visible:outline-none group-focus-visible:ring-2 group-focus-visible:ring-ring group-focus-visible:ring-offset-2',
 								highlight ? 'bg-primary/75' : 'bg-destructive/75',
 								disabled && 'cursor-default',
+								className,
 							)}
 						/>
 						<span className="sr-only">{name}</span>

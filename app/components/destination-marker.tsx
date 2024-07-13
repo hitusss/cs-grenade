@@ -22,6 +22,7 @@ type DestinationMarkerProps = {
 	count?: number
 	highlight?: boolean
 	disabled?: boolean
+	className?: string
 }
 
 export function DestinationMarker({
@@ -31,6 +32,7 @@ export function DestinationMarker({
 	count,
 	highlight,
 	disabled,
+	className,
 }: DestinationMarkerProps) {
 	const { map } = useMap()
 	const destinationRef = useRef<HTMLAnchorElement>(null)
@@ -73,6 +75,7 @@ export function DestinationMarker({
 									? 'bg-primary/75 text-primary-foreground'
 									: 'bg-white/75 text-black',
 								disabled && 'cursor-default',
+								className,
 							)}
 						>
 							{count ? count : null}
