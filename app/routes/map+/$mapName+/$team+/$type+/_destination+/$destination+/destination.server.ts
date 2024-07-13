@@ -43,6 +43,25 @@ export async function updateDestination({
 			},
 		})
 	} else {
+		const destination = await prisma.destination.findUnique({
+			where: { id },
+			select: {
+				name: true,
+				x: true,
+				y: true,
+			},
+		})
+		if (
+			name !== destination?.name ||
+			x !== destination?.x ||
+			y !== destination?.y
+		) {
+			return await redirectWithToast(`..`, {
+				title: `There isn't any changes to save`,
+				description: ``,
+				type: 'error',
+			})
+		}
 		await prisma.destinationChanges.create({
 			data: {
 				destinationId: id,
