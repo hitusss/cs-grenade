@@ -7,8 +7,6 @@ export default [
 	{
 		rules: {
 			'import/order': 'off',
-			'react-hooks/exhaustive-deps': 'off',
-			'react-hooks/rules-of-hooks': 'off',
 		},
 	},
 ]
