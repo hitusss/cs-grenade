@@ -1,3 +1,5 @@
+import { invariantResponse } from '@epic-web/invariant'
+
 import { prisma } from '#app/utils/db.server.ts'
 import {
 	getUserPermissions,
@@ -43,18 +45,31 @@ export async function updateDestination({
 			},
 		})
 	} else {
-		const destination = await prisma.destination.findUnique({
+		const prevDestination = await prisma.destination.findUnique({
 			where: { id },
 			select: {
 				name: true,
 				x: true,
 				y: true,
+				destinationChanges: {
+					select: {
+						id: true,
+					},
+				},
 			},
 		})
+
+		invariantResponse(prevDestination, 'Not found', { status: 404 })
+		invariantResponse(
+			prevDestination.destinationChanges,
+			'You have pending changes to this destination',
+			{ status: 400 },
+		)
+
 		if (
-			name === destination?.name &&
-			x === destination?.x &&
-			y === destination?.y
+			name === prevDestination?.name &&
+			x === prevDestination?.x &&
+			y === prevDestination?.y
 		) {
 			return await redirectWithToast(`..`, {
 				title: `There isn't any changes to save`,
