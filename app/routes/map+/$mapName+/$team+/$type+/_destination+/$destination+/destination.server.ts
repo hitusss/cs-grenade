@@ -52,9 +52,9 @@ export async function updateDestination({
 			},
 		})
 		if (
-			name !== destination?.name ||
-			x !== destination?.x ||
-			y !== destination?.y
+			name === destination?.name &&
+			x === destination?.x &&
+			y === destination?.y
 		) {
 			return await redirectWithToast(`..`, {
 				title: `There isn't any changes to save`,
