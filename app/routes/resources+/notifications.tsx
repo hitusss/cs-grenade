@@ -43,6 +43,7 @@ export function Notifications() {
 
 	useEffect(() => {
 		fetcher.load('/resources/notifications')
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [shouldRevalidate])
 
 	if (!fetcher.data) return null

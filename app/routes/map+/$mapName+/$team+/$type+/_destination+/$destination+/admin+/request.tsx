@@ -102,7 +102,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 					verified: true,
 				},
 			})
-			notify({
+			await notify({
 				userId: destination.userId,
 				title: 'Destination request accepted',
 				description: `Your destination request for ${destination.name} has been accepted`,
@@ -116,7 +116,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 					id: destinationId,
 				},
 			})
-			notify({
+			await notify({
 				userId: destination.userId,
 				title: 'Destination request rejected',
 				description: `Your destination request for ${destination.name} has been rejected`,

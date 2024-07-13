@@ -208,7 +208,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 				},
 			})
 
-			notify({
+			await notify({
 				userId: ticket.userId,
 				title: 'Ticket Message',
 				description: `New message in ticket: ${ticket.title}`,
@@ -222,7 +222,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 				where: { id },
 				data: { open: false },
 			})
-			notify({
+			await notify({
 				userId: ticket.userId,
 				title: 'Ticket Closed',
 				description: `Ticket closed: ${ticket.title}`,
@@ -256,6 +256,7 @@ export default function SupportTicketAdminRoute() {
 
 	useEffect(() => {
 		revalidate()
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [shouldRevalidate])
 
 	return (

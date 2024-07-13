@@ -129,6 +129,7 @@ const columns: ColumnDef<{
 	{
 		id: 'actions',
 		cell: ({ row }) => {
+			// eslint-disable-next-line react-hooks/rules-of-hooks
 			const location = useLocation()
 			const params = new URLSearchParams({
 				redirectTo: `${location.pathname}?${location.search}`,

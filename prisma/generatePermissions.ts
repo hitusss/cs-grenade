@@ -52,7 +52,7 @@ export function createSuperAdminRole() {
 		}
 	}
 
-	createRole('superadmin', permissions)
+	return createRole('superadmin', permissions)
 }
 
 export function createAdminRole() {
@@ -125,7 +125,7 @@ export function createAdminRole() {
 	permissions.push({ entity: 'user', action: 'update', access: 'any' })
 	permissions.push({ entity: 'user', action: 'delete', access: 'any' })
 
-	createRole('admin', permissions)
+	return createRole('admin', permissions)
 }
 
 export function createModeratorRole() {
@@ -195,7 +195,7 @@ export function createModeratorRole() {
 	permissions.push({ entity: 'user', action: 'update', access: 'own' })
 	permissions.push({ entity: 'user', action: 'delete', access: 'own' })
 
-	createRole('moderator', permissions)
+	return createRole('moderator', permissions)
 }
 
 export function createUserPlusRole() {
@@ -223,7 +223,7 @@ export function createUserPlusRole() {
 	permissions.push({ entity: 'user', action: 'update', access: 'own' })
 	permissions.push({ entity: 'user', action: 'delete', access: 'own' })
 
-	createRole('userplus', permissions)
+	return createRole('userplus', permissions)
 }
 
 export function createUserRole() {
@@ -245,7 +245,7 @@ export function createUserRole() {
 	permissions.push({ entity: 'user', action: 'update', access: 'own' })
 	permissions.push({ entity: 'user', action: 'delete', access: 'own' })
 
-	createRole('user', permissions)
+	return createRole('user', permissions)
 }
 
 async function generatePermissions() {
@@ -262,23 +262,23 @@ async function generatePermissions() {
 	console.timeEnd('📦 Generated the permissions database...')
 
 	console.time('📦 Created the superadmin role...')
-	createSuperAdminRole()
+	await createSuperAdminRole()
 	console.timeEnd('📦 Created the superadmin role...')
 
 	console.time('📦 Created the admin role...')
-	createAdminRole()
+	await createAdminRole()
 	console.timeEnd('📦 Created the admin role...')
 
 	console.time('📦 Created the moderator role...')
-	createModeratorRole()
+	await createModeratorRole()
 	console.timeEnd('📦 Created the moderator role...')
 
 	console.time('📦 Created the user plus role...')
-	createUserPlusRole()
+	await createUserPlusRole()
 	console.timeEnd('📦 Created the user plus role...')
 
 	console.time('📦 Created the user role...')
-	createUserRole()
+	await createUserRole()
 	console.timeEnd('📦 Created the user role...')
 
 	console.timeEnd(`🔐 Permissions have been generated`)

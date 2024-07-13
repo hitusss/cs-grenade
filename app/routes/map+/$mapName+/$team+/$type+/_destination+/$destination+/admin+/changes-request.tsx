@@ -135,7 +135,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 				data: destinationChanges,
 			})
 			await prisma.destinationChanges.delete({ where: { destinationId } })
-			notify({
+			await notify({
 				userId: destination.userId,
 				title: 'Destination changes request accepted',
 				description: `Your destination changes request for ${destination.name} has been accepted`,
@@ -149,7 +149,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 					destinationId,
 				},
 			})
-			notify({
+			await notify({
 				userId: destination.userId,
 				title: 'Destination changes request rejected',
 				description: `Your destination changes request for ${destination.name} has been rejected`,

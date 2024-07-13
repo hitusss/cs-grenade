@@ -243,6 +243,7 @@ export default function SupportRoute() {
 
 	useEffect(() => {
 		revalidate()
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [shouldRevalidate])
 
 	return (

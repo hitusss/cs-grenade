@@ -131,7 +131,9 @@ const columns: ColumnDef<{
 	{
 		id: 'actions',
 		cell: ({ row }) => {
+			// eslint-disable-next-line react-hooks/rules-of-hooks
 			const submit = useSubmit()
+			// eslint-disable-next-line react-hooks/rules-of-hooks
 			const user = useUser()
 			const isSuperadmin = userHasRole(user, 'superadmin')
 			const hasUpdateUserAnyPermission = userHasPermission(
