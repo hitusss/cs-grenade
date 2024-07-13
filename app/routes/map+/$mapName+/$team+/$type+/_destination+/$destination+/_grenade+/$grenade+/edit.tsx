@@ -248,9 +248,9 @@ export default function EditGrenadeRoute() {
 
 	if (data.grenade.grenadeChanges) {
 		return (
-			<Dialog open onOpenChange={() => navigate(-1)}>
+			<Dialog open onOpenChange={() => navigate('..')}>
 				<DialogContent>
-					<DialogTitle>Edit Destination</DialogTitle>
+					<DialogTitle>Edit Grenade</DialogTitle>
 					<p>
 						This grenade has pending changes request. You can either cancel the
 						request and then create new one.
