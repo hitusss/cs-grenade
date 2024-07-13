@@ -44,6 +44,10 @@ export const extendedTheme = {
 			DEFAULT: 'hsl(var(--card))',
 			foreground: 'hsl(var(--card-foreground))',
 		},
+		diff: {
+			green: 'hsl(var(--diff-green))',
+			red: 'hsl(var(--diff-red))',
+		},
 	},
 	borderColor: {
 		DEFAULT: 'hsl(var(--border))',

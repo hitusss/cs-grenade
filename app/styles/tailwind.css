@@ -10,12 +10,18 @@
 		/* prefixed with foreground because it should look good on the background */
 		--foreground-destructive: 345 82.7% 40.8%;
 
+		--diff-green: 142.1 76.2% 36.3%;
+		--diff-red: 0 84.2% 60.2%;
+
 		--radius: 0.5rem;
 	}
 
 	.dark {
 		/* prefixed with foreground because it should look good on the background */
 		--foreground-destructive: -4 84% 60%;
+
+		--diff-green: 142.1 70.6% 45.3%;
+		--diff-red: 0 62.8% 30.6%;
 	}
 }
 
