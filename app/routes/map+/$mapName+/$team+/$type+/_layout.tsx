@@ -2,6 +2,8 @@ import { useEffect, useRef } from 'react'
 import { json, type LoaderFunctionArgs } from '@remix-run/node'
 import { Outlet, useLoaderData, useMatches } from '@remix-run/react'
 import { invariantResponse } from '@epic-web/invariant'
+import { type SEOHandle } from '@nasa-gcn/remix-seo'
+import { serverOnly$ } from 'vite-env-only/macros'
 import { z } from 'zod'
 
 import { grenadeLabels, grenadeTypes } from '#types/grenades-types.ts'
@@ -91,6 +93,20 @@ const MapHandleMatch = z
 			currentGrenade: handle.map?.currentGrenade ? params.grenade : undefined,
 		}
 	})
+
+export const handle = serverOnly$({
+	getSitemapEntries: async () => {
+		const maps = await prisma.map.findMany({
+			select: {
+				name: true,
+			},
+		})
+		return maps.map((map) => ({
+			route: `/map/${map.name}/${teams[0]}/${grenadeTypes[0]}`,
+			priority: 0.7,
+		}))
+	},
+} satisfies SEOHandle)
 
 export async function loader({ params }: LoaderFunctionArgs) {
 	const { mapName, team, type } = params
