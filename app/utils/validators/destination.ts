@@ -18,10 +18,14 @@ export const DestinationSchema = z.object({
 		.max(24, 'Name should be not longer then 24 chars'),
 })
 
-export const EditDestinationSchema = DestinationSchema.extend({
-	intent: z.literal('edit'),
+export const UpdateDestinationSchema = DestinationSchema.extend({
+	intent: z.literal('update'),
 })
 
 export const DeleteDestinationSchema = z.object({
 	intent: z.literal('delete'),
+})
+
+export const CancelEditDestinationRequestSchema = z.object({
+	intent: z.literal('cancel-edit-request'),
 })

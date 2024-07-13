@@ -3,7 +3,13 @@ import {
 	type ActionFunctionArgs,
 	type LoaderFunctionArgs,
 } from '@remix-run/node'
-import { Link, useActionData, useLoaderData } from '@remix-run/react'
+import {
+	Form,
+	Link,
+	useActionData,
+	useLoaderData,
+	useNavigate,
+} from '@remix-run/react'
 import { parseWithZod } from '@conform-to/zod'
 import { invariantResponse } from '@epic-web/invariant'
 import { z } from 'zod'
@@ -19,20 +25,32 @@ import {
 import { userHasPermission } from '#app/utils/permissions.ts'
 import { useUser } from '#app/utils/user.ts'
 import {
+	CancelEditDestinationRequestSchema,
 	DeleteDestinationSchema,
-	EditDestinationSchema,
+	UpdateDestinationSchema,
 } from '#app/utils/validators/destination.ts'
 import { Button } from '#app/components/ui/button.tsx'
+import {
+	Dialog,
+	DialogContent,
+	DialogFooter,
+	DialogTitle,
+} from '#app/components/ui/dialog.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
 import { DestinationForm } from '#app/components/destination-form.tsx'
 import { MapBackButton } from '#app/components/map.tsx'
 
 import { type MapHandle } from '../../_layout.tsx'
-import { deleteDestination, updateDestination } from './destination.server.ts'
+import {
+	cancelEditDestinationRequest,
+	deleteDestination,
+	updateDestination,
+} from './destination.server.ts'
 
 const DestinationSchema = z.discriminatedUnion('intent', [
-	EditDestinationSchema,
+	UpdateDestinationSchema,
 	DeleteDestinationSchema,
+	CancelEditDestinationRequestSchema,
 ])
 
 export const handle: MapHandle = {
@@ -58,6 +76,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 			x: true,
 			y: true,
 			userId: true,
+			destinationChanges: {
+				select: { id: true },
+			},
 		},
 	})
 
@@ -110,7 +131,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	const isOwn = destination.userId === userId
 
 	switch (submission.value.intent) {
-		case 'edit': {
+		case 'update': {
 			const { name, x, y } = submission.value
 			return updateDestination({
 				userId,
@@ -124,6 +145,13 @@ export async function action({ request, params }: ActionFunctionArgs) {
 		case 'delete': {
 			return deleteDestination({
 				userId,
+				isOwn,
+				id: destinationId,
+			})
+		}
+
+		case 'cancel-edit-request': {
+			return cancelEditDestinationRequest({
 				isOwn,
 				id: destinationId,
 			})
@@ -146,6 +174,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 export default function EditDestinationRoute() {
 	const data = useLoaderData<typeof loader>()
 	const actionData = useActionData<typeof action>()
+	const navigate = useNavigate()
 
 	const user = useUser()
 	const isUserDestination = data.destination.userId === user.id
@@ -159,6 +188,51 @@ export default function EditDestinationRoute() {
 	)
 
 	const deleteDC = useDoubleCheck()
+
+	if (data.destination.destinationChanges) {
+		return (
+			<Dialog open onOpenChange={() => navigate('..')}>
+				<DialogContent>
+					<DialogTitle>Edit Destination</DialogTitle>
+					<p>
+						This destination has pending changes request. You can either cancel
+						the request and then create new one.
+					</p>
+					<Form method="POST">
+						<DialogFooter>
+							<Button variant="destructive" type="button" asChild>
+								<Link to="..">Back</Link>
+							</Button>
+							{hasDeleteDestinationPermission ? (
+								<Button
+									variant="destructive"
+									{...deleteDC.getButtonProps({
+										type: 'submit',
+										name: 'intent',
+										value: 'delete',
+									})}
+								>
+									{deleteDC.doubleCheck ? (
+										'Are you sure?'
+									) : (
+										<Icon name="trash">Delete</Icon>
+									)}
+								</Button>
+							) : null}
+							<Button
+								variant="destructive"
+								type="submit"
+								name="intent"
+								value="cancel-edit-request"
+							>
+								Cancel Request
+							</Button>
+						</DialogFooter>
+					</Form>
+				</DialogContent>
+			</Dialog>
+		)
+	}
 
 	return (
 		<>

@@ -92,3 +92,29 @@ export async function deleteDestination({
 		type: 'success',
 	})
 }
+
+export async function cancelEditDestinationRequest({
+	isOwn,
+	id,
+}: {
+	isOwn: boolean
+	id: string
+}) {
+	if (!isOwn) {
+		throw unauthorized({
+			message: 'You do not have permission to cancel this request',
+		})
+	}
+
+	await prisma.destinationChanges.delete({
+		where: {
+			destinationId: id,
+		},
+	})
+
+	return await redirectWithToast(`..`, {
+		title: `Destination changes cancelled`,
+		description: ``,
+		type: 'success',
+	})
+}
