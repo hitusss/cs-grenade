@@ -233,12 +233,13 @@ model Destination {
 
   grenades Grenade[]
 
+  destinationChanges DestinationChanges?
+
   user   User   @relation(fields: [userId], references: [id])
   userId String
 
-  createdAt          DateTime             @default(now())
-  updatedAt          DateTime             @updatedAt
-  DestinationChanges DestinationChanges[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([mapName, team, type, x, y])
 }
@@ -251,9 +252,8 @@ model DestinationChanges {
   x String
   y String
 
-  destination Destination @relation(fields: [destinationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-
-  destinationId String
+  destination   Destination @relation(fields: [destinationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  destinationId String      @unique
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId String
@@ -284,10 +284,10 @@ model Grenade {
 
   images GrenadeImage[]
 
+  grenadeChanges GrenadeChanges?
+
   user   User   @relation(fields: [userId], references: [id])
   userId String
-
-  grenadeChanges GrenadeChanges?
 
   favorites Favorite[]
 
