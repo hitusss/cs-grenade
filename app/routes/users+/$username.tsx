@@ -14,7 +14,10 @@ import { prisma } from '#app/utils/db.server.ts'
 import { getUserImgSrc, useOptionalUser } from '#app/utils/user.ts'
 import { Button } from '#app/components/ui/button.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
-import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
+import {
+	ErrorComponent,
+	GeneralErrorBoundary,
+} from '#app/components/error-boundary.tsx'
 
 export const meta: MetaFunction<typeof loader> = ({ data, params }) => {
 	const displayName = data?.user.name ?? params.username
@@ -149,7 +152,9 @@ export function ErrorBoundary() {
 		<GeneralErrorBoundary
 			statusHandlers={{
 				404: ({ params }) => (
-					<p>No user with the username "{params.username}" exists</p>
+					<ErrorComponent
+						error={`No user with the username "${params.username}" exists`}
+					/>
 				),
 			}}
 		/>
