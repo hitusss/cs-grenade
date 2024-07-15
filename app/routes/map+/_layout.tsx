@@ -1,6 +1,8 @@
 import { Outlet } from '@remix-run/react'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 
+import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
+
 export const handle: SEOHandle = {
 	getSitemapEntries: () => null,
 }
@@ -11,4 +13,8 @@ export default function MapLayout() {
 			<Outlet />
 		</div>
 	)
+}
+
+export function ErrorBoundary() {
+	return <GeneralErrorBoundary />
 }
