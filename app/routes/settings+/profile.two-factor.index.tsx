@@ -47,7 +47,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	return redirect('/settings/profile/two-factor/verify')
 }
 
-export default function TwoFactorRoute() {
+export default function SettingsProfileTwoFactorMainRoute() {
 	const data = useLoaderData<typeof loader>()
 	const enable2FAFetcher = useFetcher<typeof action>()
 

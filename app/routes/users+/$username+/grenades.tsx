@@ -89,7 +89,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 	return json({ grenades, total, isOwn: user.id === userId })
 }
-export default function UserGrenadesRoute() {
+export default function ProfileGrenadesRoute() {
 	const data = useLoaderData<typeof loader>()
 
 	return (

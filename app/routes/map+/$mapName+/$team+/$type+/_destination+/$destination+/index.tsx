@@ -83,7 +83,7 @@ export async function action({ request, params }: LoaderFunctionArgs) {
 	})
 }
 
-export default function DestinationRoute() {
+export default function MapDestinationRoute() {
 	const data = useLoaderData<typeof loader>()
 
 	const cancelDC = useDoubleCheck()

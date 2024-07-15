@@ -230,7 +230,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	)
 }
 
-export default function SupportRoute() {
+export default function SupportTicketRoute() {
 	const data = useLoaderData<typeof loader>()
 	const actionData = useActionData<typeof action>()
 	const { revalidate } = useRevalidator()

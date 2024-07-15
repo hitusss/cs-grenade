@@ -288,7 +288,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	return json({ destinations, total })
 }
 
-export default function DestinationsAdminRoute() {
+export default function AdminContentDestinationsRoute() {
 	const data = useLoaderData<typeof loader>()
 
 	return (

@@ -47,7 +47,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	return json({ tickets })
 }
 
-export default function MainSupportRoute() {
+export default function SupportRoute() {
 	const data = useLoaderData<typeof loader>()
 	const location = useLocation()
 	const { revalidate } = useRevalidator()

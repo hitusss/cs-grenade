@@ -39,7 +39,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	})
 }
 
-export default function TwoFactorDisableRoute() {
+export default function SettingsProfileTwoFactorDisableRoute() {
 	const disable2FAFetcher = useFetcher<typeof action>()
 	const dc = useDoubleCheck()
 

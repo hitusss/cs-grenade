@@ -297,7 +297,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	return json({ grenades, total })
 }
 
-export default function GrenadeAdminRoute() {
+export default function AdminRequestsGrenadesRoute() {
 	const data = useLoaderData<typeof loader>()
 
 	return (

@@ -125,7 +125,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	return json({ status: 'success' } as const, { headers: toastHeaders })
 }
 
-export default function Connections() {
+export default function SettingsProfileConnectionsRoute() {
 	const data = useLoaderData<typeof loader>()
 
 	return (

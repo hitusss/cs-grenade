@@ -168,7 +168,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	})
 }
 
-export default function AdminDestinationChangesRequestRoute() {
+export default function MapAdminDestinationChangesRequestRoute() {
 	const data = useLoaderData<typeof loader>()
 	const [searchParams] = useSearchParams()
 

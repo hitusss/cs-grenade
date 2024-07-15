@@ -107,7 +107,7 @@ export async function action({ request, params }: LoaderFunctionArgs) {
 	})
 }
 
-export default function GrenadeRoute() {
+export default function MapGrenadeRoute() {
 	const data = useLoaderData<typeof loader>()
 	const navigate = useNavigate()
 

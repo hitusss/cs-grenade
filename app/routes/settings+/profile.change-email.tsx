@@ -106,7 +106,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	}
 }
 
-export default function ChangeEmailIndex() {
+export default function SettingsProfileChangeEmailRoute() {
 	const data = useLoaderData<typeof loader>()
 	const actionData = useActionData<typeof action>()
 

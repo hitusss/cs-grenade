@@ -171,7 +171,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	}
 }
 
-export default function EditDestinationRoute() {
+export default function MapEditDestinationRoute() {
 	const data = useLoaderData<typeof loader>()
 	const actionData = useActionData<typeof action>()
 	const navigate = useNavigate()

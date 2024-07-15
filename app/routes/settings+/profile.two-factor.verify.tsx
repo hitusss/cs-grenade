@@ -133,7 +133,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	}
 }
 
-export default function TwoFactorRoute() {
+export default function SettingsProfileTwoFactorVerifyRoute() {
 	const data = useLoaderData<typeof loader>()
 	const actionData = useActionData<typeof action>()
 	const navigation = useNavigation()

@@ -293,7 +293,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	}
 }
 
-export default function MapsAdminRoute() {
+export default function AdminContentMapsRoute() {
 	const data = useLoaderData<typeof loader>()
 
 	return (

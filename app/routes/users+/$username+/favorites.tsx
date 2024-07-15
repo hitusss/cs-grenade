@@ -86,7 +86,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 	return json({ favorites, total })
 }
-export default function UserFavoritesRoute() {
+export default function ProfileFavoritesRoute() {
 	const data = useLoaderData<typeof loader>()
 
 	const favorites = data.favorites.map((f) => f.grenade)

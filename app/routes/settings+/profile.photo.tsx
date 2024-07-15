@@ -118,7 +118,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	return redirect('/settings/profile')
 }
 
-export default function PhotoRoute() {
+export default function SettingsProfilePhotoRoute() {
 	const data = useLoaderData<typeof loader>()
 
 	const doubleCheckDeleteImage = useDoubleCheck()

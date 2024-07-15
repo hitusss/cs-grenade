@@ -103,7 +103,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	}
 }
 
-export default function EditUserProfile() {
+export default function SettingsProfileMainRoute() {
 	const data = useLoaderData<typeof loader>()
 
 	return (

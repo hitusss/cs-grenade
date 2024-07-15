@@ -361,7 +361,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	}
 }
 
-export default function UsersRoute() {
+export default function AdminUsersRoute() {
 	const data = useLoaderData<typeof loader>()
 	const navigate = useNavigate()
 	const [searchParams, setSearchParams] = useSearchParams()

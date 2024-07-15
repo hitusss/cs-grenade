@@ -84,7 +84,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	})
 }
 
-export default function NewDestinationRoute() {
+export default function MpaNewDestinationRoute() {
 	const actionData = useActionData<typeof action>()
 
 	const user = useUser()

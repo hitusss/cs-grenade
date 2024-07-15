@@ -32,7 +32,7 @@ const BreadcrumbHandleMatch = z.object({
 	handle: BreadcrumbHandle,
 })
 
-export default function EditUserProfile() {
+export default function SettingsProfileRoute() {
 	const user = useUser()
 	const matches = useMatches()
 	const breadcrumbs = matches

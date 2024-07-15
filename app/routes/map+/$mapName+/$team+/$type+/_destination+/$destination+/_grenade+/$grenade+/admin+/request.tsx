@@ -146,7 +146,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	})
 }
 
-export default function AdminGrenadeRequestRoute() {
+export default function MapAdminGrenadeRequestRoute() {
 	const data = useLoaderData<typeof loader>()
 	const [searchParams] = useSearchParams()
 

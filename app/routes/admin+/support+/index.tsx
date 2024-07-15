@@ -216,7 +216,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	return json({ tickets: ticketsResult.data, total })
 }
 
-export default function SupportAdminRoute() {
+export default function AdminSupportRoute() {
 	const data = useLoaderData<typeof loader>()
 	const navigate = useNavigate()
 	const [searchParams, setSearchParams] = useSearchParams()

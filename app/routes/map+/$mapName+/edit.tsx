@@ -154,7 +154,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	})
 }
 
-export default function EditMapRoute() {
+export default function MapEditRoute() {
 	const data = useLoaderData<typeof loader>()
 	const actionData = useActionData<typeof action>()
 

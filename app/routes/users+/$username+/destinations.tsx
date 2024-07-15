@@ -83,7 +83,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 	return json({ destinations, total, isOwn: user.id === userId })
 }
-export default function UserDestinationsRoute() {
+export default function ProfileDestinationsRoute() {
 	const data = useLoaderData<typeof loader>()
 
 	return (

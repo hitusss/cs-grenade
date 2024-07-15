@@ -100,7 +100,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	return json({ success: true })
 }
 
-export default function CacheAdminRoute() {
+export default function AdminCacheRoute() {
 	const data = useLoaderData<typeof loader>()
 	const [searchParams] = useSearchParams()
 	const submit = useSubmit()

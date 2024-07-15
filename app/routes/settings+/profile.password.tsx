@@ -120,7 +120,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	)
 }
 
-export default function ChangePasswordRoute() {
+export default function SettingsProfilePasswordRoute() {
 	const actionData = useActionData<typeof action>()
 	const isPending = useIsPending()
 

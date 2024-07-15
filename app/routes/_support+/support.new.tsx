@@ -107,7 +107,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	})
 }
 
-export default function NewSupportRoute() {
+export default function SupportNewRoute() {
 	const actionData = useActionData<typeof action>()
 
 	const [form, fields] = useForm({
