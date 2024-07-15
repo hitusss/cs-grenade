@@ -40,13 +40,13 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '#app/components/ui/select.tsx'
-import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 
 export const handle: SEOHandle = {
 	getSitemapEntries: () => null,
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
+	throw new Response('Not implemented', { status: 501 })
 	await requireUserWithRole(request, 'superadmin')
 	const searchParams = new URL(request.url).searchParams
 	const query = searchParams.get('query')
@@ -246,17 +246,5 @@ function CacheKeyRow({
 				{cacheKey}
 			</Link>
 		</li>
-	)
-}
-
-export function ErrorBoundary() {
-	return (
-		<GeneralErrorBoundary
-			statusHandlers={{
-				403: ({ error }) => (
-					<p>You are not allowed to do that: {error?.data.message}</p>
-				),
-			}}
-		/>
 	)
 }
