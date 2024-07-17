@@ -60,6 +60,7 @@ export const handle: MapHandle = {
 	map: {
 		currentDestination: true,
 		currentGrenade: true,
+		disableAllGrenades: true,
 		hideCurrentGrenade: true,
 	},
 }
