@@ -215,12 +215,11 @@ export default function MapAdminDestinationChangesRequestRoute() {
 				</DialogTrigger>
 				<DialogContent>
 					<DialogHeader>Destination changes request</DialogHeader>
-					{hasChangedName ? (
-						<DiffView
-							oldValue={data.destination.name}
-							newValue={data.destinationChanges.name}
-						/>
-					) : null}
+					<DiffView
+						name="Name"
+						oldValue={data.destination.name}
+						newValue={hasChangedName ? data.destination.name : undefined}
+					/>
 					<DialogFooter>
 						<Form method="POST" className="flex items-center gap-2">
 							<Button
