@@ -214,7 +214,9 @@ export default function MapAdminDestinationChangesRequestRoute() {
 					</Button>
 				</DialogTrigger>
 				<DialogContent>
-					<DialogHeader>Destination changes request</DialogHeader>
+					<DialogHeader>
+						<h3>Destination changes request</h3>
+					</DialogHeader>
 					<DiffView
 						name="Name"
 						oldValue={data.destination.name}
