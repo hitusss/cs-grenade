@@ -255,7 +255,7 @@ export default function MapEditGrenadeRoute() {
 						This grenade has pending changes request. You can either cancel the
 						request and then create new one.
 					</p>
-					<Form method="POST">
+					<Form method="POST" encType="multipart/form-data">
 						<DialogFooter>
 							<Button variant="destructive" type="button" asChild>
 								<Link to="..">Back</Link>
