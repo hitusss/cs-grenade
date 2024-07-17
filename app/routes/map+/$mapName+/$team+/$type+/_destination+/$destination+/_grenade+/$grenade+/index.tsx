@@ -168,9 +168,9 @@ export default function MapGrenadeRoute() {
 							</Button>
 						</Form>
 					) : null}
-					{data.grenade.verified && canEdit ? (
+					{data.grenade.verified && (isUserGrenade || canEdit) ? (
 						<Button asChild>
-							<Link to="edit">Edit</Link>
+							<Link to="edit">{canEdit ? 'Edit' : 'Request changes'}</Link>
 						</Button>
 					) : null}
 				</DialogFooter>
