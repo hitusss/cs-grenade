@@ -56,6 +56,7 @@ const DestinationSchema = z.discriminatedUnion('intent', [
 export const handle: MapHandle = {
 	map: {
 		currentDestination: true,
+		disableAllDestinations: true,
 		hideCurrentDestination: true,
 	},
 }
