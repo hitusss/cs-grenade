@@ -20,6 +20,7 @@ export const MapHandle = z
 			currentDestination: z.boolean().optional(),
 			hideCurrentDestination: z.boolean().optional(),
 			disableAllDestinations: z.boolean().optional(),
+			hideAllGrenades: z.boolean().optional(),
 			currentGrenade: z.boolean().optional(),
 			hideCurrentGrenade: z.boolean().optional(),
 			disableAllGrenades: z.boolean().optional(),
@@ -225,34 +226,36 @@ export default function MapLayout() {
 								highlight={d.id === currentDestination?.id}
 							/>
 						))}
-					{currentDestination?.grenades
-						.filter((g) =>
-							mapHandle?.currentGrenade
-								? mapHandle?.hideCurrentGrenade
-									? g.id !== mapHandle.currentGrenade
-									: g.id === mapHandle.currentGrenade
-								: true,
-						)
-						.map((g) => (
-							<GrenadeMarker
-								key={g.id}
-								to={`${currentDestination.id}/${g.id}`}
-								name={g.name}
-								destination={{
-									x: currentDestination.x,
-									y: currentDestination.y,
-								}}
-								coords={{
-									x: g.x,
-									y: g.y,
-								}}
-								disabled={
-									mapHandle?.disableAllGrenades ||
-									g.id === mapHandle?.currentGrenade
-								}
-								highlight={g.id === mapHandle?.currentGrenade}
-							/>
-						))}
+					{mapHandle?.hideAllGrenades
+						? null
+						: currentDestination?.grenades
+								.filter((g) =>
+									mapHandle?.currentGrenade
+										? mapHandle?.hideCurrentGrenade
+											? g.id !== mapHandle.currentGrenade
+											: g.id === mapHandle.currentGrenade
+										: true,
+								)
+								.map((g) => (
+									<GrenadeMarker
+										key={g.id}
+										to={`${currentDestination.id}/${g.id}`}
+										name={g.name}
+										destination={{
+											x: currentDestination.x,
+											y: currentDestination.y,
+										}}
+										coords={{
+											x: g.x,
+											y: g.y,
+										}}
+										disabled={
+											mapHandle?.disableAllGrenades ||
+											g.id === mapHandle?.currentGrenade
+										}
+										highlight={g.id === mapHandle?.currentGrenade}
+									/>
+								))}
 					<Outlet />
 				</Map>
 			</div>
