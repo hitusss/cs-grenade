@@ -61,7 +61,7 @@ export async function updateDestination({
 
 		invariantResponse(prevDestination, 'Not found', { status: 404 })
 		invariantResponse(
-			prevDestination.destinationChanges,
+			!prevDestination.destinationChanges,
 			'You have pending changes to this destination',
 			{ status: 400 },
 		)
