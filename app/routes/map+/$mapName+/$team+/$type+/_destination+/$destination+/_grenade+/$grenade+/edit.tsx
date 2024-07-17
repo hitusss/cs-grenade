@@ -104,10 +104,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 	if (
 		grenade.userId !== userId &&
-		!userHasPermission(userPermissions, 'update:destination:any')
+		!userHasPermission(userPermissions, 'update:grenade:any')
 	) {
 		throw unauthorized({
-			message: 'You do not have permission to edit this destination',
+			message: 'You do not have permission to edit this grenade',
 		})
 	}
 
@@ -235,14 +235,11 @@ export default function MapEditGrenadeRoute() {
 	const navigate = useNavigate()
 
 	const user = useUser()
-	const isUserDestination = data.grenade.userId === user.id
-	const hasUpdateDestinationPermission = userHasPermission(
+	const isUserGrenade = data.grenade.userId === user.id
+	const hasUpdateGrenadePermission = userHasPermission(user, 'update:grenade')
+	const hasDeleteGrenadePermission = userHasPermission(
 		user,
-		'update:destination',
-	)
-	const hasDeleteDestinationPermission = userHasPermission(
-		user,
-		isUserDestination ? 'delete:destination' : 'delete:destination:any',
+		isUserGrenade ? 'delete:grenade' : 'delete:grenade:any',
 	)
 
 	const deleteDC = useDoubleCheck()
@@ -261,7 +258,7 @@ export default function MapEditGrenadeRoute() {
 							<Button variant="destructive" type="button" asChild>
 								<Link to="..">Back</Link>
 							</Button>
-							{hasDeleteDestinationPermission ? (
+							{hasDeleteGrenadePermission ? (
 								<Button
 									variant="destructive"
 									{...deleteDC.getButtonProps({
@@ -298,7 +295,7 @@ export default function MapEditGrenadeRoute() {
 			<GrenadeForm
 				type="edit"
 				title={
-					hasUpdateDestinationPermission
+					hasUpdateGrenadePermission
 						? 'Edit Grenade'
 						: 'Request Grenade Changes'
 				}
@@ -320,7 +317,7 @@ export default function MapEditGrenadeRoute() {
 				<Button variant="destructive" type="button" asChild>
 					<Link to="..">Back</Link>
 				</Button>
-				{hasDeleteDestinationPermission ? (
+				{hasDeleteGrenadePermission ? (
 					<Button
 						variant="destructive"
 						{...deleteDC.getButtonProps({
@@ -337,7 +334,7 @@ export default function MapEditGrenadeRoute() {
 					</Button>
 				) : null}
 				<Button type="submit" name="intent" value="update">
-					{hasUpdateDestinationPermission ? 'Update' : 'Request changes'}
+					{hasUpdateGrenadePermission ? 'Update' : 'Request changes'}
 				</Button>
 			</GrenadeForm>
 		</>
