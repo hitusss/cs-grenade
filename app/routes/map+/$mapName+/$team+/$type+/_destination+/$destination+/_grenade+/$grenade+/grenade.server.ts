@@ -216,7 +216,7 @@ async function requestGrenadeChanges({
 
 	invariantResponse(prevGrenade, 'Not found', { status: 404 })
 	invariantResponse(
-		prevGrenade.grenadeChanges,
+		!prevGrenade.grenadeChanges,
 		'You have pending changes to this grenade',
 		{ status: 400 },
 	)
