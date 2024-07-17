@@ -23,6 +23,7 @@ import { type MapHandle } from '../../../../_layout.tsx'
 export const handle: MapHandle = {
 	map: {
 		currentDestination: true,
+		currentGrenade: true,
 	},
 }
 
