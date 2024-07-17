@@ -46,7 +46,6 @@ export const handle: SEOHandle = {
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
-	throw new Response('Not implemented', { status: 501 })
 	await requireUserWithRole(request, 'superadmin')
 	const searchParams = new URL(request.url).searchParams
 	const query = searchParams.get('query')
