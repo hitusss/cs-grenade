@@ -49,6 +49,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 			name: true,
 			description: true,
 			images: {
+				orderBy: {
+					order: 'asc',
+				},
 				select: {
 					id: true,
 					description: true,
