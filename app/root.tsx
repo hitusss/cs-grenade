@@ -112,6 +112,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 							roles: {
 								select: {
 									name: true,
+									priority: true,
 									permissions: {
 										select: { entity: true, action: true, access: true },
 									},
