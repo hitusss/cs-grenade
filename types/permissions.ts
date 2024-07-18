@@ -1,5 +1,7 @@
 export const entities = [
+	'admin',
 	'user',
+	'cache',
 	'support',
 	'map',
 	'destination',
@@ -17,12 +19,3 @@ export type Access = (typeof accesses)[number]
 export type PermissionString =
 	| `${Action}:${Entity}`
 	| `${Action}:${Entity}:${Access}`
-
-export const roles = [
-	'user',
-	'userplus',
-	'moderator',
-	'admin',
-	'superadmin',
-] as const
-export type Role = (typeof roles)[number]
