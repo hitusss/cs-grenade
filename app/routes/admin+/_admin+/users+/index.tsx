@@ -12,19 +12,22 @@ import {
 	useSubmit,
 } from '@remix-run/react'
 import { parseWithZod } from '@conform-to/zod'
+import { invariantResponse } from '@epic-web/invariant'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { type Prisma } from '@prisma/client'
 import { type ColumnDef } from '@tanstack/react-table'
 import { z } from 'zod'
 
-import { roles } from '#types/permissions.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { useDebounce } from '#app/utils/misc.tsx'
 import {
 	requireUserWithPermission,
-	requireUserWithRole,
+	requireUserWithRolePriority,
 } from '#app/utils/permissions.server.ts'
-import { userHasPermission, userHasRole } from '#app/utils/permissions.ts'
+import {
+	userHasPermission,
+	userHasRolePriority,
+} from '#app/utils/permissions.ts'
 import { getUserImgSrc, useUser } from '#app/utils/user.ts'
 import { Badge } from '#app/components/ui/badge.js'
 import { Button } from '#app/components/ui/button.tsx'
@@ -132,10 +135,11 @@ const columns: ColumnDef<{
 		id: 'actions',
 		cell: ({ row }) => {
 			// eslint-disable-next-line react-hooks/rules-of-hooks
+			const data = useLoaderData<typeof loader>()
+			// eslint-disable-next-line react-hooks/rules-of-hooks
 			const submit = useSubmit()
 			// eslint-disable-next-line react-hooks/rules-of-hooks
 			const user = useUser()
-			const isSuperadmin = userHasRole(user, 'superadmin')
 			const hasUpdateUserAnyPermission = userHasPermission(
 				user,
 				'update:user:any',
@@ -165,23 +169,25 @@ const columns: ColumnDef<{
 						{hasUpdateUserAnyPermission ? (
 							<DropdownMenuGroup>
 								<DropdownMenuLabel>Toggle Groups</DropdownMenuLabel>
-								{roles.map((role) => (
+								{data.roles.map((role) => (
 									<DropdownMenuCheckboxItem
-										key={role}
-										checked={row.original.roles.some((r) => r.name === role)}
+										key={role.name}
+										checked={row.original.roles.some(
+											(r) => r.name === role.name,
+										)}
 										onCheckedChange={(value) => {
 											const formData = new FormData()
 											formData.append('intent', 'toggleRole')
 											formData.append('userId', row.original.id)
-											formData.append('role', role)
+											formData.append('role', role.name)
 											formData.append('value', String(value))
 
 											submit(formData, { method: 'post' })
 										}}
 										className="capitalize"
-										disabled={role === 'superadmin' && !isSuperadmin}
+										disabled={!userHasRolePriority(user, role.priority)}
 									>
-										{role}
+										{role.name}
 									</DropdownMenuCheckboxItem>
 								))}
 							</DropdownMenuGroup>
@@ -208,7 +214,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		return redirect(`/admin/users?${searchParams.toString()}`)
 	}
 	const role = searchParams.get('role')
-	if (role === '' || (role && roles.indexOf(role) === -1)) {
+	if (role === '' || role?.toLowerCase() === 'any') {
 		searchParams.delete('role')
 		return redirect(`/admin/users?${searchParams.toString()}`)
 	}
@@ -295,11 +301,18 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		take: perPage,
 	})
 
-	return json({ total, users })
+	const roles = await prisma.role.findMany({
+		select: {
+			name: true,
+			priority: true,
+		},
+	})
+
+	return json({ total, users, roles })
 }
 
 export async function action({ request }: ActionFunctionArgs) {
-	await requireUserWithPermission(request, 'read:user:any')
+	await requireUserWithPermission(request, 'update:user:any')
 
 	const formData = await request.formData()
 
@@ -318,13 +331,20 @@ export async function action({ request }: ActionFunctionArgs) {
 
 	switch (submission.value.intent) {
 		case 'toggleRole': {
-			await requireUserWithPermission(request, 'update:user:any')
 			const { userId, role, value } = submission.value
 			const booleanValue = value === 'true'
 
-			if (role === 'superadmin') {
-				await requireUserWithRole(request, 'superadmin')
-			}
+			const roleWithPriority = await prisma.role.findUnique({
+				where: {
+					name: role,
+				},
+				select: {
+					priority: true,
+				},
+			})
+
+			invariantResponse(roleWithPriority, "Role doesn't exist")
+			await requireUserWithRolePriority(request, roleWithPriority.priority)
 
 			await prisma.user.update({
 				where: { id: userId },
@@ -411,9 +431,13 @@ export default function AdminUsersRoute() {
 							</SelectTrigger>
 							<SelectContent>
 								<SelectItem value="Any">Any</SelectItem>
-								{roles.map((role) => (
-									<SelectItem key={role} value={role} className="capitalize">
-										{role}
+								{data.roles.map((role) => (
+									<SelectItem
+										key={role.name}
+										value={role.name}
+										className="capitalize"
+									>
+										{role.name}
 									</SelectItem>
 								))}
 							</SelectContent>

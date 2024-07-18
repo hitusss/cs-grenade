@@ -28,7 +28,7 @@ import {
 	getInstanceInfo,
 } from '#app/utils/litefs.server.ts'
 import { useDebounce, useDoubleCheck } from '#app/utils/misc.tsx'
-import { requireUserWithRole } from '#app/utils/permissions.server.ts'
+import { requireUserWithPermission } from '#app/utils/permissions.server.ts'
 import { Button } from '#app/components/ui/button.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
 import { Input } from '#app/components/ui/input.tsx'
@@ -46,7 +46,7 @@ export const handle: SEOHandle = {
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
-	await requireUserWithRole(request, 'superadmin')
+	await requireUserWithPermission(request, 'read:cache:any')
 	const searchParams = new URL(request.url).searchParams
 	const query = searchParams.get('query')
 	if (query === '') {
@@ -71,7 +71,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
-	await requireUserWithRole(request, 'admin')
+	await requireUserWithPermission(request, 'delete:cache:any')
 	const formData = await request.formData()
 	const key = formData.get('cacheKey')
 	const { currentInstance } = await getInstanceInfo()

@@ -15,10 +15,7 @@ import { z } from 'zod'
 import { grenadeTypes } from '#types/grenades-types.ts'
 import { teams } from '#types/teams.ts'
 import { prisma } from '#app/utils/db.server.ts'
-import {
-	requireUserWithPermission,
-	requireUserWithRole,
-} from '#app/utils/permissions.server.ts'
+import { requireUserWithPermission } from '#app/utils/permissions.server.ts'
 import { userHasPermission } from '#app/utils/permissions.ts'
 import { getUserImgSrc, useUser } from '#app/utils/user.ts'
 import { Button } from '#app/components/ui/button.tsx'
@@ -197,7 +194,7 @@ export const handle: SEOHandle = {
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
-	await requireUserWithRole(request, ['moderator', 'admin', 'superadmin'])
+	await requireUserWithPermission(request, 'read:admin:any')
 
 	const searchParams = new URL(request.url).searchParams
 

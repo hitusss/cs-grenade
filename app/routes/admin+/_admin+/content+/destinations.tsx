@@ -7,7 +7,7 @@ import { type ColumnDef } from '@tanstack/react-table'
 import { grenadeLabels } from '#types/grenades-types.ts'
 import { teamLabels } from '#types/teams.ts'
 import { prisma } from '#app/utils/db.server.ts'
-import { requireUserWithRole } from '#app/utils/permissions.server.ts'
+import { requireUserWithPermission } from '#app/utils/permissions.server.ts'
 import { getUserImgSrc } from '#app/utils/user.ts'
 import { Button } from '#app/components/ui/button.tsx'
 import {
@@ -185,7 +185,7 @@ export const handle: SEOHandle = {
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
-	await requireUserWithRole(request, ['moderator', 'admin', 'superadmin'])
+	await requireUserWithPermission(request, 'read:admin:any')
 
 	const searchParams = new URL(request.url).searchParams
 

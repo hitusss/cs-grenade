@@ -3,14 +3,14 @@ import { json, type LoaderFunctionArgs } from '@remix-run/node'
 import { Link, Outlet, useLocation } from '@remix-run/react'
 
 import { cn } from '#app/utils/misc.tsx'
-import { requireUserWithRole } from '#app/utils/permissions.server.ts'
-import { userHasPermission, userHasRole } from '#app/utils/permissions.ts'
+import { requireUserWithPermission } from '#app/utils/permissions.server.ts'
+import { userHasPermission } from '#app/utils/permissions.ts'
 import { useUser } from '#app/utils/user.js'
 import { Button } from '#app/components/ui/button.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
 
 export async function loader({ request }: LoaderFunctionArgs) {
-	await requireUserWithRole(request, ['moderator', 'admin', 'superadmin'])
+	await requireUserWithPermission(request, 'read:admin:any')
 	return json({})
 }
 
@@ -33,6 +33,7 @@ export default function AdminLayout() {
 		user,
 		'read:review-grenade-request:any',
 	)
+	const hasReadCacheAnyPermission = userHasPermission(user, 'read:cache:any')
 
 	useEffect(() => {
 		const lsValue = window.localStorage.getItem('admin-sidebar')
@@ -158,10 +159,7 @@ export default function AdminLayout() {
 							</SidebarLink>
 						</SidebarGroup>
 						{/* Cache */}
-						<SidebarGroup
-							title="Cache"
-							permission={userHasRole(user, 'superadmin')}
-						>
+						<SidebarGroup title="Cache" permission={hasReadCacheAnyPermission}>
 							<SidebarLink
 								to="cache"
 								isActive={location.pathname === '/admin/cache'}
