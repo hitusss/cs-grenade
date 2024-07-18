@@ -7,7 +7,7 @@ import { prisma } from '#app/utils/db.server.ts'
 import { useDoubleCheck } from '#app/utils/misc.tsx'
 import { unauthorized } from '#app/utils/permissions.server.ts'
 import { userHasPermission } from '#app/utils/permissions.ts'
-import { redirectWithToast } from '#app/utils/toast.server.ts'
+import { jsonWithToast, redirectWithToast } from '#app/utils/toast.server.ts'
 import { useOptionalUser } from '#app/utils/user.ts'
 import { Button } from '#app/components/ui/button.tsx'
 import {
@@ -16,6 +16,13 @@ import {
 	DialogFooter,
 	DialogHeader,
 } from '#app/components/ui/dialog.tsx'
+import { Icon } from '#app/components/ui/icon.tsx'
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from '#app/components/ui/tooltip.tsx'
 import { useLightbox } from '#app/components/lightbox.tsx'
 
 import { type MapHandle } from '../../../../_layout.tsx'
@@ -76,6 +83,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 export async function action({ request, params }: LoaderFunctionArgs) {
 	const { grenade: grenadeId } = params
+	invariantResponse(grenadeId, 'Grenade is required')
+
 	const userId = await requireUserId(request)
 
 	const grenade = await prisma.grenade.findUnique({
@@ -88,24 +97,61 @@ export async function action({ request, params }: LoaderFunctionArgs) {
 	})
 
 	invariantResponse(grenade, 'Not found', { status: 404 })
-	if (grenade.userId !== userId) {
-		throw unauthorized({
-			message: 'You are not allowed to perform this action',
-		})
+
+	const formData = await request.formData()
+	const intent = formData.get('intent')
+
+	switch (intent) {
+		case 'cancel': {
+			if (grenade.userId !== userId) {
+				throw unauthorized({
+					message: 'You are not allowed to perform this action',
+				})
+			}
+
+			await prisma.grenade.delete({
+				where: {
+					id: grenadeId,
+					verified: false,
+				},
+			})
+
+			return await redirectWithToast(`..`, {
+				title: `Grenade request cancelled`,
+				description: ``,
+				type: 'success',
+			})
+		}
+		case 'addFavorite': {
+			await prisma.favorite.create({
+				data: {
+					grenadeId,
+					userId,
+				},
+			})
+			return redirectWithToast('.', {
+				title: `Grenade added to favorite`,
+				description: ``,
+				type: `success`,
+			})
+		}
+		case 'removeFavorite': {
+			await prisma.favorite.deleteMany({
+				where: {
+					grenadeId,
+					userId,
+				},
+			})
+			return redirectWithToast('.', {
+				title: `Grenade removed from favorite`,
+				description: ``,
+				type: `success`,
+			})
+		}
+		default: {
+			throw new Response(`Invalid intent "${intent}"`, { status: 400 })
+		}
 	}
-
-	await prisma.grenade.delete({
-		where: {
-			id: grenadeId,
-			verified: false,
-		},
-	})
-
-	return await redirectWithToast(`..`, {
-		title: `Grenade request cancelled`,
-		description: ``,
-		type: 'success',
-	})
 }
 
 export default function MapGrenadeRoute() {
@@ -155,6 +201,39 @@ export default function MapGrenadeRoute() {
 					))}
 				</ul>
 				<DialogFooter>
+					<Form method="POST">
+						<TooltipProvider>
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<Button
+										variant={
+											data.grenade.favorites.length > 0 ? 'default' : 'outline'
+										}
+										size="icon"
+										type="submit"
+										name="intent"
+										value={
+											data.grenade.favorites.length > 0
+												? 'removeFavorite'
+												: 'addFavorite'
+										}
+									>
+										<Icon name="star" />
+										<span className="sr-only">
+											{data.grenade.favorites.length > 0
+												? 'Remove from favorite'
+												: 'Add to favorite'}
+										</span>
+									</Button>
+								</TooltipTrigger>
+								<TooltipContent>
+									{data.grenade.favorites.length > 0
+										? 'Remove from favorite'
+										: 'Add to favorite'}
+								</TooltipContent>
+							</Tooltip>
+						</TooltipProvider>
+					</Form>
 					{!data.grenade.verified ? (
 						<Form method="POST">
 							<Button
