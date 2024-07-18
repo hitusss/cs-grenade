@@ -23,7 +23,11 @@ export async function createPermissions() {
 	await prisma.permission.createMany({ data: permissionsToCreate })
 }
 
-async function createRole(name: string, permissions: PermissionArray) {
+async function createRole(
+	name: string,
+	priority: number,
+	permissions: PermissionArray,
+) {
 	const permissionIds = await Promise.all(
 		permissions.map(
 			async ({ entity, action, access }) =>
@@ -36,6 +40,7 @@ async function createRole(name: string, permissions: PermissionArray) {
 	await prisma.role.create({
 		data: {
 			name,
+			priority,
 			permissions: {
 				connect: permissionIds.filter(Boolean),
 			},
@@ -52,11 +57,13 @@ export function createSuperAdminRole() {
 		}
 	}
 
-	return createRole('superadmin', permissions)
+	return createRole('superadmin', 100, permissions)
 }
 
 export function createAdminRole() {
 	const permissions: PermissionArray = []
+
+	permissions.push({ entity: 'admin', action: 'read', access: 'any' })
 
 	permissions.push({ entity: 'map', action: 'create', access: 'any' })
 	permissions.push({ entity: 'map', action: 'read', access: 'any' })
@@ -125,11 +132,13 @@ export function createAdminRole() {
 	permissions.push({ entity: 'user', action: 'update', access: 'any' })
 	permissions.push({ entity: 'user', action: 'delete', access: 'any' })
 
-	return createRole('admin', permissions)
+	return createRole('admin', 80, permissions)
 }
 
 export function createModeratorRole() {
 	const permissions: PermissionArray = []
+
+	permissions.push({ entity: 'admin', action: 'read', access: 'any' })
 
 	permissions.push({ entity: 'map', action: 'read', access: 'own' })
 
@@ -195,7 +204,7 @@ export function createModeratorRole() {
 	permissions.push({ entity: 'user', action: 'update', access: 'own' })
 	permissions.push({ entity: 'user', action: 'delete', access: 'own' })
 
-	return createRole('moderator', permissions)
+	return createRole('moderator', 50, permissions)
 }
 
 export function createUserPlusRole() {
@@ -223,7 +232,7 @@ export function createUserPlusRole() {
 	permissions.push({ entity: 'user', action: 'update', access: 'own' })
 	permissions.push({ entity: 'user', action: 'delete', access: 'own' })
 
-	return createRole('userplus', permissions)
+	return createRole('userplus', 0, permissions)
 }
 
 export function createUserRole() {
@@ -245,7 +254,7 @@ export function createUserRole() {
 	permissions.push({ entity: 'user', action: 'update', access: 'own' })
 	permissions.push({ entity: 'user', action: 'delete', access: 'own' })
 
-	return createRole('user', permissions)
+	return createRole('user', 0, permissions)
 }
 
 async function generatePermissions() {
