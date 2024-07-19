@@ -104,6 +104,11 @@ export function MapForm({ type, defaultValue, result }: MapFormProps) {
 				/>
 			</div>
 			<div className="mt-4 flex gap-4 [&>*]:flex-1">
+				{type === 'edit' ? (
+					<Button variant="ghost" type="reset">
+						Reset
+					</Button>
+				) : null}
 				<StatusButton
 					type="submit"
 					status={isPending ? 'pending' : form.status ?? 'idle'}
@@ -111,11 +116,6 @@ export function MapForm({ type, defaultValue, result }: MapFormProps) {
 				>
 					{type === 'new' ? 'Create' : 'Update'} map
 				</StatusButton>
-				{type === 'edit' ? (
-					<Button variant="destructive" type="reset">
-						Reset
-					</Button>
-				) : null}
 			</div>
 
 			<ErrorList errors={form.errors} />
