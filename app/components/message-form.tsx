@@ -10,7 +10,7 @@ import {
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
 
-import { useIsPending } from '#app/utils/misc.tsx'
+import { cn, useIsPending } from '#app/utils/misc.tsx'
 import { MessageSchema } from '#app/utils/validators/message.ts'
 
 import { ErrorList, MultipleImageField, TextareaField } from './forms.tsx'
@@ -93,7 +93,12 @@ export function MessageForm({ result }: MessageFormProps) {
 										disabled={isPending}
 										ref={sendRef}
 									>
-										<Icon name="send" />
+										<Icon
+											name={isPending ? 'refresh-cw' : 'send'}
+											className={cn({
+												'animate-spin': isPending,
+											})}
+										/>
 									</Button>
 								</TooltipTrigger>
 								<TooltipContent>Send message</TooltipContent>
