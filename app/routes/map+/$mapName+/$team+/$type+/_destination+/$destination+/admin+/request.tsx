@@ -155,7 +155,7 @@ export default function MapAdminDestinationRequestRoute() {
 				highlight
 				disabled
 			/>
-			<Form method="POST" className="absolute bottom-0 right-0 z-10">
+			<Form method="POST" className="absolute bottom-0 right-0 z-10 flex">
 				<StatusButton
 					type="submit"
 					name="intent"
