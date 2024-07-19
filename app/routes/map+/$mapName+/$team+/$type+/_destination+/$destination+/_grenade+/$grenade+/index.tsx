@@ -4,10 +4,10 @@ import { invariantResponse } from '@epic-web/invariant'
 
 import { getUserId, requireUserId } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
-import { useDoubleCheck } from '#app/utils/misc.tsx'
+import { useDoubleCheck, useIsPending } from '#app/utils/misc.tsx'
 import { unauthorized } from '#app/utils/permissions.server.ts'
 import { userHasPermission } from '#app/utils/permissions.ts'
-import { jsonWithToast, redirectWithToast } from '#app/utils/toast.server.ts'
+import { redirectWithToast } from '#app/utils/toast.server.ts'
 import { useOptionalUser } from '#app/utils/user.ts'
 import { Button } from '#app/components/ui/button.tsx'
 import {
@@ -17,6 +17,7 @@ import {
 	DialogHeader,
 } from '#app/components/ui/dialog.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
+import { StatusButton } from '#app/components/ui/status-button.tsx'
 import {
 	Tooltip,
 	TooltipContent,
@@ -158,6 +159,7 @@ export default function MapGrenadeRoute() {
 	const data = useLoaderData<typeof loader>()
 	const navigate = useNavigate()
 
+	const isPending = useIsPending()
 	const cancelDC = useDoubleCheck()
 
 	const { activeLightbox, openLightbox } = useLightbox()
@@ -236,16 +238,17 @@ export default function MapGrenadeRoute() {
 					</Form>
 					{!data.grenade.verified ? (
 						<Form method="POST">
-							<Button
+							<StatusButton
 								variant="destructive"
 								{...cancelDC.getButtonProps({
 									type: 'submit',
 									name: 'intent',
 									value: 'cancel',
 								})}
+								status={isPending ? 'pending' : 'idle'}
 							>
 								{cancelDC.doubleCheck ? 'Are you sure?' : 'Cancel request'}
-							</Button>
+							</StatusButton>
 						</Form>
 					) : null}
 					{data.grenade.verified && (isUserGrenade || canEdit) ? (

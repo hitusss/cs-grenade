@@ -19,7 +19,7 @@ import { z } from 'zod'
 import { requireUserId } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { checkHoneypot } from '#app/utils/honeypot.server.ts'
-import { useDoubleCheck } from '#app/utils/misc.tsx'
+import { useDoubleCheck, useIsPending } from '#app/utils/misc.tsx'
 import {
 	getUserPermissions,
 	unauthorized,
@@ -40,6 +40,7 @@ import {
 	DialogTitle,
 } from '#app/components/ui/dialog.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
+import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { GrenadeForm } from '#app/components/grenade-form.tsx'
 import { MapBackButton } from '#app/components/map.tsx'
 
@@ -234,6 +235,8 @@ export default function MapEditGrenadeRoute() {
 	const actionData = useActionData<typeof action>()
 	const navigate = useNavigate()
 
+	const isPending = useIsPending()
+
 	const user = useUser()
 	const isUserGrenade = data.grenade.userId === user.id
 	const hasUpdateGrenadePermission = userHasPermission(user, 'update:grenade')
@@ -259,29 +262,35 @@ export default function MapEditGrenadeRoute() {
 								<Link to="..">Back</Link>
 							</Button>
 							{hasDeleteGrenadePermission ? (
-								<Button
+								<StatusButton
 									variant="destructive"
 									{...deleteDC.getButtonProps({
 										type: 'submit',
 										name: 'intent',
 										value: 'delete',
 									})}
+									status={
+										isPending ? 'pending' : actionData?.result.status ?? 'idle'
+									}
 								>
 									{deleteDC.doubleCheck ? (
 										'Are you sure?'
 									) : (
 										<Icon name="trash">Delete</Icon>
 									)}
-								</Button>
+								</StatusButton>
 							) : null}
-							<Button
+							<StatusButton
 								variant="destructive"
 								type="submit"
 								name="intent"
 								value="cancel-edit-request"
+								status={
+									isPending ? 'pending' : actionData?.result.status ?? 'idle'
+								}
 							>
 								Cancel Request
-							</Button>
+							</StatusButton>
 						</DialogFooter>
 					</Form>
 				</DialogContent>
@@ -318,24 +327,30 @@ export default function MapEditGrenadeRoute() {
 					<Link to="..">Back</Link>
 				</Button>
 				{hasDeleteGrenadePermission ? (
-					<Button
+					<StatusButton
 						variant="destructive"
 						{...deleteDC.getButtonProps({
 							type: 'submit',
 							name: 'intent',
 							value: 'delete',
 						})}
+						status={isPending ? 'pending' : actionData?.result.status ?? 'idle'}
 					>
 						{deleteDC.doubleCheck ? (
 							'Are you sure?'
 						) : (
 							<Icon name="trash">Delete</Icon>
 						)}
-					</Button>
+					</StatusButton>
 				) : null}
-				<Button type="submit" name="intent" value="update">
+				<StatusButton
+					type="submit"
+					name="intent"
+					value="update"
+					status={isPending ? 'pending' : actionData?.result.status ?? 'idle'}
+				>
 					{hasUpdateGrenadePermission ? 'Update' : 'Request changes'}
-				</Button>
+				</StatusButton>
 			</GrenadeForm>
 		</>
 	)

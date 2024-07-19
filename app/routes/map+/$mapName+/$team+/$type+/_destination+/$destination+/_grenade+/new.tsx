@@ -10,12 +10,14 @@ import { invariantResponse } from '@epic-web/invariant'
 import { requireUserId } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { checkHoneypot } from '#app/utils/honeypot.server.ts'
+import { useIsPending } from '#app/utils/misc.tsx'
 import { getUserPermissions } from '#app/utils/permissions.server.ts'
 import { userHasPermission } from '#app/utils/permissions.ts'
 import { redirectWithToast } from '#app/utils/toast.server.ts'
 import { useUser } from '#app/utils/user.ts'
 import { GrenadeSchema } from '#app/utils/validators/grenade.ts'
 import { Button } from '#app/components/ui/button.tsx'
+import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { GrenadeForm } from '#app/components/grenade-form.tsx'
 import { MapBackButton, MapTitle } from '#app/components/map.tsx'
 
@@ -136,6 +138,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
 export default function MapNewGrenadeRoute() {
 	const actionData = useActionData<typeof action>()
 
+	const isPending = useIsPending()
+
 	const user = useUser()
 	const hasCreateGrenadePermission = userHasPermission(user, 'create:grenade')
 
@@ -156,9 +160,12 @@ export default function MapNewGrenadeRoute() {
 				<Button variant="destructive" type="button" asChild>
 					<Link to="..">Cancel</Link>
 				</Button>
-				<Button type="submit">
+				<StatusButton
+					type="submit"
+					status={isPending ? 'pending' : actionData?.result.status ?? 'idle'}
+				>
 					{hasCreateGrenadePermission ? 'Create' : 'Request'}
-				</Button>
+				</StatusButton>
 			</GrenadeForm>
 		</>
 	)

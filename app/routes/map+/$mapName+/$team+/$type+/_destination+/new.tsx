@@ -10,12 +10,14 @@ import { invariantResponse } from '@epic-web/invariant'
 import { requireUserId } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { checkHoneypot } from '#app/utils/honeypot.server.ts'
+import { useIsPending } from '#app/utils/misc.tsx'
 import { getUserPermissions } from '#app/utils/permissions.server.ts'
 import { userHasPermission } from '#app/utils/permissions.ts'
 import { redirectWithToast } from '#app/utils/toast.server.ts'
 import { useUser } from '#app/utils/user.ts'
 import { DestinationSchema } from '#app/utils/validators/destination.ts'
 import { Button } from '#app/components/ui/button.tsx'
+import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { DestinationForm } from '#app/components/destination-form.tsx'
 import { MapBackButton, MapTitle } from '#app/components/map.tsx'
 
@@ -87,6 +89,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
 export default function MpaNewDestinationRoute() {
 	const actionData = useActionData<typeof action>()
 
+	const isPending = useIsPending()
+
 	const user = useUser()
 	const hasCreateDestinationPermission = userHasPermission(
 		user,
@@ -112,9 +116,12 @@ export default function MpaNewDestinationRoute() {
 				<Button variant="destructive" type="button" asChild>
 					<Link to="..">Cancel</Link>
 				</Button>
-				<Button type="submit">
+				<StatusButton
+					type="submit"
+					status={isPending ? 'pending' : actionData?.result.status ?? 'idle'}
+				>
 					{hasCreateDestinationPermission ? 'Create' : 'Request'}
-				</Button>
+				</StatusButton>
 			</DestinationForm>
 		</>
 	)

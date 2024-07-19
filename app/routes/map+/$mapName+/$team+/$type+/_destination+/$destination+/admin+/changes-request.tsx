@@ -7,7 +7,7 @@ import { Form, useLoaderData, useSearchParams } from '@remix-run/react'
 import { invariantResponse } from '@epic-web/invariant'
 
 import { prisma } from '#app/utils/db.server.ts'
-import { cn } from '#app/utils/misc.tsx'
+import { cn, useIsPending } from '#app/utils/misc.tsx'
 import { notify } from '#app/utils/notifications.server.ts'
 import { requireUserWithPermission } from '#app/utils/permissions.server.ts'
 import { redirectWithToast } from '#app/utils/toast.server.ts'
@@ -19,6 +19,7 @@ import {
 	DialogHeader,
 	DialogTrigger,
 } from '#app/components/ui/dialog.tsx'
+import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { DestinationMarker } from '#app/components/destination-marker.tsx'
 import { DiffView } from '#app/components/diff.tsx'
 import { MapBackButton } from '#app/components/map.tsx'
@@ -172,6 +173,8 @@ export default function MapAdminDestinationChangesRequestRoute() {
 	const data = useLoaderData<typeof loader>()
 	const [searchParams] = useSearchParams()
 
+	const isPending = useIsPending()
+
 	const redirectTo = searchParams.get('redirectTo') ?? DEFAULT_REDIRECT_TO
 
 	const hasChangedPosition =
@@ -224,17 +227,23 @@ export default function MapAdminDestinationChangesRequestRoute() {
 					/>
 					<DialogFooter>
 						<Form method="POST" className="flex items-center gap-2">
-							<Button
+							<StatusButton
 								type="submit"
 								name="intent"
 								value="reject"
 								variant="destructive"
+								status={isPending ? 'pending' : 'idle'}
 							>
 								Reject
-							</Button>
-							<Button type="submit" name="intent" value="accept">
+							</StatusButton>
+							<StatusButton
+								type="submit"
+								name="intent"
+								value="accept"
+								status={isPending ? 'pending' : 'idle'}
+							>
 								Accept
-							</Button>
+							</StatusButton>
 						</Form>
 					</DialogFooter>
 				</DialogContent>

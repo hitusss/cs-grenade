@@ -4,12 +4,13 @@ import { invariantResponse } from '@epic-web/invariant'
 
 import { getUserId, requireUserId } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
-import { useDoubleCheck } from '#app/utils/misc.tsx'
+import { useDoubleCheck, useIsPending } from '#app/utils/misc.tsx'
 import { unauthorized } from '#app/utils/permissions.server.ts'
 import { userHasPermission } from '#app/utils/permissions.ts'
 import { redirectWithToast } from '#app/utils/toast.server.ts'
 import { useOptionalUser } from '#app/utils/user.ts'
 import { Button } from '#app/components/ui/button.tsx'
+import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { DestinationMarker } from '#app/components/destination-marker.tsx'
 import { MapBackButton } from '#app/components/map.tsx'
 
@@ -86,6 +87,7 @@ export async function action({ request, params }: LoaderFunctionArgs) {
 export default function MapDestinationRoute() {
 	const data = useLoaderData<typeof loader>()
 
+	const isPending = useIsPending()
 	const cancelDC = useDoubleCheck()
 
 	const user = useOptionalUser()
@@ -117,7 +119,7 @@ export default function MapDestinationRoute() {
 						highlight
 						disabled
 					/>
-					<Button
+					<StatusButton
 						variant="destructive"
 						{...cancelDC.getButtonProps({
 							type: 'submit',
@@ -125,9 +127,10 @@ export default function MapDestinationRoute() {
 							value: 'cancel',
 						})}
 						className="absolute bottom-0 right-0 z-10"
+						status={isPending ? 'pending' : 'idle'}
 					>
 						{cancelDC.doubleCheck ? 'Are you sure?' : 'Cancel request'}
-					</Button>
+					</StatusButton>
 				</Form>
 			) : (
 				<>
