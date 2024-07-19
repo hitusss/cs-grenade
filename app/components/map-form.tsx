@@ -57,7 +57,10 @@ export function MapForm({ type, defaultValue, result }: MapFormProps) {
 			<HoneypotInputs />
 			<Field
 				labelProps={{ children: 'Label' }}
-				inputProps={getInputProps(fields.label, { type: 'text' })}
+				inputProps={getInputProps(fields.label, {
+					type: 'text',
+					autoFocus: true,
+				})}
 				errors={fields.label.errors}
 			/>
 			<div className="flex flex-wrap gap-8">

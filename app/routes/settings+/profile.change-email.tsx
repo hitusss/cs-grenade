@@ -133,6 +133,7 @@ export default function SettingsProfileChangeEmailRoute() {
 						labelProps={{ children: 'New Email' }}
 						inputProps={{
 							...getInputProps(fields.email, { type: 'email' }),
+							autoFocus: true,
 							autoComplete: 'email',
 						}}
 						errors={fields.email.errors}

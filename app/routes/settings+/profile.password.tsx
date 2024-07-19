@@ -140,6 +140,7 @@ export default function SettingsProfilePasswordRoute() {
 				labelProps={{ children: 'Current Password' }}
 				inputProps={{
 					...getInputProps(fields.currentPassword, { type: 'password' }),
+					autoFocus: true,
 					autoComplete: 'current-password',
 				}}
 				errors={fields.currentPassword.errors}

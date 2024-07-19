@@ -220,6 +220,7 @@ export default function OnboardingProviderRoute() {
 					labelProps={{ htmlFor: fields.username.id, children: 'Username' }}
 					inputProps={{
 						...getInputProps(fields.username, { type: 'text' }),
+						autoFocus: true,
 						autoComplete: 'username',
 						className: 'lowercase',
 					}}

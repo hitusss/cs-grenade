@@ -100,6 +100,7 @@ export default function SettingsProfilePasswordCreateRoute() {
 				inputProps={{
 					...getInputProps(fields.password, { type: 'password' }),
 					autoComplete: 'new-password',
+					autoFocus: true,
 				}}
 				errors={fields.password.errors}
 			/>

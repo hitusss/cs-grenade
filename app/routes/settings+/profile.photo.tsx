@@ -149,7 +149,10 @@ export default function SettingsProfilePhotoRoute() {
 				{...getFormProps(form)}
 			>
 				<ImageField
-					inputProps={getInputProps(fields.photoFile, { type: 'file' })}
+					inputProps={getInputProps(fields.photoFile, {
+						type: 'file',
+						autoFocus: true,
+					})}
 					labelProps={{ children: 'Photo' }}
 					errors={fields.photoFile.errors}
 					size="lg"
