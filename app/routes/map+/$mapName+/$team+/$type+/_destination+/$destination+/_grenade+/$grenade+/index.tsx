@@ -123,7 +123,7 @@ export async function action({ request, params }: LoaderFunctionArgs) {
 				type: 'success',
 			})
 		}
-		case 'addFavorite': {
+		case 'add-favorite': {
 			await prisma.favorite.create({
 				data: {
 					grenadeId,
@@ -136,7 +136,7 @@ export async function action({ request, params }: LoaderFunctionArgs) {
 				type: `success`,
 			})
 		}
-		case 'removeFavorite': {
+		case 'remove-favorite': {
 			await prisma.favorite.deleteMany({
 				where: {
 					grenadeId,
@@ -216,8 +216,8 @@ export default function MapGrenadeRoute() {
 										name="intent"
 										value={
 											data.grenade.favorites.length > 0
-												? 'removeFavorite'
-												: 'addFavorite'
+												? 'remove-favorite'
+												: 'add-favorite'
 										}
 									>
 										<Icon name="star" />
