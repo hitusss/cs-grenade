@@ -50,6 +50,7 @@ export function MessageForm({ result }: MessageFormProps) {
 			className="w-full"
 		>
 			<MultipleImageField.Provider
+				key={fields.images.key}
 				inputProps={{
 					...getInputProps(fields.images, { type: 'file' }),
 					required: false,

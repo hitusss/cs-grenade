@@ -127,6 +127,7 @@ export default function SupportNewRoute() {
 			<h2>Create a new support ticket</h2>
 			<Form method="POST" encType="multipart/form-data" {...getFormProps(form)}>
 				<MultipleImageField.Provider
+					key={fields.images.key}
 					inputProps={{
 						...getInputProps(fields.images, { type: 'file' }),
 						required: false,

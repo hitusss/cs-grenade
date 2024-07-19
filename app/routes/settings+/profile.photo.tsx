@@ -149,6 +149,7 @@ export default function SettingsProfilePhotoRoute() {
 				{...getFormProps(form)}
 			>
 				<ImageField
+					key={fields.photoFile.key}
 					inputProps={getInputProps(fields.photoFile, {
 						type: 'file',
 						autoFocus: true,

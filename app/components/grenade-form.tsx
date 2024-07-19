@@ -227,6 +227,7 @@ export function GrenadeForm({
 													readOnly
 												/>
 												<ImageField
+													key={imageFields.image.key}
 													labelProps={{ children: 'Image' }}
 													inputProps={getInputProps(imageFields.image, {
 														type: 'file',
