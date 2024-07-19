@@ -65,6 +65,7 @@ export function MapForm({ type, defaultValue, result }: MapFormProps) {
 			/>
 			<div className="flex flex-wrap gap-8">
 				<ImageField
+					key={fields.image.key}
 					labelProps={{ children: 'Image' }}
 					inputProps={getInputProps(fields.image, { type: 'file' })}
 					errors={fields.image.errors}
@@ -76,6 +77,7 @@ export function MapForm({ type, defaultValue, result }: MapFormProps) {
 					}
 				/>
 				<ImageField
+					key={fields.logo.key}
 					labelProps={{ children: 'Logo' }}
 					inputProps={getInputProps(fields.logo, { type: 'file' })}
 					errors={fields.logo.errors}
@@ -87,6 +89,7 @@ export function MapForm({ type, defaultValue, result }: MapFormProps) {
 					}
 				/>
 				<ImageField
+					key={fields.radar.key}
 					labelProps={{ children: 'Radar' }}
 					inputProps={{
 						...getInputProps(fields.radar, {
