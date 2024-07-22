@@ -27,7 +27,6 @@
     "db:push": "prisma db push",
     "db:reset": "prisma migrate reset",
     "db:seed": "prisma db seed",
-    "db:generatePermissions": "tsx prisma/generatePermissions.ts",
     "db:studio": "prisma studio",
     "dev": "node ./server/dev-server.js",
     "format": "prettier --write .",
