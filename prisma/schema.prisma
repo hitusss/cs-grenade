@@ -294,6 +294,8 @@ model Grenade {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@unique([mapName, team, type, destinationId, x, y])
 }
 
 model GrenadeChanges {
