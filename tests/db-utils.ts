@@ -59,7 +59,13 @@ export async function img({
 }) {
 	return {
 		altText,
-		contentType: filepath.endsWith('.png') ? 'image/png' : 'image/jpeg',
+		contentType: filepath.endsWith('.svg')
+			? 'image/svg+xml'
+			: filepath.endsWith('.webp')
+				? 'image/webp'
+				: filepath.endsWith('.png')
+					? 'image/png'
+					: 'image/jpeg',
 		blob: await fs.promises.readFile(filepath),
 	}
 }
