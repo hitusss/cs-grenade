@@ -1,54 +1,49 @@
-<div align="center">
-  <h1 align="center"><a href="https://www.epicweb.dev/epic-stack">The Epic Stack 🚀</a></h1>
-  <strong align="center">
-    Ditch analysis paralysis and start shipping Epic Web apps.
-  </strong>
-  <p>
-    This is an opinionated project starter and reference that allows teams to
-    ship their ideas to production faster and on a more stable foundation based
-    on the experience of <a href="https://kentcdodds.com">Kent C. Dodds</a> and
-    <a href="https://github.com/epicweb-dev/epic-stack/graphs/contributors">contributors</a>.
-  </p>
-</div>
+# CS-Grenade
 
-```sh
-npx create-epic-app@latest
-```
+![cs-grenade banner](./public/img/banner.png)
 
-[![The Epic Stack](https://github-production-user-asset-6210df.s3.amazonaws.com/1500684/246885449-1b00286c-aa3d-44b2-9ef2-04f694eb3592.png)](https://www.epicweb.dev/epic-stack)
+Welcome to the CS-Grenade! This project is designed to help players of
+Counter-Strike 2 plan and execute grenade throws more effectively. The web app
+provides visualizations, guides, and strategies for using grenades in the game.
 
-[The Epic Stack](https://www.epicweb.dev/epic-stack)
+## Features
 
-<hr />
+- **Interactive Map**: Navigate through different maps and find the best grenade
+  spots.
+- **Detailed Guides**: Step-by-step instructions for various grenade throws.
+- **Screenshot Tutorials**: Screenshots showing how to execute each grenade
+  throw.
+- **User Submissions**: Contribute your own grenade spots and strategies.
+- **Admin Dashboard**: Manage content, user submissions and more through an
+  intuitive admin interface.
 
-## Watch Kent's Introduction to The Epic Stack
+## Development
 
-[![Epic Stack Talk slide showing Flynn Rider with knives, the text "I've been around and I've got opinions" and Kent speaking in the corner](https://github-production-user-asset-6210df.s3.amazonaws.com/1500684/277818553-47158e68-4efc-43ae-a477-9d1670d4217d.png)](https://www.epicweb.dev/talks/the-epic-stack)
+To run the CS-Grenade locally, follow these steps:
 
-["The Epic Stack" by Kent C. Dodds](https://www.epicweb.dev/talks/the-epic-stack)
+1. **Clone the repository**:
 
-## Docs
+   ```bash
+   git clone git@github.com:hitusss/cs-grenade.git
+   cd cs-grenade
+   ```
 
-[Read the docs](https://github.com/epicweb-dev/epic-stack/blob/main/docs)
-(please 🙏).
+2. **Setup project**:
 
-## Support
+   ```bash
+   cp .env.example .env
+   pnpm install
+   pnpm run setup
+   ```
 
-- 🆘 Join the
-  [discussion on GitHub](https://github.com/epicweb-dev/epic-stack/discussions)
-  and the [KCD Community on Discord](https://kcd.im/discord).
-- 💡 Create an
-  [idea discussion](https://github.com/epicweb-dev/epic-stack/discussions/new?category=ideas)
-  for suggestions.
-- 🐛 Open a [GitHub issue](https://github.com/epicweb-dev/epic-stack/issues) to
-  report a bug.
+3. **Start the development server**:
+   ```bash
+   pnpm run dev
+   ```
 
-## Branding
+The app should now be running on `http://localhost:3000`.
 
-Want to talk about the Epic Stack in a blog post or talk? Great! Here are some
-assets you can use in your material:
-[EpicWeb.dev/brand](https://epicweb.dev/brand)
+## License
 
-## Thanks
-
-You rock 🪨
+This project is licensed under the GPL-3.0 License. See the [LICENSE](LICENSE)
+file for details.
