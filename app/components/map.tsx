@@ -1,4 +1,11 @@
-import { createContext, useContext, useEffect, useRef, useState } from 'react'
+import {
+	createContext,
+	useCallback,
+	useContext,
+	useEffect,
+	useRef,
+	useState,
+} from 'react'
 import { Link } from '@remix-run/react'
 import { TooltipProvider } from '@radix-ui/react-tooltip'
 import { Map as OlMap, View } from 'ol'
@@ -102,11 +109,27 @@ export function useMap() {
 }
 
 export function MapBackButton({ to = '..' }: { to?: string }) {
+	const ref = useRef<HTMLAnchorElement>(null)
+
+	const handleKeyDown = useCallback((e: KeyboardEvent) => {
+		if (e.code === 'Escape') {
+			ref.current?.click()
+		}
+	}, [])
+
+	useEffect(() => {
+		if (!ref.current) return
+		document.addEventListener('keydown', handleKeyDown)
+		return () => {
+			document.removeEventListener('keydown', handleKeyDown)
+		}
+	}, [handleKeyDown])
+
 	return (
 		<Tooltip>
 			<TooltipTrigger asChild>
 				<Button size="icon" className="absolute bottom-0 left-0 z-10" asChild>
-					<Link to={to}>
+					<Link to={to} ref={ref}>
 						<Icon name="chevron-left" />
 						<span className="sr-only">Back</span>
 					</Link>
