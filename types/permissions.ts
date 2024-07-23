@@ -1,11 +1,11 @@
 export const entities = [
-	'admin',
 	'user',
-	'cache',
 	'support',
 	'map',
 	'destination',
 	'grenade',
+	'admin',
+	'cache',
 	'review-destination-request',
 	'review-grenade-request',
 ] as const
