@@ -96,6 +96,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 						},
 					},
 				},
+				orderBy: {
+					name: 'asc',
+				},
 			}),
 		{ timings, type: 'select maps', desc: 'select maps in root' },
 	)
