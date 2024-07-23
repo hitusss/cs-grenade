@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { Form, Link, useSubmit } from '@remix-run/react'
 
+import { userHasPermission } from '#app/utils/permissions.ts'
 import { getUserImgSrc, useOptionalUser, useUser } from '#app/utils/user.ts'
 import { Notifications } from '#app/routes/resources+/notifications.tsx'
 import { ThemeSwitch } from '#app/routes/resources+/theme-switch.tsx'
@@ -45,9 +46,12 @@ export function Header() {
 }
 
 function UserDropdown() {
-	const user = useUser()
 	const submit = useSubmit()
 	const formRef = useRef<HTMLFormElement>(null)
+
+	const user = useUser()
+	const hasReadSupportPermission = userHasPermission(user, 'read:support')
+	const hasReadAdminAnyPermission = userHasPermission(user, 'read:admin:any')
 
 	return (
 		<DropdownMenu>
@@ -69,7 +73,7 @@ function UserDropdown() {
 							alt={user.name ?? user.username}
 							src={getUserImgSrc(user.image?.id)}
 						/>
-						<span className="hidden font-bold sm:block">
+						<span className="hidden sm:block">
 							{user.name ?? user.username}
 						</span>
 					</Link>
@@ -77,6 +81,15 @@ function UserDropdown() {
 			</DropdownMenuTrigger>
 			<DropdownMenuPortal>
 				<DropdownMenuContent sideOffset={8} align="start">
+					{hasReadAdminAnyPermission ? (
+						<DropdownMenuItem asChild>
+							<Link prefetch="intent" to="/admin">
+								<Icon className="text-body-md" name="shield">
+									Admin
+								</Icon>
+							</Link>
+						</DropdownMenuItem>
+					) : null}
 					<DropdownMenuItem asChild>
 						<Link prefetch="intent" to={`/users/${user.username}`}>
 							<Icon className="text-body-md" name="circle-user">
@@ -84,6 +97,15 @@ function UserDropdown() {
 							</Icon>
 						</Link>
 					</DropdownMenuItem>
+					{hasReadSupportPermission ? (
+						<DropdownMenuItem asChild>
+							<Link prefetch="intent" to="/support">
+								<Icon className="text-body-md" name="life-buoy">
+									Support
+								</Icon>
+							</Link>
+						</DropdownMenuItem>
+					) : null}
 					<DropdownMenuItem
 						asChild
 						// this prevents the menu from closing before the form submission is completed
