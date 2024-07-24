@@ -151,7 +151,7 @@ export default function LoginRoute() {
 
 					<StatusButton
 						className="mt-4 w-full"
-						status={isPending ? 'pending' : form.status ?? 'idle'}
+						status={isPending ? 'pending' : (form.status ?? 'idle')}
 						type="submit"
 						disabled={isPending}
 					>

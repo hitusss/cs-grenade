@@ -162,7 +162,7 @@ export default function MapNewGrenadeRoute() {
 				</Button>
 				<StatusButton
 					type="submit"
-					status={isPending ? 'pending' : actionData?.result.status ?? 'idle'}
+					status={isPending ? 'pending' : (actionData?.result.status ?? 'idle')}
 				>
 					{hasCreateGrenadePermission ? 'Create' : 'Request'}
 				</StatusButton>

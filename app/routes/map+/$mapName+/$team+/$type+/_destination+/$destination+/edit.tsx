@@ -230,7 +230,7 @@ export default function MapEditDestinationRoute() {
 								name="intent"
 								value="cancel-edit-request"
 								status={
-									isPending ? 'pending' : actionData?.result.status ?? 'idle'
+									isPending ? 'pending' : (actionData?.result.status ?? 'idle')
 								}
 							>
 								Cancel Request
@@ -273,7 +273,9 @@ export default function MapEditDestinationRoute() {
 							name: 'intent',
 							value: 'delete',
 						})}
-						status={isPending ? 'pending' : actionData?.result.status ?? 'idle'}
+						status={
+							isPending ? 'pending' : (actionData?.result.status ?? 'idle')
+						}
 					>
 						{deleteDC.doubleCheck ? (
 							'Are you sure?'
@@ -286,7 +288,7 @@ export default function MapEditDestinationRoute() {
 					type="submit"
 					name="intent"
 					value="update"
-					status={isPending ? 'pending' : actionData?.result.status ?? 'idle'}
+					status={isPending ? 'pending' : (actionData?.result.status ?? 'idle')}
 				>
 					{hasUpdateDestinationPermission ? 'Update' : 'Request changes'}
 				</StatusButton>

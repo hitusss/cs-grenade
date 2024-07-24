@@ -121,7 +121,7 @@ export default function SettingsProfilePasswordCreateRoute() {
 				</Button>
 				<StatusButton
 					type="submit"
-					status={isPending ? 'pending' : form.status ?? 'idle'}
+					status={isPending ? 'pending' : (form.status ?? 'idle')}
 				>
 					Create Password
 				</StatusButton>

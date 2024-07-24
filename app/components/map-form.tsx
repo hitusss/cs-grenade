@@ -114,7 +114,7 @@ export function MapForm({ type, defaultValue, result }: MapFormProps) {
 				) : null}
 				<StatusButton
 					type="submit"
-					status={isPending ? 'pending' : form.status ?? 'idle'}
+					status={isPending ? 'pending' : (form.status ?? 'idle')}
 					disabled={isPending}
 				>
 					{type === 'new' ? 'Create' : 'Update'} map

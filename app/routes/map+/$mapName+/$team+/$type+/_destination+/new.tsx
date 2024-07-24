@@ -118,7 +118,7 @@ export default function MpaNewDestinationRoute() {
 				</Button>
 				<StatusButton
 					type="submit"
-					status={isPending ? 'pending' : actionData?.result.status ?? 'idle'}
+					status={isPending ? 'pending' : (actionData?.result.status ?? 'idle')}
 				>
 					{hasCreateDestinationPermission ? 'Create' : 'Request'}
 				</StatusButton>

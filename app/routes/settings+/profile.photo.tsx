@@ -179,7 +179,7 @@ export default function SettingsProfilePhotoRoute() {
 								pendingIntent === 'delete'
 									? 'pending'
 									: lastSubmissionIntent === 'delete'
-										? form.status ?? 'idle'
+										? (form.status ?? 'idle')
 										: 'idle'
 							}
 						>
@@ -199,7 +199,7 @@ export default function SettingsProfilePhotoRoute() {
 							pendingIntent === 'submit'
 								? 'pending'
 								: lastSubmissionIntent === 'submit'
-									? form.status ?? 'idle'
+									? (form.status ?? 'idle')
 									: 'idle'
 						}
 					>

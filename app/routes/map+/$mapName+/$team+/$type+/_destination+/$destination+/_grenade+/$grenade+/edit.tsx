@@ -270,7 +270,9 @@ export default function MapEditGrenadeRoute() {
 										value: 'delete',
 									})}
 									status={
-										isPending ? 'pending' : actionData?.result.status ?? 'idle'
+										isPending
+											? 'pending'
+											: (actionData?.result.status ?? 'idle')
 									}
 								>
 									{deleteDC.doubleCheck ? (
@@ -286,7 +288,7 @@ export default function MapEditGrenadeRoute() {
 								name="intent"
 								value="cancel-edit-request"
 								status={
-									isPending ? 'pending' : actionData?.result.status ?? 'idle'
+									isPending ? 'pending' : (actionData?.result.status ?? 'idle')
 								}
 							>
 								Cancel Request
@@ -334,7 +336,9 @@ export default function MapEditGrenadeRoute() {
 							name: 'intent',
 							value: 'delete',
 						})}
-						status={isPending ? 'pending' : actionData?.result.status ?? 'idle'}
+						status={
+							isPending ? 'pending' : (actionData?.result.status ?? 'idle')
+						}
 					>
 						{deleteDC.doubleCheck ? (
 							'Are you sure?'
@@ -347,7 +351,7 @@ export default function MapEditGrenadeRoute() {
 					type="submit"
 					name="intent"
 					value="update"
-					status={isPending ? 'pending' : actionData?.result.status ?? 'idle'}
+					status={isPending ? 'pending' : (actionData?.result.status ?? 'idle')}
 				>
 					{hasUpdateGrenadePermission ? 'Update' : 'Request changes'}
 				</StatusButton>
