@@ -16,7 +16,7 @@ import {
 } from '#app/components/ui/popover.tsx'
 
 export async function loader({ request }: LoaderFunctionArgs) {
-	const userId = await requireUserId(request)
+	const userId = await requireUserId(request, { redirectTo: null })
 	const notifications = await prisma.notification.findMany({
 		where: {
 			userId,
