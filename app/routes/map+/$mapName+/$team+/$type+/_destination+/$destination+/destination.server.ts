@@ -1,6 +1,7 @@
 import { invariantResponse } from '@epic-web/invariant'
 
 import { prisma } from '#app/utils/db.server.ts'
+import { notify } from '#app/utils/notifications.server.ts'
 import {
 	getUserPermissions,
 	unauthorized,
@@ -35,6 +36,26 @@ export async function updateDestination({
 		})
 	}
 
+	const prevDestination = await prisma.destination.findUnique({
+		where: { id },
+		select: {
+			name: true,
+			x: true,
+			y: true,
+			destinationChanges: {
+				select: {
+					id: true,
+				},
+			},
+			mapName: true,
+			team: true,
+			type: true,
+			userId: true,
+		},
+	})
+
+	invariantResponse(prevDestination, 'Not found', { status: 404 })
+
 	if (hasUpdateDestinationPermission) {
 		await prisma.destination.update({
 			where: { id },
@@ -44,22 +65,15 @@ export async function updateDestination({
 				y,
 			},
 		})
+		if (!isOwn) {
+			await notify({
+				userId: prevDestination.userId,
+				title: 'Destination updated',
+				description: `Admin has updated your destination: ${prevDestination.name}`,
+				redirectTo: `/map/${prevDestination.mapName}/${prevDestination.team}/${prevDestination.type}/${id}`,
+			})
+		}
 	} else {
-		const prevDestination = await prisma.destination.findUnique({
-			where: { id },
-			select: {
-				name: true,
-				x: true,
-				y: true,
-				destinationChanges: {
-					select: {
-						id: true,
-					},
-				},
-			},
-		})
-
-		invariantResponse(prevDestination, 'Not found', { status: 404 })
 		invariantResponse(
 			!prevDestination.destinationChanges,
 			'You have pending changes to this destination',
@@ -116,9 +130,18 @@ export async function deleteDestination({
 		})
 	}
 
-	await prisma.destination.delete({
+	const deletedDestination = await prisma.destination.delete({
 		where: { id },
+		select: { name: true, userId: true },
 	})
+
+	if (!isOwn) {
+		await notify({
+			userId: deletedDestination.userId,
+			title: 'Destination deleted',
+			description: `Admin has deleted your destination: ${deletedDestination.name}`,
+		})
+	}
 
 	return await redirectWithToast(`../..`, {
 		title: `Destination deleted`,

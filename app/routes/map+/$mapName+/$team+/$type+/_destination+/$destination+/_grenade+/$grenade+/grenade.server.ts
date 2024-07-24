@@ -1,6 +1,7 @@
 import { invariantResponse } from '@epic-web/invariant'
 
 import { prisma } from '#app/utils/db.server.ts'
+import { notify } from '#app/utils/notifications.server.ts'
 import {
 	getUserPermissions,
 	unauthorized,
@@ -71,6 +72,7 @@ export async function updateGrenade({
 			x,
 			y,
 			images,
+			isOwn,
 		})
 	} else {
 		return await requestGrenadeChanges({
@@ -92,7 +94,23 @@ async function editGrenade({
 	x,
 	y,
 	images,
-}: GrenadeType) {
+	isOwn,
+}: GrenadeType & { isOwn: boolean }) {
+	const prevGrenade = await prisma.grenade.findUnique({
+		where: {
+			id,
+		},
+		select: {
+			name: true,
+			mapName: true,
+			team: true,
+			type: true,
+			destinationId: true,
+			userId: true,
+		},
+	})
+	invariantResponse(prevGrenade, 'Not found', { status: 404 })
+
 	const grenade = await prisma.grenade.update({
 		where: {
 			id,
@@ -173,6 +191,15 @@ async function editGrenade({
 			}
 		}),
 	)
+
+	if (!isOwn) {
+		await notify({
+			userId: prevGrenade.userId,
+			title: 'Grenade updated',
+			description: `Admin has updated your grenade: ${prevGrenade.name}`,
+			redirectTo: `/map/${prevGrenade.mapName}/${prevGrenade.team}/${prevGrenade.type}/${prevGrenade.destinationId}/${id}`,
+		})
+	}
 
 	return await redirectWithToast(`..`, {
 		title: 'Grenade updated',
@@ -332,11 +359,23 @@ export async function deleteGrenade({
 		})
 	}
 
-	await prisma.grenade.delete({
+	const deletedGrenade = await prisma.grenade.delete({
 		where: {
 			id,
 		},
+		select: {
+			name: true,
+			userId: true,
+		},
 	})
+
+	if (!isOwn) {
+		await notify({
+			userId: deletedGrenade.userId,
+			title: 'Grenade deleted',
+			description: `Admin has deleted your grenade: ${deletedGrenade.name}`,
+		})
+	}
 
 	return await redirectWithToast(`../..`, {
 		title: `Grenade deleted`,
