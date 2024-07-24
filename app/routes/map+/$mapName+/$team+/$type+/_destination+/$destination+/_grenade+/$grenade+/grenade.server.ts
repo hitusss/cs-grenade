@@ -338,7 +338,7 @@ export async function deleteGrenade({
 		},
 	})
 
-	return await redirectWithToast(`..`, {
+	return await redirectWithToast(`../..`, {
 		title: `Grenade deleted`,
 		description: ``,
 		type: 'success',

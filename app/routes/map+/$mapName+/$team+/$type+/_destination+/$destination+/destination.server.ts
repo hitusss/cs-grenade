@@ -120,7 +120,7 @@ export async function deleteDestination({
 		where: { id },
 	})
 
-	return await redirectWithToast(`..`, {
+	return await redirectWithToast(`../..`, {
 		title: `Destination deleted`,
 		description: ``,
 		type: 'success',
