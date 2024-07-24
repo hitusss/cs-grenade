@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { json, type LoaderFunctionArgs } from '@remix-run/node'
 import { Link, Outlet, useLocation } from '@remix-run/react'
+import { type SEOHandle } from '@nasa-gcn/remix-seo'
 
 import { cn } from '#app/utils/misc.tsx'
 import { requireUserWithPermission } from '#app/utils/permissions.server.ts'
@@ -8,6 +9,10 @@ import { userHasPermission } from '#app/utils/permissions.ts'
 import { useUser } from '#app/utils/user.js'
 import { Button } from '#app/components/ui/button.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
+
+export const handle: SEOHandle = {
+	getSitemapEntries: () => null,
+}
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	await requireUserWithPermission(request, 'read:admin:any')

@@ -6,11 +6,16 @@
 // message for them than the Remix and/or browser default.
 
 import { useLocation } from '@remix-run/react'
+import { type SEOHandle } from '@nasa-gcn/remix-seo'
 
 import {
 	ErrorComponent,
 	GeneralErrorBoundary,
 } from '#app/components/error-boundary.tsx'
+
+export const handle: SEOHandle = {
+	getSitemapEntries: () => null,
+}
 
 export async function loader() {
 	throw new Response('Not found', { status: 404 })

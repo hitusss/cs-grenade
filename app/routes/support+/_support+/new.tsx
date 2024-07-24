@@ -12,6 +12,7 @@ import {
 	useForm,
 } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
+import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
 
 import { requireUserId } from '#app/utils/auth.server.ts'
@@ -27,6 +28,10 @@ import {
 	MultipleImageField,
 	TextareaField,
 } from '#app/components/forms.tsx'
+
+export const handle: SEOHandle = {
+	getSitemapEntries: () => null,
+}
 
 export async function action({ request }: ActionFunctionArgs) {
 	const userId = await requireUserId(request)
@@ -159,7 +164,7 @@ export default function SupportNewRoute() {
 						<MultipleImageField.Input size="icon" />
 						<StatusButton
 							type="submit"
-							status={isPending ? 'pending' : form.status ?? 'idle'}
+							status={isPending ? 'pending' : (form.status ?? 'idle')}
 							disabled={isPending}
 						>
 							Create ticket

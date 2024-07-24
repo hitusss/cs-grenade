@@ -13,6 +13,7 @@ import {
 } from '@remix-run/react'
 import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
+import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
 import { safeRedirect } from 'remix-utils/safe-redirect'
 import { z } from 'zod'
@@ -58,6 +59,10 @@ async function requireOnboardingEmail(request: Request) {
 		throw redirect('/signup')
 	}
 	return email
+}
+
+export const handle: SEOHandle = {
+	getSitemapEntries: () => null,
 }
 
 export const meta: MetaFunction = () => {
@@ -220,7 +225,7 @@ export default function OnboardingRoute() {
 
 				<StatusButton
 					className="mt-4 w-full"
-					status={isPending ? 'pending' : form.status ?? 'idle'}
+					status={isPending ? 'pending' : (form.status ?? 'idle')}
 					type="submit"
 					disabled={isPending}
 				>

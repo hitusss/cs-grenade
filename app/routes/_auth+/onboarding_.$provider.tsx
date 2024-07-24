@@ -19,6 +19,7 @@ import {
 	type SubmissionResult,
 } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
+import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { safeRedirect } from 'remix-utils/safe-redirect'
 import { z } from 'zod'
 
@@ -82,6 +83,10 @@ async function requireData({
 		console.error(result.error)
 		throw redirect('/signup')
 	}
+}
+
+export const handle: SEOHandle = {
+	getSitemapEntries: () => null,
 }
 
 export const meta: MetaFunction = () => {
@@ -264,7 +269,7 @@ export default function OnboardingProviderRoute() {
 
 				<StatusButton
 					className="mt-4 w-full"
-					status={isPending ? 'pending' : form.status ?? 'idle'}
+					status={isPending ? 'pending' : (form.status ?? 'idle')}
 					type="submit"
 					disabled={isPending}
 				>

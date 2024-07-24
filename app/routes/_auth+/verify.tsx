@@ -2,6 +2,7 @@ import { type ActionFunctionArgs } from '@remix-run/node'
 import { Form, useActionData, useSearchParams } from '@remix-run/react'
 import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
+import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
 import { z } from 'zod'
 
@@ -28,6 +29,10 @@ export const VerifySchema = z.object({
 	[targetQueryParam]: z.string(),
 	[redirectToQueryParam]: z.string().optional(),
 })
+
+export const handle: SEOHandle = {
+	getSitemapEntries: () => null,
+}
 
 export async function action({ request }: ActionFunctionArgs) {
 	const formData = await request.formData()
@@ -116,7 +121,7 @@ export default function VerifyRoute() {
 					<ErrorList errors={form.errors} id={form.errorId} />
 					<StatusButton
 						className="w-full"
-						status={isPending ? 'pending' : form.status ?? 'idle'}
+						status={isPending ? 'pending' : (form.status ?? 'idle')}
 						type="submit"
 						disabled={isPending}
 					>

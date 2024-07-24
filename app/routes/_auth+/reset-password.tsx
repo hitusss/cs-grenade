@@ -8,6 +8,7 @@ import {
 import { Form, useActionData, useLoaderData } from '@remix-run/react'
 import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
+import { type SEOHandle } from '@nasa-gcn/remix-seo'
 
 import { requireAnonymous, resetUserPassword } from '#app/utils/auth.server.ts'
 import { useIsPending } from '#app/utils/misc.tsx'
@@ -34,6 +35,10 @@ async function requireResetPasswordUsername(request: Request) {
 		throw redirect('/login')
 	}
 	return resetPasswordUsername
+}
+
+export const handle: SEOHandle = {
+	getSitemapEntries: () => null,
 }
 
 export const meta: MetaFunction = () => {
@@ -117,7 +122,7 @@ export default function ResetPasswordRoute() {
 
 				<StatusButton
 					className="w-full"
-					status={isPending ? 'pending' : form.status ?? 'idle'}
+					status={isPending ? 'pending' : (form.status ?? 'idle')}
 					type="submit"
 					disabled={isPending}
 				>
