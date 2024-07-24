@@ -67,7 +67,7 @@ export default function UsersRoute() {
 			<div className="w-full max-w-[700px]">
 				<SearchBar status={data.status} autoFocus autoSubmit />
 			</div>
-			<main>
+			<div>
 				{data.status === 'idle' ? (
 					data.users.length ? (
 						<ul
@@ -105,7 +105,7 @@ export default function UsersRoute() {
 				) : data.status === 'error' ? (
 					<ErrorList errors={['There was an error parsing the results']} />
 				) : null}
-			</main>
+			</div>
 		</div>
 	)
 }

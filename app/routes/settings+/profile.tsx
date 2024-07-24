@@ -71,9 +71,9 @@ export default function SettingsProfileRoute() {
 					))}
 				</ul>
 			</div>
-			<main className="mx-auto mt-16 bg-muted px-6 py-8 md:container md:rounded-3xl">
+			<div className="mx-auto mt-16 bg-muted px-6 py-8 md:container md:rounded-3xl">
 				<Outlet />
-			</main>
+			</div>
 		</div>
 	)
 }
