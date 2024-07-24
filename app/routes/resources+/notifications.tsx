@@ -3,7 +3,7 @@ import { json, type LoaderFunctionArgs } from '@remix-run/node'
 import { Link, useFetcher, useSubmit } from '@remix-run/react'
 import { useEventSource } from 'remix-utils/sse/react'
 
-import { requireUserId } from '#app/utils/auth.server.ts'
+import { getUserId } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { cn } from '#app/utils/misc.tsx'
 import { useUser } from '#app/utils/user.ts'
@@ -16,7 +16,10 @@ import {
 } from '#app/components/ui/popover.tsx'
 
 export async function loader({ request }: LoaderFunctionArgs) {
-	const userId = await requireUserId(request, { redirectTo: null })
+	const userId = await getUserId(request)
+	if (!userId) {
+		return json({ notifications: [] })
+	}
 	const notifications = await prisma.notification.findMany({
 		where: {
 			userId,
