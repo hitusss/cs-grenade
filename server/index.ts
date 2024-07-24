@@ -92,8 +92,13 @@ app.use(
 	morgan('tiny', {
 		skip: (req, res) =>
 			res.statusCode === 200 &&
-			(req.url?.startsWith('/resources/note-images') ||
-				req.url?.startsWith('/resources/user-images') ||
+			(req.url?.startsWith('/resources/user-images') ||
+				req.url?.startsWith('/resources/ticket-images') ||
+				req.url?.startsWith('/resources/map-images') ||
+				req.url?.startsWith('/resources/map-logos') ||
+				req.url?.startsWith('/resources/map-radars') ||
+				req.url?.startsWith('/resources/grenade-changes-images') ||
+				req.url?.startsWith('/resources/grenade-images') ||
 				req.url?.startsWith('/resources/healthcheck')),
 	}),
 )
@@ -109,8 +114,7 @@ app.use(
 		referrerPolicy: { policy: 'same-origin' },
 		crossOriginEmbedderPolicy: false,
 		contentSecurityPolicy: {
-			// NOTE: Remove reportOnly when you're ready to enforce this CSP
-			reportOnly: true,
+			reportOnly: false,
 			directives: {
 				'connect-src': [
 					MODE === 'development' ? 'ws:' : null,
@@ -173,15 +177,14 @@ const strongRateLimit = rateLimit({
 const generalRateLimit = rateLimit(rateLimitDefault)
 app.use((req, res, next) => {
 	const strongPaths = [
+		'/admin',
 		'/login',
 		'/signup',
 		'/verify',
-		'/admin',
 		'/onboarding',
 		'/reset-password',
-		'/settings/profile',
-		'/resources/login',
-		'/resources/verify',
+		'/settings',
+		'/support',
 	]
 	if (req.method !== 'GET' && req.method !== 'HEAD') {
 		if (strongPaths.some((p) => req.path.includes(p))) {
