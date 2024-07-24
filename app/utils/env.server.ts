@@ -4,18 +4,20 @@ const schema = z.object({
 	NODE_ENV: z.enum(['production', 'development', 'test'] as const),
 	DATABASE_PATH: z.string(),
 	DATABASE_URL: z.string(),
-	SESSION_SECRET: z.string(),
-	INTERNAL_COMMAND_TOKEN: z.string(),
-	HONEYPOT_SECRET: z.string(),
 	CACHE_DATABASE_PATH: z.string(),
-	// If you plan on using Sentry, uncomment this line
+
+	SESSION_SECRET: z.string(),
+	HONEYPOT_SECRET: z.string(),
+	INTERNAL_COMMAND_TOKEN: z.string(),
+
 	// SENTRY_DSN: z.string(),
-	// If you plan to use Resend, uncomment this line
+
 	// RESEND_API_KEY: z.string(),
-	// If you plan to use GitHub auth, remove the default:
+
 	GITHUB_CLIENT_ID: z.string().default('MOCK_GITHUB_CLIENT_ID'),
 	GITHUB_CLIENT_SECRET: z.string().default('MOCK_GITHUB_CLIENT_SECRET'),
 	GITHUB_TOKEN: z.string().default('MOCK_GITHUB_TOKEN'),
+
 	ALLOW_INDEXING: z.enum(['true', 'false']).optional(),
 })
 
