@@ -51,12 +51,6 @@ export function Footer() {
 					</FooterSection>
 				) : null}
 			</div>
-			<p className="px-4 text-right font-light text-muted-foreground">
-				<a href="https://github.com/hitusss">
-					All rights reserved © Hitusss
-					{new Date().getFullYear()}
-				</a>
-			</p>
 		</footer>
 	)
 }
