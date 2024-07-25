@@ -5,6 +5,13 @@ import { type loader as rootLoader } from '#app/root.tsx'
 
 import { Logo } from './logo.tsx'
 import { Button } from './ui/button.tsx'
+import { Icon } from './ui/icon.tsx'
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from './ui/tooltip.tsx'
 
 export function Footer() {
 	const data = useRouteLoaderData<typeof rootLoader>('root')
@@ -15,7 +22,22 @@ export function Footer() {
 	return (
 		<footer className="bg-accent">
 			<div className="container flex flex-wrap justify-evenly gap-12 py-8 sm:gap-24 sm:py-16">
-				<Logo className="size-36" />
+				<div>
+					<Logo className="size-36" />
+					<div className="mt-4 flex w-36 flex-wrap gap-4">
+						<TooltipProvider>
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<a href="https://github.com/hitusss/cs-grenade">
+										<Icon name="github-logo" className="size-8" />
+										<span className="sr-only">github repository</span>
+									</a>
+								</TooltipTrigger>
+								<TooltipContent>Github repository</TooltipContent>
+							</Tooltip>
+						</TooltipProvider>
+					</div>
+				</div>
 				<FooterSection title="Links">
 					<FooterLink to="/">Home</FooterLink>
 					<FooterLink to="/users">Users</FooterLink>
