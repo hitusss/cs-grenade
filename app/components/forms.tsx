@@ -45,7 +45,7 @@ export function ErrorList({
 	return (
 		<ul id={id} className="flex flex-col gap-1">
 			{errorsToRender.map((e) => (
-				<li key={e} className="text-[10px] text-foreground-destructive">
+				<li key={e} className="text-body-2xs text-foreground-destructive">
 					{e}
 				</li>
 			))}
@@ -76,7 +76,7 @@ export function Field({
 				aria-describedby={errorId}
 				{...inputProps}
 			/>
-			<div className="min-h-[32px] px-4 pb-3 pt-1">
+			<div className="min-h-8 px-4 pb-3 pt-1">
 				{errorId ? <ErrorList id={errorId} errors={errors} /> : null}
 			</div>
 		</div>
@@ -120,7 +120,7 @@ export function OTPField({
 					<InputOTPSlot index={5} />
 				</InputOTPGroup>
 			</InputOTP>
-			<div className="min-h-[32px] px-4 pb-3 pt-1">
+			<div className="min-h-8 px-4 pb-3 pt-1">
 				{errorId ? <ErrorList id={errorId} errors={errors} /> : null}
 			</div>
 		</div>
@@ -150,7 +150,7 @@ export function TextareaField({
 				aria-describedby={errorId}
 				{...textareaProps}
 			/>
-			<div className="min-h-[32px] px-4 pb-3 pt-1">
+			<div className="min-h-8 px-4 pb-3 pt-1">
 				{errorId ? <ErrorList id={errorId} errors={errors} /> : null}
 			</div>
 		</div>
@@ -339,7 +339,7 @@ export function ImageField({
 				className={imageFieldVariants({
 					size,
 					fullRounded,
-					className: 'h-auto min-h-[32px] pb-3 pt-1',
+					className: 'h-auto min-h-8 pb-3 pt-1',
 				})}
 			>
 				{errorId ? <ErrorList id={errorId} errors={errors} /> : null}
@@ -530,7 +530,7 @@ function MultipleImageFieldDisplay({
 				))}
 			</ul>
 
-			<div className="h-auto min-h-[32px] pb-3 pt-1">
+			<div className="h-auto min-h-8 pb-3 pt-1">
 				{context.errorId ? (
 					<ErrorList id={context.errorId} errors={context.errors} />
 				) : null}
