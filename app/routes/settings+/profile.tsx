@@ -8,6 +8,13 @@ import { requireUserId } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { cn } from '#app/utils/misc.tsx'
 import { useUser } from '#app/utils/user.ts'
+import {
+	Breadcrumb,
+	BreadcrumbItem,
+	BreadcrumbLink,
+	BreadcrumbList,
+	BreadcrumbSeparator,
+} from '#app/components/ui/breadcrumb.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
 
 export const BreadcrumbHandle = z.object({ breadcrumb: z.any() })
@@ -50,26 +57,35 @@ export default function SettingsProfileRoute() {
 	return (
 		<div className="m-auto mb-24 mt-16 max-w-3xl">
 			<div className="container">
-				<ul className="flex gap-3">
-					<li>
-						<Link
-							className="text-muted-foreground"
-							to={`/users/${user.username}`}
-						>
-							Profile
-						</Link>
-					</li>
-					{breadcrumbs.map((breadcrumb, i, arr) => (
-						<li
-							key={i}
-							className={cn('flex items-center gap-3', {
-								'text-muted-foreground': i < arr.length - 1,
-							})}
-						>
-							<Icon name="chevron-right" /> {breadcrumb}
-						</li>
-					))}
-				</ul>
+				<Breadcrumb>
+					<BreadcrumbList>
+						<BreadcrumbItem>
+							<BreadcrumbLink asChild>
+								<Link
+									className="text-muted-foreground"
+									to={`/users/${user.username}`}
+								>
+									Profile
+								</Link>
+							</BreadcrumbLink>
+						</BreadcrumbItem>
+						{breadcrumbs.map((breadcrumb, i, arr) => (
+							<>
+								<BreadcrumbSeparator />
+								<BreadcrumbItem>
+									<BreadcrumbLink
+										className={cn({
+											'text-foreground': i === arr.length - 1,
+										})}
+										asChild
+									>
+										{breadcrumb}
+									</BreadcrumbLink>
+								</BreadcrumbItem>
+							</>
+						))}
+					</BreadcrumbList>
+				</Breadcrumb>
 			</div>
 			<div className="mx-auto mt-16 bg-muted px-6 py-8 md:container md:rounded-3xl">
 				<Outlet />
