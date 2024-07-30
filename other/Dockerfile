@@ -30,6 +30,7 @@ WORKDIR /myapp
 
 COPY --from=deps /myapp/node_modules /myapp/node_modules
 ADD package.json pnpm-lock.yaml .npmrc ./
+ADD prisma .
 RUN pnpm prune --prod
 
 # Build the app
@@ -37,6 +38,11 @@ FROM base as build
 
 ARG COMMIT_SHA
 ENV COMMIT_SHA=$COMMIT_SHA
+
+# Use the following environment variables to configure Sentry
+# ENV SENTRY_ORG=
+# ENV SENTRY_PROJECT=
+
 
 WORKDIR /myapp
 
