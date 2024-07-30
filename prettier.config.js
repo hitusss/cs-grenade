@@ -21,6 +21,5 @@ export default {
 		'',
 		'^[./]',
 	],
-	importOrderTypeScriptVersion: '5.4.5',
 	importOrderParserPlugins: ['typescript', 'jsx', 'decorators-legacy'],
 }
