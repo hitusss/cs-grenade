@@ -10,9 +10,9 @@ const schema = z.object({
 	HONEYPOT_SECRET: z.string(),
 	INTERNAL_COMMAND_TOKEN: z.string(),
 
-	// SENTRY_DSN: z.string(),
+	SENTRY_DSN: z.string(),
 
-	// RESEND_API_KEY: z.string(),
+	RESEND_API_KEY: z.string(),
 
 	GITHUB_CLIENT_ID: z.string().default('MOCK_GITHUB_CLIENT_ID'),
 	GITHUB_CLIENT_SECRET: z.string().default('MOCK_GITHUB_CLIENT_SECRET'),
