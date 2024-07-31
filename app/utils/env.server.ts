@@ -13,6 +13,7 @@ const schema = z.object({
 	SENTRY_DSN: z.string(),
 
 	RESEND_API_KEY: z.string(),
+	RESEND_FROM: z.string(),
 
 	GITHUB_CLIENT_ID: z.string().default('MOCK_GITHUB_CLIENT_ID'),
 	GITHUB_CLIENT_SECRET: z.string().default('MOCK_GITHUB_CLIENT_SECRET'),
