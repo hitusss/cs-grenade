@@ -1,7 +1,8 @@
 {
-  "name": "cs-grenade-efe0",
+  "name": "cs-grenade",
+  "version": "0.1.0",
   "license": "GPL-3.0-only",
-  "author": "",
+  "author": "Jakub Nieśpielak <kuba.niespielak@gmail.com> (https://github.com/hitusss)",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/hitusss/cs-grenade.git"
