@@ -7,6 +7,7 @@ import {
 } from '@remix-run/node'
 import {
 	Form,
+	Link,
 	useActionData,
 	useLoaderData,
 	useSearchParams,
@@ -30,6 +31,7 @@ import {
 	UsernameSchema,
 } from '#app/utils/validators/user.ts'
 import { verifySessionStorage } from '#app/utils/verification.server.ts'
+import { Button } from '#app/components/ui/button.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { AuthLayout } from '#app/components/auth-layout.tsx'
 import { CheckboxField, ErrorList, Field } from '#app/components/forms.tsx'
@@ -202,8 +204,23 @@ export default function OnboardingRoute() {
 				<CheckboxField
 					labelProps={{
 						htmlFor: fields.agreeToTermsOfServiceAndPrivacyPolicy.id,
-						children:
-							'Do you agree to our Terms of Service and Privacy Policy?',
+						children: (
+							<div>
+								Do you agree to our{' '}
+								<Button variant="link" asChild className="inline p-0">
+									<Link to="/tos" target="_blank">
+										Terms of Service
+									</Link>
+								</Button>{' '}
+								and{' '}
+								<Button variant="link" asChild className="inline p-0">
+									<Link to="/privacy" target="_blank">
+										Privacy Policy
+									</Link>
+								</Button>
+								?
+							</div>
+						),
 					}}
 					buttonProps={getInputProps(
 						fields.agreeToTermsOfServiceAndPrivacyPolicy,
