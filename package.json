@@ -31,6 +31,7 @@
     "db:studio": "prisma studio",
     "dev": "node ./server/dev-server.js",
     "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "lint": "eslint .",
     "setup": "pnpm run build && pnpm run db:deploy && pnpm run db:seed && pnpm run test:e2e:install",
     "start": "cross-env NODE_ENV=production node .",
