@@ -65,7 +65,7 @@ export async function updateDestination({
 				y,
 			},
 		})
-		if (!isOwn) {
+		if (!isOwn && prevDestination.userId) {
 			await notify({
 				userId: prevDestination.userId,
 				title: 'Destination updated',
@@ -135,7 +135,7 @@ export async function deleteDestination({
 		select: { name: true, userId: true },
 	})
 
-	if (!isOwn) {
+	if (!isOwn && deletedDestination.userId) {
 		await notify({
 			userId: deletedDestination.userId,
 			title: 'Destination deleted',

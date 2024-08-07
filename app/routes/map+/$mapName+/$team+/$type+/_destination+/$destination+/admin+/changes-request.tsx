@@ -136,12 +136,14 @@ export async function action({ request, params }: ActionFunctionArgs) {
 				data: destinationChanges,
 			})
 			await prisma.destinationChanges.delete({ where: { destinationId } })
-			await notify({
-				userId: destination.userId,
-				title: 'Destination changes request accepted',
-				description: `Your destination changes request for ${destination.name} has been accepted`,
-				redirectTo: `/map/${destination.mapName}/${destination.team}/${destination.type}/${destinationId}`,
-			})
+			if (destination.userId) {
+				await notify({
+					userId: destination.userId,
+					title: 'Destination changes request accepted',
+					description: `Your destination changes request for ${destination.name} has been accepted`,
+					redirectTo: `/map/${destination.mapName}/${destination.team}/${destination.type}/${destinationId}`,
+				})
+			}
 			break
 		}
 		case 'reject': {
@@ -150,11 +152,13 @@ export async function action({ request, params }: ActionFunctionArgs) {
 					destinationId,
 				},
 			})
-			await notify({
-				userId: destination.userId,
-				title: 'Destination changes request rejected',
-				description: `Your destination changes request for ${destination.name} has been rejected`,
-			})
+			if (destination.userId) {
+				await notify({
+					userId: destination.userId,
+					title: 'Destination changes request rejected',
+					description: `Your destination changes request for ${destination.name} has been rejected`,
+				})
+			}
 			break
 		}
 		default: {

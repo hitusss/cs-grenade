@@ -103,12 +103,14 @@ export async function action({ request, params }: ActionFunctionArgs) {
 					verified: true,
 				},
 			})
-			await notify({
-				userId: destination.userId,
-				title: 'Destination request accepted',
-				description: `Your destination request for ${destination.name} has been accepted`,
-				redirectTo: `/map/${destination.mapName}/${destination.team}/${destination.type}/${destinationId}`,
-			})
+			if (destination.userId) {
+				await notify({
+					userId: destination.userId,
+					title: 'Destination request accepted',
+					description: `Your destination request for ${destination.name} has been accepted`,
+					redirectTo: `/map/${destination.mapName}/${destination.team}/${destination.type}/${destinationId}`,
+				})
+			}
 			break
 		}
 		case 'reject': {
@@ -117,11 +119,13 @@ export async function action({ request, params }: ActionFunctionArgs) {
 					id: destinationId,
 				},
 			})
-			await notify({
-				userId: destination.userId,
-				title: 'Destination request rejected',
-				description: `Your destination request for ${destination.name} has been rejected`,
-			})
+			if (destination.userId) {
+				await notify({
+					userId: destination.userId,
+					title: 'Destination request rejected',
+					description: `Your destination request for ${destination.name} has been rejected`,
+				})
+			}
 			break
 		}
 		default: {

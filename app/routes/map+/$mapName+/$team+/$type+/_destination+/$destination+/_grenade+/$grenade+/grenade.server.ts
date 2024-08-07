@@ -192,7 +192,7 @@ async function editGrenade({
 		}),
 	)
 
-	if (!isOwn) {
+	if (!isOwn && prevGrenade.userId) {
 		await notify({
 			userId: prevGrenade.userId,
 			title: 'Grenade updated',
@@ -369,7 +369,7 @@ export async function deleteGrenade({
 		},
 	})
 
-	if (!isOwn) {
+	if (!isOwn && deletedGrenade.userId) {
 		await notify({
 			userId: deletedGrenade.userId,
 			title: 'Grenade deleted',

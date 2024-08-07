@@ -17,7 +17,12 @@ import { teams } from '#types/teams.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { requireUserWithPermission } from '#app/utils/permissions.server.ts'
 import { userHasPermission } from '#app/utils/permissions.ts'
-import { getUserImgSrc, useUser } from '#app/utils/user.ts'
+import {
+	getUserDisplayName,
+	getUserFullName,
+	getUserImgSrc,
+	useUser,
+} from '#app/utils/user.ts'
 import { Button } from '#app/components/ui/button.tsx'
 import {
 	DropdownMenu,
@@ -56,7 +61,7 @@ const columns: ColumnDef<{
 			id: string
 		} | null
 		username: string
-	}
+	} | null
 }>[] = [
 	{
 		accessorKey: 'logo',
@@ -105,13 +110,11 @@ const columns: ColumnDef<{
 		cell: ({ row }) => (
 			<div className="flex items-center gap-2">
 				<img
-					src={getUserImgSrc(row.original.user.image?.id)}
+					src={getUserImgSrc(row.original.user?.image?.id)}
 					className="size-6 rounded-full"
-					alt={row.original.user.username}
+					alt={getUserDisplayName(row.original.user)}
 				/>
-				{row.original.user.name
-					? `${row.original.user.name} (${row.original.user.username})`
-					: row.original.user.username}
+				{getUserFullName(row.original.user)}
 			</div>
 		),
 		enableSorting: true,
@@ -146,15 +149,17 @@ const columns: ColumnDef<{
 								<Icon name="arrow-right" />
 							</Link>
 						</DropdownMenuItem>
-						<DropdownMenuItem asChild>
-							<Link
-								to={`/users/${row.original.user.username}`}
-								className="flex items-center gap-2"
-							>
-								Go to user profile
-								<Icon name="arrow-right" />
-							</Link>
-						</DropdownMenuItem>
+						{row.original.user ? (
+							<DropdownMenuItem asChild>
+								<Link
+									to={`/users/${row.original.user.username}`}
+									className="flex items-center gap-2"
+								>
+									Go to user profile
+									<Icon name="arrow-right" />
+								</Link>
+							</DropdownMenuItem>
+						) : null}
 						{hasUpdateMapPermission ? (
 							<DropdownMenuGroup>
 								<DropdownMenuLabel>Menage</DropdownMenuLabel>

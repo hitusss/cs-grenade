@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 
 import { cn } from '#app/utils/misc.tsx'
-import { getUserImgSrc } from '#app/utils/user.ts'
+import { getUserDisplayName, getUserImgSrc } from '#app/utils/user.ts'
 
 import { useLightbox } from './lightbox.tsx'
 
@@ -18,7 +18,7 @@ type MessageProps = {
 		image: {
 			id: string
 		} | null
-	}
+	} | null
 	date?: Date
 }
 
@@ -50,8 +50,8 @@ export function Message({
 					className={cn('size-7 self-end rounded-full object-cover', {
 						'order-2': align === 'end',
 					})}
-					alt={user.username}
-					src={getUserImgSrc(user.image?.id)}
+					alt={getUserDisplayName(user)}
+					src={getUserImgSrc(user?.image?.id)}
 				/>
 				<div className="flex-1 overflow-hidden drop-shadow-md">
 					<p
@@ -59,7 +59,7 @@ export function Message({
 							'text-end': align === 'end',
 						})}
 					>
-						{user.name ?? user.username}
+						{getUserDisplayName(user)}
 					</p>
 					<div className="max-w-full break-words rounded-md bg-secondary px-6 py-3 text-secondary-foreground">
 						{message}

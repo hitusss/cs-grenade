@@ -249,21 +249,25 @@ export async function action({ request, params }: ActionFunctionArgs) {
 			)
 
 			await prisma.grenadeChanges.delete({ where: { grenadeId } })
-			await notify({
-				userId: grenade.userId,
-				title: 'Grenade changes request accepted',
-				description: `Your grenade changes request for ${grenade.name} has been accepted`,
-				redirectTo: `/map/${grenade.mapName}/${grenade.team}/${grenade.type}/${grenade.destinationId}/${grenadeId}`,
-			})
+			if (grenade.userId) {
+				await notify({
+					userId: grenade.userId,
+					title: 'Grenade changes request accepted',
+					description: `Your grenade changes request for ${grenade.name} has been accepted`,
+					redirectTo: `/map/${grenade.mapName}/${grenade.team}/${grenade.type}/${grenade.destinationId}/${grenadeId}`,
+				})
+			}
 			break
 		}
 		case 'reject': {
 			await prisma.grenadeChanges.delete({ where: { grenadeId } })
-			await notify({
-				userId: grenade.userId,
-				title: 'Grenade changes request rejected',
-				description: `Your grenade changes request for ${grenade.name} has been rejected`,
-			})
+			if (grenade.userId) {
+				await notify({
+					userId: grenade.userId,
+					title: 'Grenade changes request rejected',
+					description: `Your grenade changes request for ${grenade.name} has been rejected`,
+				})
+			}
 			break
 		}
 		default: {

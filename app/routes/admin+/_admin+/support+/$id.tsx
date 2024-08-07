@@ -24,7 +24,7 @@ import { checkHoneypot } from '#app/utils/honeypot.server.ts'
 import { useDoubleCheck, useIsPending } from '#app/utils/misc.tsx'
 import { notify } from '#app/utils/notifications.server.js'
 import { requireUserWithPermission } from '#app/utils/permissions.server.ts'
-import { getUserImgSrc } from '#app/utils/user.ts'
+import { getUserFullName, getUserImgSrc } from '#app/utils/user.ts'
 import { MAX_SIZE, TicketMessageSchema } from '#app/utils/validators/support.ts'
 import { Button } from '#app/components/ui/button.tsx'
 import { MessageForm } from '#app/components/message-form.tsx'
@@ -123,6 +123,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	})
 
 	invariantResponse(ticket, 'Not found', { status: 404 })
+	invariantResponse(ticket.userId, 'Ticket author does not exist', {
+		status: 400,
+	})
 
 	const formData = await unstable_parseMultipartFormData(
 		request,
@@ -266,12 +269,10 @@ export default function AdminSupportTicketRoute() {
 					<h2>{data.ticket.title}</h2>
 					<div className="mt-2 flex items-center gap-2 font-semibold">
 						<img
-							src={getUserImgSrc(data.ticket.user.image?.id)}
+							src={getUserImgSrc(data.ticket.user?.image?.id)}
 							className="size-6 rounded-full"
 						/>
-						{data.ticket.user.name
-							? `${data.ticket.user.name} (${data.ticket.user.username})`
-							: data.ticket.user.username}
+						{getUserFullName(data.ticket.user)}
 					</div>
 				</div>
 
@@ -303,7 +304,9 @@ export default function AdminSupportTicketRoute() {
 					/>
 				))}
 			</MessageContainer>
-			{data.ticket.open ? <MessageForm result={actionData?.result} /> : null}
+			{data.ticket.open && data.ticket.user ? (
+				<MessageForm result={actionData?.result} />
+			) : null}
 		</>
 	)
 }

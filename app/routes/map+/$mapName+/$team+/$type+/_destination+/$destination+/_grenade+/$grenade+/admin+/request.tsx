@@ -118,12 +118,14 @@ export async function action({ request, params }: ActionFunctionArgs) {
 					verified: true,
 				},
 			})
-			await notify({
-				userId: grenade.userId,
-				title: 'Grenade request accepted',
-				description: `Your grenade request for ${grenade.name} has been accepted`,
-				redirectTo: `/map/${grenade.mapName}/${grenade.team}/${grenade.type}/${grenade.destinationId}/${grenadeId}`,
-			})
+			if (grenade.userId) {
+				await notify({
+					userId: grenade.userId,
+					title: 'Grenade request accepted',
+					description: `Your grenade request for ${grenade.name} has been accepted`,
+					redirectTo: `/map/${grenade.mapName}/${grenade.team}/${grenade.type}/${grenade.destinationId}/${grenadeId}`,
+				})
+			}
 			break
 		}
 		case 'reject': {
@@ -132,11 +134,13 @@ export async function action({ request, params }: ActionFunctionArgs) {
 					id: grenadeId,
 				},
 			})
-			await notify({
-				userId: grenade.userId,
-				title: 'Grenade request rejected',
-				description: `Your grenade request for ${grenade.name} has been rejected`,
-			})
+			if (grenade.userId) {
+				await notify({
+					userId: grenade.userId,
+					title: 'Grenade request rejected',
+					description: `Your grenade request for ${grenade.name} has been rejected`,
+				})
+			}
 			break
 		}
 		default: {
