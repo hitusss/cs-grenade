@@ -153,7 +153,7 @@ model Notification {
 
   seen Boolean @default(false)
 
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId String
 
   createdAt DateTime @default(now())
@@ -171,8 +171,8 @@ model Map {
 
   destinations Destination[]
 
-  user   User   @relation(fields: [userId], references: [id])
-  userId String
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  userId String?
 
   grenade Grenade[]
 
@@ -236,8 +236,8 @@ model Destination {
 
   destinationChanges DestinationChanges?
 
-  user   User   @relation(fields: [userId], references: [id])
-  userId String
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  userId String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -256,8 +256,8 @@ model DestinationChanges {
   destination   Destination @relation(fields: [destinationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   destinationId String      @unique
 
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId String
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  userId String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -271,7 +271,7 @@ model Grenade {
   map     Map    @relation(fields: [mapName], references: [name], onDelete: Cascade, onUpdate: Cascade)
   mapName String
 
-  destination   Destination @relation(fields: [destinationId], references: [id])
+  destination   Destination @relation(fields: [destinationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   destinationId String
 
   team String
@@ -287,8 +287,8 @@ model Grenade {
 
   grenadeChanges GrenadeChanges?
 
-  user   User   @relation(fields: [userId], references: [id])
-  userId String
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  userId String?
 
   favorites Favorite[]
 
@@ -312,8 +312,8 @@ model GrenadeChanges {
   grenade   Grenade @relation(fields: [grenadeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   grenadeId String  @unique
 
-  user   User   @relation(fields: [userId], references: [id])
-  userId String
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  userId String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -380,8 +380,8 @@ model Ticket {
   title    String
   messages TicketMessage[]
 
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId String
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  userId String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -399,8 +399,8 @@ model TicketMessage {
   ticket   Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   ticketId String
 
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId String
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  userId String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
