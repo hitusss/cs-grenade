@@ -2,7 +2,12 @@ import { useRef } from 'react'
 import { Form, Link, useSubmit } from '@remix-run/react'
 
 import { userHasPermission } from '#app/utils/permissions.ts'
-import { getUserImgSrc, useOptionalUser, useUser } from '#app/utils/user.ts'
+import {
+	getUserDisplayName,
+	getUserImgSrc,
+	useOptionalUser,
+	useUser,
+} from '#app/utils/user.ts'
 import { Notifications } from '#app/routes/resources+/notifications.tsx'
 import { ThemeSwitch } from '#app/routes/resources+/theme-switch.tsx'
 
@@ -73,9 +78,7 @@ function UserDropdown() {
 							alt={user.name ?? user.username}
 							src={getUserImgSrc(user.image?.id)}
 						/>
-						<span className="hidden sm:block">
-							{user.name ?? user.username}
-						</span>
+						<span className="hidden sm:block">{getUserDisplayName(user)}</span>
 					</Link>
 				</Button>
 			</DropdownMenuTrigger>

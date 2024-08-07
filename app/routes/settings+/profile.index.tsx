@@ -15,7 +15,7 @@ import { prisma } from '#app/utils/db.server.ts'
 import { useDoubleCheck } from '#app/utils/misc.tsx'
 import { authSessionStorage } from '#app/utils/session.server.ts'
 import { redirectWithToast } from '#app/utils/toast.server.ts'
-import { getUserImgSrc } from '#app/utils/user.ts'
+import { getUserDisplayName, getUserImgSrc } from '#app/utils/user.ts'
 import { NameSchema, UsernameSchema } from '#app/utils/validators/user.ts'
 import { Button } from '#app/components/ui/button.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
@@ -112,7 +112,7 @@ export default function SettingsProfileMainRoute() {
 				<div className="relative h-52 w-52">
 					<img
 						src={getUserImgSrc(data.user.image?.id)}
-						alt={data.user.username}
+						alt={getUserDisplayName(data.user)}
 						className="h-full w-full rounded-full object-cover"
 					/>
 					<Button
