@@ -7,6 +7,30 @@ export function getUserImgSrc(imageId?: string | null) {
 	return imageId ? `/resources/user-images/${imageId}` : '/img/user.png'
 }
 
+export function getUserDisplayName(
+	user: { username: string; name: string | null } | null,
+) {
+	if (user) {
+		if (user.name) {
+			return user.name
+		}
+		return user.username
+	}
+	return 'Deleted user'
+}
+
+export function getUserFullName(
+	user: { username: string; name: string | null } | null,
+) {
+	if (user) {
+		if (user.name) {
+			return `${user.name} (${user.username})`
+		}
+		return user.username
+	}
+	return 'Deleted user'
+}
+
 function isUser(user: any): user is SerializeFrom<typeof rootLoader>['user'] {
 	return user && typeof user === 'object' && typeof user.id === 'string'
 }
