@@ -1,6 +1,10 @@
 import * as cookie from 'cookie'
+import { z } from 'zod'
 
-import { colors, modes, type Color, type Mode, type Theme } from './theme.ts'
+import { colors, modes, type Color, type Mode } from './theme.ts'
+
+const ModeSchema = z.enum(modes)
+const ColorSchema = z.enum(colors)
 
 const modeCookieName = 'en_theme_mode'
 
@@ -9,22 +13,18 @@ const colorCookieName = 'en_theme_color'
 export function getTheme(request: Request) {
 	const cookieHeader = request.headers.get('cookie')
 
-	let mode = cookieHeader
-		? cookie.parse(cookieHeader)[modeCookieName]
-		: 'system'
-	if (mode === undefined) mode = 'system'
-	if (!modes.includes(mode)) mode = 'system'
+	let mode = cookieHeader ? cookie.parse(cookieHeader)[modeCookieName] : 'light'
+	const modeResult = ModeSchema.safeParse(mode)
 
 	let color = cookieHeader
 		? cookie.parse(cookieHeader)[colorCookieName]
 		: 'yellow'
-	if (color === undefined) color = 'yellow'
-	if (!colors.includes(color)) color = 'yellow'
+	const colorResult = ColorSchema.safeParse(color)
 
 	return {
-		mode,
-		color,
-	} as Theme
+		mode: modeResult.success ? modeResult.data : null,
+		color: colorResult.success ? colorResult.data : null,
+	}
 }
 
 export function setTheme(mode: Mode, color: Color) {
