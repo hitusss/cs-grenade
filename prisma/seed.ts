@@ -308,17 +308,6 @@ async function seed() {
 							...mapImages.radar,
 						},
 					},
-					user: {
-						connectOrCreate: {
-							where: {
-								username: 'maps',
-							},
-							create: {
-								username: 'maps',
-								email: 'maps',
-							},
-						},
-					},
 				},
 			})
 		}
