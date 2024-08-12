@@ -156,19 +156,19 @@ export default function SettingsProfileTwoFactorVerifyRoute() {
 			<div className="flex flex-col items-center gap-4">
 				<img alt="qr code" src={data.qrCode} className="h-56 w-56" />
 				<p>Scan this QR code with your authenticator app.</p>
-				<p className="text-body-xs">
+				<p className="text-sm">
 					If you cannot scan the QR code, you can manually add this account to
 					your authenticator app using this code:
 				</p>
 				<div className="p-3">
 					<pre
-						className="whitespace-pre-wrap break-all text-body-xs"
+						className="whitespace-pre-wrap break-all text-sm"
 						aria-label="One-time Password URI"
 					>
 						{data.otpUri}
 					</pre>
 				</div>
-				<p className="text-body-xs">
+				<p className="text-sm">
 					Once you've added the account, enter the code from your authenticator
 					app below. Once you enable 2FA, you will need to enter a code from
 					your authenticator app every time you log in or perform important

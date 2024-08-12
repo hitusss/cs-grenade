@@ -87,7 +87,7 @@ function UserDropdown() {
 					{hasReadAdminAnyPermission ? (
 						<DropdownMenuItem asChild>
 							<Link prefetch="intent" to="/admin">
-								<Icon className="text-body-md" name="shield">
+								<Icon className="text-lg" name="shield">
 									Admin
 								</Icon>
 							</Link>
@@ -95,7 +95,7 @@ function UserDropdown() {
 					) : null}
 					<DropdownMenuItem asChild>
 						<Link prefetch="intent" to={`/users/${user.username}`}>
-							<Icon className="text-body-md" name="circle-user">
+							<Icon className="text-lg" name="circle-user">
 								Profile
 							</Icon>
 						</Link>
@@ -103,7 +103,7 @@ function UserDropdown() {
 					{hasReadSupportPermission ? (
 						<DropdownMenuItem asChild>
 							<Link prefetch="intent" to="/support">
-								<Icon className="text-body-md" name="life-buoy">
+								<Icon className="text-lg" name="life-buoy">
 									Support
 								</Icon>
 							</Link>
@@ -118,7 +118,7 @@ function UserDropdown() {
 						}}
 					>
 						<Form action="/logout" method="POST" ref={formRef}>
-							<Icon className="text-body-md" name="log-out">
+							<Icon className="text-lg" name="log-out">
 								<button type="submit">Logout</button>
 							</Icon>
 						</Form>

@@ -68,7 +68,7 @@ export function ErrorComponent({
 		<div className="grid max-w-xl gap-6">
 			<div className="grid gap-3">
 				<h1>{heading}</h1>
-				<pre className="whitespace-pre-wrap break-all text-body-md">
+				<pre className="whitespace-pre-wrap break-all text-lg">
 					{typeof error === 'string'
 						? error
 						: `${error.status} - ${error.data}`}

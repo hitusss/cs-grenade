@@ -330,7 +330,7 @@
 
 @layer base {
 	* {
-		@apply text-pretty border-border text-body-sm;
+		@apply text-pretty border-border text-base;
 	}
 	body {
 		@apply bg-background text-foreground;

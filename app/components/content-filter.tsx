@@ -129,7 +129,7 @@ export function ContentFilter({ hideFilter }: ContentFilterProps) {
 										<SelectLabel>Active</SelectLabel>
 										{activeMaps.map((m) => (
 											<SelectItem key={m.label} value={m.name}>
-												<div className="flex items-center gap-2 truncate text-body-xs">
+												<div className="flex items-center gap-2 truncate text-sm">
 													<img
 														src={`/resources/map-logos/${m.logo?.id}`}
 														alt=""
@@ -145,7 +145,7 @@ export function ContentFilter({ hideFilter }: ContentFilterProps) {
 											<SelectLabel>Inactive</SelectLabel>
 											{inactiveMaps.map((m) => (
 												<SelectItem key={m.label} value={m.name}>
-													<div className="flex items-center gap-2 truncate text-body-xs">
+													<div className="flex items-center gap-2 truncate text-sm">
 														<img
 															src={`/resources/map-logos/${m.logo?.id}`}
 															alt=""

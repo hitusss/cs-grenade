@@ -137,10 +137,7 @@ export default function LoginRoute() {
 							errors={fields.remember.errors}
 						/>
 						<div>
-							<Link
-								to="/forgot-password"
-								className="text-body-xs font-semibold"
-							>
+							<Link to="/forgot-password" className="text-sm font-semibold">
 								Forgot password?
 							</Link>
 						</div>

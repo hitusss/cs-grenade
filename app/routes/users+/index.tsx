@@ -88,7 +88,7 @@ export default function UsersRoute() {
 											className="h-16 w-16 rounded-full"
 										/>
 										{user.name ? (
-											<span className="w-full overflow-hidden text-ellipsis whitespace-nowrap text-center text-body-md">
+											<span className="w-full overflow-hidden text-ellipsis whitespace-nowrap text-center text-lg">
 												{user.name}
 											</span>
 										) : null}

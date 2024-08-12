@@ -61,7 +61,7 @@ export function Notifications() {
 				<Button variant="ghost" size="icon" className="relative">
 					<Icon name="bell" />
 					{notificationCount > 0 ? (
-						<span className="absolute right-0 top-0 grid size-5 place-items-center rounded-full bg-destructive text-body-2xs text-destructive-foreground">
+						<span className="absolute right-0 top-0 grid size-5 place-items-center rounded-full bg-destructive text-xs text-destructive-foreground">
 							{notificationCount >= 10 ? '9+' : notificationCount}
 						</span>
 					) : null}
@@ -82,7 +82,7 @@ export function Notifications() {
 							/>
 						))
 					) : (
-						<div className="grid flex-1 place-items-center text-body-lg text-muted-foreground">
+						<div className="grid flex-1 place-items-center text-xl text-muted-foreground">
 							You don't have any notification
 						</div>
 					)}
@@ -151,7 +151,7 @@ function Notification({
 			)}
 		>
 			<p className="text-caption">{title}</p>
-			<p className="text-body-sm">{description}</p>
+			<p>{description}</p>
 			{redirectTo ? (
 				<Button variant="link" asChild className="px-0">
 					<Link to={redirectTo}>
@@ -161,7 +161,7 @@ function Notification({
 					</Link>
 				</Button>
 			) : null}
-			<p className="mt-2 text-right text-body-xs">{date.toLocaleString()}</p>
+			<p className="mt-2 text-right text-sm">{date.toLocaleString()}</p>
 
 			<Button
 				size="icon"

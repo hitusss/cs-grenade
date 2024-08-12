@@ -55,7 +55,7 @@ export function Message({
 				/>
 				<div className="flex-1 overflow-hidden drop-shadow-md">
 					<p
-						className={cn('px-2 text-body-xs font-semibold', {
+						className={cn('px-2 text-sm font-semibold', {
 							'text-end': align === 'end',
 						})}
 					>
@@ -85,7 +85,7 @@ export function Message({
 			</div>
 			{date ? (
 				<span
-					className={cn('mt-1 text-body-xs', {
+					className={cn('mt-1 text-sm', {
 						'self-end pr-12': align === 'end',
 						'pl-12': align === 'start',
 					})}

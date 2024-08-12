@@ -24,10 +24,10 @@ export function ContentCard({
 			className="flex flex-col justify-between break-words"
 		>
 			<CardHeader>
-				<p className="text-body-sm">Name</p>
+				<p>Name</p>
 				<p className="text-h5">{name}</p>
 				{verified ? null : (
-					<p className="text-body-sm font-thin italic">Waiting for accept</p>
+					<p className="font-thin italic">Waiting for accept</p>
 				)}
 			</CardHeader>
 			<CardFooter className="flex-col items-start">
@@ -36,7 +36,7 @@ export function ContentCard({
 						key={f.label}
 						className="flex w-full flex-wrap items-center justify-between gap-1"
 					>
-						<p className="text-body-xs">{f.label}</p>
+						<p className="text-sm">{f.label}</p>
 						<div className="flex items-center gap-1">
 							{f.img ? (
 								<img
@@ -45,7 +45,7 @@ export function ContentCard({
 									className={cn('size-4', !verified && 'opacity-75')}
 								/>
 							) : null}
-							<p className="text-body-xs font-semibold">{f.value}</p>
+							<p className="text-sm font-semibold">{f.value}</p>
 						</div>
 					</div>
 				))}

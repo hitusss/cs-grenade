@@ -129,7 +129,7 @@ export default function SupportRoute() {
 											<div className="flex justify-between gap-2">
 												<p className="text-caption">{ticket.title}</p>
 												{ticket._count.messages > 0 ? (
-													<span className="mt-2 grid size-3 animate-pulse place-items-center rounded-full bg-destructive text-body-xs text-destructive-foreground" />
+													<span className="mt-2 grid size-3 animate-pulse place-items-center rounded-full bg-destructive text-sm text-destructive-foreground" />
 												) : null}
 											</div>
 											<div className="text-right">
