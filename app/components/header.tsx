@@ -4,6 +4,7 @@ import { Form, Link, useSubmit } from '@remix-run/react'
 import { userHasPermission } from '#app/utils/permissions.ts'
 import {
 	getUserDisplayName,
+	getUserFullName,
 	getUserImgSrc,
 	useOptionalUser,
 	useUser,
@@ -75,7 +76,7 @@ function UserDropdown() {
 					>
 						<img
 							className="h-8 w-8 rounded-full object-cover"
-							alt={user.name ?? user.username}
+							alt={getUserFullName(user)}
 							src={getUserImgSrc(user.image?.id)}
 						/>
 						<span className="hidden sm:block">{getUserDisplayName(user)}</span>
