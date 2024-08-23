@@ -14,6 +14,9 @@ permissions:
   actions: write
   contents: read
 
+env:
+  NODE_VERSION: 20
+
 jobs:
   format:
     name: 🧹 Prettier
@@ -25,7 +28,7 @@ jobs:
       - name: ⎔ Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: 📦 Install pnpm
         uses: pnpm/action-setup@v4
@@ -61,7 +64,7 @@ jobs:
       - name: ⎔ Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: 📦 Install pnpm
         uses: pnpm/action-setup@v4
@@ -100,7 +103,7 @@ jobs:
       - name: ⎔ Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: 📦 Install pnpm
         uses: pnpm/action-setup@v4
@@ -142,7 +145,7 @@ jobs:
       - name: ⎔ Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: 📦 Install pnpm
         uses: pnpm/action-setup@v4
@@ -185,7 +188,7 @@ jobs:
       - name: ⎔ Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: 📦 Install pnpm
         uses: pnpm/action-setup@v4
