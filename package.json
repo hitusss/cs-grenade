@@ -42,7 +42,7 @@
     "test:e2e:setup": "pnpm run test:e2e:install && pnpm run db:deploy deploy && pnpm run build",
     "test:e2e:dev": "playwright test --ui",
     "test:e2e:run": "cross-env CI=true playwright test",
-    "test:e2e:install": "pnpx playwright install --with-deps chromium",
+    "test:e2e:install": "pnpm exec playwright install --with-deps chromium",
     "typecheck": "tsc",
     "validate": "run-p \"test -- --run\" lint typecheck test:e2e:run",
     "postinstall": "pnpm run db:generate"
