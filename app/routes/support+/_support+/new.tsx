@@ -1,9 +1,4 @@
-import {
-	json,
-	unstable_createMemoryUploadHandler,
-	unstable_parseMultipartFormData,
-	type ActionFunctionArgs,
-} from '@remix-run/node'
+import { json, type ActionFunctionArgs } from '@remix-run/node'
 import { Form, useActionData } from '@remix-run/react'
 import {
 	getFormProps,
@@ -12,13 +7,14 @@ import {
 	useForm,
 } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
+import { parseFormData } from '@mjackson/form-data-parser'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
 
 import { requireUserId } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { checkHoneypot } from '#app/utils/honeypot.server.ts'
-import { useIsPending } from '#app/utils/misc.tsx'
+import { uploadHandler, useIsPending } from '#app/utils/misc.tsx'
 import { redirectWithToast } from '#app/utils/toast.server.ts'
 import { MAX_SIZE, NewTicketSchema } from '#app/utils/validators/support.ts'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
@@ -35,9 +31,9 @@ export const handle: SEOHandle = {
 
 export async function action({ request }: ActionFunctionArgs) {
 	const userId = await requireUserId(request)
-	const formData = await unstable_parseMultipartFormData(
+	const formData = await parseFormData(
 		request,
-		unstable_createMemoryUploadHandler({ maxPartSize: MAX_SIZE }),
+		uploadHandler({ maxPartSize: MAX_SIZE }),
 	)
 	checkHoneypot(formData)
 

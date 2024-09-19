@@ -62,6 +62,7 @@
     "@epic-web/invariant": "^1.0.0",
     "@epic-web/remember": "^1.1.0",
     "@epic-web/totp": "^1.1.2",
+    "@mjackson/form-data-parser": "^0.4.0",
     "@nasa-gcn/remix-seo": "^2.0.1",
     "@paralleldrive/cuid2": "^2.2.2",
     "@prisma/client": "^5.17.0",

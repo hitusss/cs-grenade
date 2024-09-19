@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useFormAction, useNavigation } from '@remix-run/react'
+import { type FileUpload } from '@mjackson/form-data-parser'
 import { clsx, type ClassValue } from 'clsx'
 import { useSpinDelay } from 'spin-delay'
 import { extendTailwindMerge } from 'tailwind-merge'
@@ -293,4 +294,22 @@ export function range(start: number, end: number) {
     start value to end value.
   */
 	return Array.from({ length }, (_, idx) => idx + start)
+}
+
+export function uploadHandler(options: { maxPartSize?: number } = {}) {
+	return async (fileUpload: FileUpload) => {
+		const chunks = []
+		let size = 0
+
+		const reader = fileUpload.stream().getReader()
+		while (true) {
+			if (options.maxPartSize && options.maxPartSize <= size) break
+			const { done, value } = await reader.read()
+			if (done) break
+			chunks.push(value)
+			size += value.length
+		}
+
+		return new File(chunks, fileUpload.name, { type: fileUpload.type })
+	}
 }

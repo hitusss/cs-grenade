@@ -1,18 +1,17 @@
 import {
 	json,
-	unstable_createMemoryUploadHandler,
-	unstable_parseMultipartFormData,
 	type ActionFunctionArgs,
 	type LoaderFunctionArgs,
 } from '@remix-run/node'
 import { useActionData } from '@remix-run/react'
 import { parseWithZod } from '@conform-to/zod'
+import { parseFormData } from '@mjackson/form-data-parser'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { z } from 'zod'
 
 import { prisma } from '#app/utils/db.server.ts'
 import { checkHoneypot } from '#app/utils/honeypot.server.ts'
-import { toSlug } from '#app/utils/misc.tsx'
+import { toSlug, uploadHandler } from '#app/utils/misc.tsx'
 import { requireUserWithPermission } from '#app/utils/permissions.server.ts'
 import { redirectWithToast } from '#app/utils/toast.server.ts'
 import { MapSchema, MAX_SIZE } from '#app/utils/validators/map.ts'
@@ -30,9 +29,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export async function action({ request }: ActionFunctionArgs) {
 	const userId = await requireUserWithPermission(request, 'create:map')
 
-	const formData = await unstable_parseMultipartFormData(
+	const formData = await parseFormData(
 		request,
-		unstable_createMemoryUploadHandler({ maxPartSize: MAX_SIZE }),
+		uploadHandler({ maxPartSize: MAX_SIZE }),
 	)
 	checkHoneypot(formData)
 

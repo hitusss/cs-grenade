@@ -1,8 +1,6 @@
 import { useEffect } from 'react'
 import {
 	json,
-	unstable_createMemoryUploadHandler,
-	unstable_parseMultipartFormData,
 	type ActionFunctionArgs,
 	type LoaderFunctionArgs,
 } from '@remix-run/node'
@@ -14,6 +12,7 @@ import {
 } from '@remix-run/react'
 import { parseWithZod } from '@conform-to/zod'
 import { invariantResponse } from '@epic-web/invariant'
+import { parseFormData } from '@mjackson/form-data-parser'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { useEventSource } from 'remix-utils/sse/react'
 import { z } from 'zod'
@@ -21,7 +20,11 @@ import { z } from 'zod'
 import { prisma } from '#app/utils/db.server.ts'
 import { emitter } from '#app/utils/event.server.ts'
 import { checkHoneypot } from '#app/utils/honeypot.server.ts'
-import { useDoubleCheck, useIsPending } from '#app/utils/misc.tsx'
+import {
+	uploadHandler,
+	useDoubleCheck,
+	useIsPending,
+} from '#app/utils/misc.tsx'
 import { notify } from '#app/utils/notifications.server.js'
 import { requireUserWithPermission } from '#app/utils/permissions.server.ts'
 import { getUserFullName, getUserImgSrc } from '#app/utils/user.ts'
@@ -127,9 +130,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
 		status: 400,
 	})
 
-	const formData = await unstable_parseMultipartFormData(
+	const formData = await parseFormData(
 		request,
-		unstable_createMemoryUploadHandler({ maxPartSize: MAX_SIZE }),
+		uploadHandler({ maxPartSize: MAX_SIZE }),
 	)
 	checkHoneypot(formData)
 
