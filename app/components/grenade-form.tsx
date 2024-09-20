@@ -232,7 +232,7 @@ export function GrenadeForm({
 													inputProps={getInputProps(imageFields.image, {
 														type: 'file',
 													})}
-													errors={imageFields.id.errors}
+													errors={imageFields.image.errors}
 													existingImage={
 														imageFields.id.initialValue
 															? `/resources/grenade-images/${imageFields.id.initialValue}`
