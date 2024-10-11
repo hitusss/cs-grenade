@@ -31,6 +31,8 @@ export function GeneralErrorBoundary({
 	captureRemixErrorBoundaryError(error)
 	const params = useParams()
 
+	console.log(error)
+
 	if (typeof document !== 'undefined') {
 		console.error(error)
 	}
@@ -71,7 +73,7 @@ export function ErrorComponent({
 				<pre className="whitespace-pre-wrap break-all text-lg">
 					{typeof error === 'string'
 						? error
-						: `${error.status} - ${error.data}`}
+						: `${error.status} - ${getErrorMessage(error.data)}`}
 				</pre>
 			</div>
 			<Link to={link.to}>
