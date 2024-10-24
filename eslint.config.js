@@ -9,4 +9,8 @@ export default [
 			'import/order': 'off',
 		},
 	},
+	{
+		files: ['**/tests/**/*.ts'],
+		rules: { 'react-hooks/rules-of-hooks': 'off' },
+	},
 ]
