@@ -34,6 +34,7 @@ import { getEnv } from './utils/env.server.ts'
 import { honeypot } from './utils/honeypot.server.ts'
 import { combineHeaders, getDomainUrl } from './utils/misc.tsx'
 import { useNonce } from './utils/nonce-provider.ts'
+import { getSocialMetas } from './utils/seo.ts'
 import { getTheme } from './utils/theme.server.ts'
 import { type Color, type Mode } from './utils/theme.ts'
 import { makeTimings, time } from './utils/timing.server.ts'
@@ -64,10 +65,15 @@ export const links: LinksFunction = () => {
 }
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
-	return [
-		{ title: data ? 'CS-Grenade' : 'Error | CS-Grenade' },
-		{ name: 'description', content: `Your own captain's log` },
-	]
+	if (!data) {
+		return getSocialMetas({
+			url: '',
+			title: 'Error - CSGrenade',
+		})
+	}
+	return getSocialMetas({
+		url: `${data?.requestInfo.origin}${data?.requestInfo.path}`,
+	})
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {

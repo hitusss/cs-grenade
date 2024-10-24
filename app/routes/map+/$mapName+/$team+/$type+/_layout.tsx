@@ -1,5 +1,9 @@
 import { useEffect, useRef } from 'react'
-import { json, type LoaderFunctionArgs } from '@remix-run/node'
+import {
+	json,
+	type LoaderFunctionArgs,
+	type MetaFunction,
+} from '@remix-run/node'
 import { Outlet, useLoaderData, useMatches } from '@remix-run/react'
 import { invariantResponse } from '@epic-web/invariant'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
@@ -9,10 +13,12 @@ import { z } from 'zod'
 import { grenadeLabels, grenadeTypes } from '#types/grenades-types.ts'
 import { teamLabels, teams } from '#types/teams.ts'
 import { prisma } from '#app/utils/db.server.ts'
+import { getSocialMetas } from '#app/utils/seo.ts'
 import { DestinationMarker } from '#app/components/destination-marker.tsx'
 import { GrenadeMarker } from '#app/components/grenade-marker.tsx'
 import { MapNav } from '#app/components/map-nav.tsx'
 import { Map } from '#app/components/map.tsx'
+import { type loader as rootLoader } from '#app/root.tsx'
 
 export const MapHandle = z
 	.object({
@@ -94,6 +100,31 @@ const MapHandleMatch = z
 			currentGrenade: handle.map?.currentGrenade ? params.grenade : undefined,
 		}
 	})
+
+export const meta: MetaFunction<
+	typeof loader,
+	{
+		root: typeof rootLoader
+	}
+> = ({ data, matches }) => {
+	const rootData = matches.find((m) => m.id === 'root')
+
+	if (!data || !rootData) {
+		return getSocialMetas({
+			url: '',
+			title: 'Error - CSGrenade',
+		})
+	}
+
+	return getSocialMetas({
+		url: `${rootData.data.requestInfo.origin}${rootData.data.requestInfo.path}`,
+		title: `${data.map.label} - CSGrenade`,
+		image: {
+			title: `${data.map.label} - CSGrenade`,
+			map: data.mapName,
+		},
+	})
+}
 
 export const handle = serverOnly$({
 	getSitemapEntries: async () => {
