@@ -11,6 +11,7 @@ export default {
 		'',
 		'^#types/(.*)$',
 		'^#app/utils/(.*)$',
+		'^#app/hooks/(.*)$',
 		'^#app/components/ui/(.*)$',
 		'^#app/components/(.*)$',
 		'^#app/styles/(.*)$',
