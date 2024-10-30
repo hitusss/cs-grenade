@@ -10,8 +10,11 @@ import { parseWithZod } from '@conform-to/zod'
 import { invariantResponse } from '@epic-web/invariant'
 import { z } from 'zod'
 
-import { useHints } from '#app/utils/client-hints.tsx'
-import { useRequestInfo } from '#app/utils/request-info.ts'
+import { useHints, useOptionalHints } from '#app/utils/client-hints.tsx'
+import {
+	useOptionalRequestInfo,
+	useRequestInfo,
+} from '#app/utils/request-info.ts'
 import { setTheme } from '#app/utils/theme.server.ts'
 import { colors, modes, type Color, type Mode } from '#app/utils/theme.ts'
 import { Button } from '#app/components/ui/button.tsx'
@@ -228,5 +231,24 @@ export function useTheme() {
 	return {
 		mode: requestInfo.userPrefs.theme.mode ?? hints.theme,
 		color: requestInfo.userPrefs.theme.color ?? 'yellow',
+	}
+}
+
+export function useOptionalTheme() {
+	const optionalHints = useOptionalHints()
+	const optionalRequestInfo = useOptionalRequestInfo()
+	const optimisticTheme = useOptimisticTheme()
+	if (optimisticTheme) {
+		return {
+			mode:
+				optimisticTheme.mode === 'system'
+					? optionalHints?.theme
+					: optimisticTheme.mode,
+			color: optimisticTheme.color,
+		}
+	}
+	return {
+		mode: optionalRequestInfo?.userPrefs.theme.mode ?? optionalHints?.theme,
+		color: optionalRequestInfo?.userPrefs.theme.color ?? 'yellow',
 	}
 }
