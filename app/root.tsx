@@ -25,7 +25,10 @@ import { EpicProgress } from './components/progress-bar.tsx'
 import { useToast } from './components/toaster.tsx'
 import { href as iconsHref } from './components/ui/icon.tsx'
 import { Toaster } from './components/ui/sonner.tsx'
-import { useTheme } from './routes/resources+/theme-switch.tsx'
+import {
+	useOptionalTheme,
+	useTheme,
+} from './routes/resources+/theme-switch.tsx'
 import tailwindStyleSheetUrl from './styles/tailwind.css?url'
 import { getUserId, logout } from './utils/auth.server.ts'
 import { ClientHintCheck, getHints } from './utils/client-hints.tsx'
@@ -180,15 +183,14 @@ function Document({
 	mode = 'light',
 	color = 'yellow',
 	env = {},
-	allowIndexing = true,
 }: {
 	children: React.ReactNode
 	nonce: string
 	mode?: Mode
 	color?: Color
 	env?: Record<string, string>
-	allowIndexing?: boolean
 }) {
+	const allowIndexing = ENV.ALLOW_INDEXING !== 'false'
 	return (
 		<html lang="en" className={`${mode} ${color} h-full overflow-x-hidden`}>
 			<head>
@@ -223,21 +225,30 @@ function Document({
 	)
 }
 
-function App() {
-	const data = useLoaderData<typeof loader>()
+export function Layout({ children }: { children: React.ReactNode }) {
+	// if there was an error running the loader, data could be missing
+	const data = useLoaderData<typeof loader | null>()
 	const nonce = useNonce()
-	const theme = useTheme()
-	const allowIndexing = data.ENV.ALLOW_INDEXING !== 'false'
-	useToast(data.toast)
-
+	const theme = useOptionalTheme()
 	return (
 		<Document
 			nonce={nonce}
 			mode={theme.mode}
 			color={theme.color}
-			allowIndexing={allowIndexing}
-			env={data.ENV}
+			env={data?.ENV}
 		>
+			{children}
+		</Document>
+	)
+}
+
+function App() {
+	const data = useLoaderData<typeof loader>()
+	const theme = useTheme()
+	useToast(data.toast)
+
+	return (
+		<>
 			<div className="flex h-screen flex-col justify-between">
 				<Header />
 
@@ -250,7 +261,7 @@ function App() {
 			<Toaster closeButton position="top-center" theme={theme.mode} />
 			<EpicProgress />
 			<Lightbox />
-		</Document>
+		</>
 	)
 }
 
@@ -268,20 +279,5 @@ function AppWithProviders() {
 export default withSentry(AppWithProviders)
 
 export function ErrorBoundary() {
-	// the nonce doesn't rely on the loader so we can access that
-	const nonce = useNonce()
-
-	// NOTE: you cannot use useLoaderData in an ErrorBoundary because the loader
-	// likely failed to run so we have to do the best we can.
-	// We could probably do better than this (it's possible the loader did run).
-	// This would require a change in Remix.
-
-	// Just make sure your root route never errors out and you'll always be able
-	// to give the user a better UX.
-
-	return (
-		<Document nonce={nonce}>
-			<GeneralErrorBoundary />
-		</Document>
-	)
+	return <GeneralErrorBoundary />
 }
