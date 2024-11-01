@@ -7,7 +7,6 @@ import {
 	useState,
 } from 'react'
 import { Link } from '@remix-run/react'
-import { TooltipProvider } from '@radix-ui/react-tooltip'
 import { Map as OlMap, View } from 'ol'
 import { getCenter } from 'ol/extent'
 import ImageLayer from 'ol/layer/Image'
@@ -16,7 +15,12 @@ import Static from 'ol/source/ImageStatic'
 
 import { Button } from './ui/button.tsx'
 import { Icon } from './ui/icon.tsx'
-import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip.tsx'
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from './ui/tooltip.tsx'
 
 type MapContextType = {
 	map: OlMap | undefined
