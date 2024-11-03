@@ -10,7 +10,7 @@ const cardVariants = cva('rounded-lg border shadow-sm', {
 			muted: 'bg-muted text-muted-foreground',
 		},
 		size: {
-			default: 'p-1',
+			default: '',
 			base: 'h-64 w-52',
 			lg: 'h-80 w-64',
 		},
