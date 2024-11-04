@@ -23,6 +23,7 @@ import {
 	DropdownMenuTrigger,
 } from '#app/components/ui/dropdown-menu.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
+import { SidebarTrigger } from '#app/components/ui/sidebar.tsx'
 import { ContentFilter } from '#app/components/content-filter.tsx'
 import {
 	DataTable,
@@ -294,7 +295,10 @@ export default function AdminRequestsDestinationsChangesRoute() {
 
 	return (
 		<>
-			<h2>Destinations Changes Requests</h2>
+			<div className="flex items-center gap-4">
+				<SidebarTrigger />
+				<h2>Destinations Changes Requests</h2>
+			</div>
 			<ContentFilter hideFilter={{ verified: true }} />
 			<DataTable columns={columns} data={data.destinations} />
 			<Pagination total={data.total} />

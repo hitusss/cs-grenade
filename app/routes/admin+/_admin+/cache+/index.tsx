@@ -40,6 +40,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '#app/components/ui/select.tsx'
+import { SidebarTrigger } from '#app/components/ui/sidebar.tsx'
 
 export const handle: SEOHandle = {
 	getSitemapEntries: () => null,
@@ -115,7 +116,10 @@ export default function AdminCacheRoute() {
 
 	return (
 		<>
-			<h2>Cache Admin</h2>
+			<div className="flex items-center gap-4">
+				<SidebarTrigger />
+				<h2>Cache Admin</h2>
+			</div>
 			<Form
 				method="get"
 				className="flex flex-col gap-4"

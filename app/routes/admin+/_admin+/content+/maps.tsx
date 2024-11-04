@@ -8,7 +8,6 @@ import { Link, useLoaderData, useSubmit } from '@remix-run/react'
 import { parseWithZod } from '@conform-to/zod'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { type Prisma } from '@prisma/client'
-import { DropdownMenuGroup } from '@radix-ui/react-dropdown-menu'
 import { type ColumnDef } from '@tanstack/react-table'
 import { z } from 'zod'
 
@@ -27,12 +26,14 @@ import { Button } from '#app/components/ui/button.tsx'
 import {
 	DropdownMenu,
 	DropdownMenuContent,
+	DropdownMenuGroup,
 	DropdownMenuItem,
 	DropdownMenuLabel,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '#app/components/ui/dropdown-menu.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
+import { SidebarTrigger } from '#app/components/ui/sidebar.tsx'
 import {
 	DataTable,
 	DataTableColumnHeader,
@@ -300,7 +301,10 @@ export default function AdminContentMapsRoute() {
 
 	return (
 		<>
-			<h2>Maps</h2>
+			<div className="flex items-center gap-4">
+				<SidebarTrigger />
+				<h2>Maps</h2>
+			</div>
 			<DataTable columns={columns} data={data.maps} />
 			<Pagination total={data.total} />
 		</>

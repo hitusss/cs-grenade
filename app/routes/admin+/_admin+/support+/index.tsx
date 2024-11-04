@@ -15,6 +15,7 @@ import { requireUserWithPermission } from '#app/utils/permissions.server.ts'
 import { getUserImgSrc } from '#app/utils/user.ts'
 import { Icon } from '#app/components/ui/icon.tsx'
 import { Input } from '#app/components/ui/input.tsx'
+import { SidebarTrigger } from '#app/components/ui/sidebar.tsx'
 import {
 	DataTable,
 	DataTableColumnHeader,
@@ -238,7 +239,10 @@ export default function AdminSupportRoute() {
 
 	return (
 		<>
-			<h2>Support</h2>
+			<div className="flex items-center gap-4">
+				<SidebarTrigger />
+				<h2>Support</h2>
+			</div>
 			<Input
 				type="search"
 				name="query"
