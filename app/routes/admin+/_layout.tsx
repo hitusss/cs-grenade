@@ -1,14 +1,42 @@
-import { useEffect, useState } from 'react'
 import { json, type LoaderFunctionArgs } from '@remix-run/node'
 import { Link, Outlet, useLocation } from '@remix-run/react'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 
-import { cn } from '#app/utils/misc.tsx'
 import { requireUserWithPermission } from '#app/utils/permissions.server.ts'
 import { userHasPermission } from '#app/utils/permissions.ts'
 import { useUser } from '#app/utils/user.js'
-import { Button } from '#app/components/ui/button.tsx'
+import {
+	Collapsible,
+	CollapsibleContent,
+	CollapsibleTrigger,
+} from '#app/components/ui/collapsible.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
+import {
+	Sidebar,
+	SidebarContent,
+	SidebarHeader,
+	SidebarMenu,
+	SidebarMenuButton,
+	SidebarMenuItem,
+	SidebarMenuSub,
+	SidebarMenuSubButton,
+	SidebarMenuSubItem,
+	SidebarProvider,
+	SidebarRail,
+	SidebarSeparator,
+} from '#app/components/ui/sidebar.tsx'
+
+type NavGroup = {
+	title: string
+	items: NavItem[]
+}
+
+type NavItem = {
+	title: string
+	to: string
+	isActive?: boolean
+	permission?: boolean
+}
 
 export const handle: SEOHandle = {
 	getSitemapEntries: () => null,
@@ -21,7 +49,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export default function AdminLayout() {
 	const location = useLocation()
-	const [isOpen, setIsOpen] = useState(false)
 
 	const user = useUser()
 
@@ -40,189 +67,150 @@ export default function AdminLayout() {
 	)
 	const hasReadCacheAnyPermission = userHasPermission(user, 'read:cache:any')
 
-	useEffect(() => {
-		const lsValue = window.localStorage.getItem('admin-sidebar')
-		if (!lsValue) return setIsOpen(true)
-		setIsOpen(lsValue === 'true')
-	}, [])
-
-	useEffect(() => {
-		window.localStorage.setItem('admin-sidebar', JSON.stringify(isOpen))
-	}, [isOpen])
+	const nav: NavGroup[] = [
+		{
+			title: 'Users',
+			items: [
+				{
+					title: 'Users',
+					to: 'users',
+					isActive: location.pathname === '/admin/users',
+					permission: hasReadUserAnyPermission,
+				},
+			],
+		},
+		{
+			title: 'Content',
+			items: [
+				{
+					title: 'Maps',
+					to: 'content/maps',
+					isActive: location.pathname === '/admin/content/maps',
+				},
+				{
+					title: 'Destinations',
+					to: 'content/destinations',
+					isActive: location.pathname === '/admin/content/destinations',
+				},
+				{
+					title: 'Grenades',
+					to: 'content/grenades',
+					isActive: location.pathname === '/admin/content/grenades',
+				},
+			],
+		},
+		{
+			title: 'Support',
+			items: [
+				{
+					title: 'Support',
+					to: 'support',
+					isActive: /\/admin\/support/.test(location.pathname),
+					permission: hasReadSupportAnyPermission,
+				},
+			],
+		},
+		{
+			title: 'Requests',
+			items: [
+				{
+					title: 'Destinations',
+					to: 'requests/destinations',
+					isActive: location.pathname === '/admin/requests/destinations',
+					permission: hasReadReviewDestinationRequestAnyPermission,
+				},
+				{
+					title: 'Destinations Changes',
+					to: 'requests/destinations-changes',
+					isActive:
+						location.pathname === '/admin/requests/destinations-changes',
+					permission: hasReadReviewDestinationRequestAnyPermission,
+				},
+				{
+					title: 'Grenades',
+					to: 'requests/grenades',
+					isActive: location.pathname === '/admin/requests/grenades',
+					permission: hasReadReviewGrenadeRequestAnyPermission,
+				},
+				{
+					title: 'Grenades Changes',
+					to: 'requests/grenades-changes',
+					isActive: location.pathname === '/admin/requests/grenades-changes',
+					permission: hasReadReviewGrenadeRequestAnyPermission,
+				},
+			],
+		},
+		{
+			title: 'Cache',
+			items: [
+				{
+					title: 'Cache',
+					to: 'cache',
+					isActive: location.pathname === '/admin/cache',
+					permission: hasReadCacheAnyPermission,
+				},
+			],
+		},
+	]
 
 	return (
-		<div className="container flex h-[90vh] py-4 lg:py-8">
-			<div
-				className={cn(
-					'relative h-full max-w-72 border-r px-4 pt-12 transition-all',
-					isOpen ? 'w-[calc(100%)]' : 'w-12',
-				)}
-			>
-				<Button
-					size="icon"
-					className="absolute right-2 top-2"
-					onClick={() => setIsOpen((prev) => !prev)}
-				>
-					<Icon
-						name="chevron-left"
-						className={cn('transition', isOpen ? 'rotate-0' : 'rotate-180')}
-					/>
-					<span className="sr-only">{isOpen ? 'Close' : 'Open'} sidebar</span>
-				</Button>
-				<aside
-					className={cn(
-						'flex h-full flex-col gap-4 transition-all',
-						isOpen ? 'w-[calc(100%)] opacity-100' : 'hidden w-0 opacity-0',
-					)}
-					style={{
-						transitionBehavior: 'allow-discrete',
-					}}
-				>
-					<h1>Admin</h1>
-					<ul className="mt-6 flex h-full flex-col justify-center gap-4 overflow-y-auto">
-						{/* Users	 */}
-						<SidebarGroup title="Users" permission={hasReadUserAnyPermission}>
-							<SidebarLink
-								to="users"
-								isActive={location.pathname === '/admin/users'}
-							>
-								Users
-							</SidebarLink>
-						</SidebarGroup>
-						{/* Content */}
-						<SidebarGroup title="Content">
-							<SidebarLink
-								to="content/maps"
-								isActive={location.pathname === '/admin/content/maps'}
-							>
-								Maps
-							</SidebarLink>
-							<SidebarLink
-								to="content/destinations"
-								isActive={location.pathname === '/admin/content/destinations'}
-							>
-								Destinations
-							</SidebarLink>
-							<SidebarLink
-								to="content/grenades"
-								isActive={location.pathname === '/admin/content/grenades'}
-							>
-								Grenades
-							</SidebarLink>
-						</SidebarGroup>
-						{/* Support */}
-						<SidebarGroup
-							title="Support"
-							permission={hasReadSupportAnyPermission}
-						>
-							<SidebarLink
-								to="support"
-								isActive={/\/admin\/support/.test(location.pathname)}
-							>
-								Support
-							</SidebarLink>
-						</SidebarGroup>
-						{/* Requests */}
-						<SidebarGroup
-							title="Requests"
-							permission={
-								hasReadReviewDestinationRequestAnyPermission ||
-								hasReadReviewGrenadeRequestAnyPermission
-							}
-						>
-							<SidebarLink
-								to="requests/destinations"
-								isActive={location.pathname === '/admin/requests/destinations'}
-								permission={hasReadReviewDestinationRequestAnyPermission}
-							>
-								Destinations
-							</SidebarLink>
-							<SidebarLink
-								to="requests/destinations-changes"
-								isActive={
-									location.pathname === '/admin/requests/destinations-changes'
-								}
-								permission={hasReadReviewDestinationRequestAnyPermission}
-							>
-								Destinations Changes
-							</SidebarLink>
-							<SidebarLink
-								to="requests/grenades"
-								isActive={location.pathname === '/admin/requests/grenades'}
-								permission={hasReadReviewGrenadeRequestAnyPermission}
-							>
-								Grenades
-							</SidebarLink>
-							<SidebarLink
-								to="requests/grenades-changes"
-								isActive={
-									location.pathname === '/admin/requests/grenades-changes'
-								}
-								permission={hasReadReviewGrenadeRequestAnyPermission}
-							>
-								Grenades Changes
-							</SidebarLink>
-						</SidebarGroup>
-						{/* Cache */}
-						<SidebarGroup title="Cache" permission={hasReadCacheAnyPermission}>
-							<SidebarLink
-								to="cache"
-								isActive={location.pathname === '/admin/cache'}
-							>
-								Cache
-							</SidebarLink>
-						</SidebarGroup>
-					</ul>
-				</aside>
+		<SidebarProvider className="container my-2 h-[90vh] min-h-[90vh] overflow-hidden rounded-lg border p-0 lg:my-4">
+			<div className="relative">
+				<Sidebar variant="floating" className="absolute top-0 h-full p-0">
+					<SidebarHeader>
+						<h1 className="text-center">Admin</h1>
+					</SidebarHeader>
+					<SidebarSeparator />
+					<SidebarContent className="mt-6">
+						<SidebarMenu>
+							{nav.map((group) => (
+								<SidebarNavGroup key={group.title} group={group} />
+							))}
+						</SidebarMenu>
+					</SidebarContent>
+					<SidebarRail />
+				</Sidebar>
 			</div>
-			<div className="grid h-full w-full flex-1 p-2 md:p-4 2xl:p-8">
-				<div className="flex flex-col gap-8 overflow-hidden">
-					<Outlet />
-				</div>
+			<div className="flex h-full w-full flex-col gap-4 p-4 md:p-8">
+				<Outlet />
 			</div>
-		</div>
+		</SidebarProvider>
 	)
 }
 
-function SidebarGroup({
-	permission = true,
-	title,
-	children,
-}: {
-	permission?: boolean
-	title: string
-	children: React.ReactNode
-}) {
-	if (!permission) return null
-	return (
-		<li>
-			<p className="text-caption">{title}</p>
-			<ul className="mt-1 space-y-2 px-1">{children}</ul>
-		</li>
+function SidebarNavGroup({ group }: { group: NavGroup }) {
+	const filteredItems = group.items.filter((i) =>
+		i.permission !== undefined ? i.permission : true,
 	)
-}
 
-function SidebarLink({
-	permission = true,
-	isActive = false,
-	to,
-	children,
-}: {
-	permission?: boolean
-	isActive?: boolean
-	to: string
-	children: React.ReactNode
-}) {
-	if (!permission) return null
+	if (filteredItems.length === 0) {
+		return null
+	}
+
 	return (
-		<li>
-			<Button
-				variant={isActive ? 'default' : 'secondary'}
-				className="w-full justify-start"
-				asChild
-			>
-				<Link to={to}>{children}</Link>
-			</Button>
-		</li>
+		<Collapsible defaultOpen className="group/collapsible" asChild>
+			<SidebarMenuItem>
+				<CollapsibleTrigger asChild>
+					<SidebarMenuButton tooltip={group.title}>
+						{group.title}
+						<Icon
+							name="chevron-right"
+							className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90"
+						/>
+					</SidebarMenuButton>
+				</CollapsibleTrigger>
+				<CollapsibleContent>
+					<SidebarMenuSub>
+						{filteredItems.map((item) => (
+							<SidebarMenuSubItem key={item.to}>
+								<SidebarMenuSubButton isActive={item.isActive} asChild>
+									<Link to={item.to}>{item.title}</Link>
+								</SidebarMenuSubButton>
+							</SidebarMenuSubItem>
+						))}
+					</SidebarMenuSub>
+				</CollapsibleContent>
+			</SidebarMenuItem>
+		</Collapsible>
 	)
 }
