@@ -20,9 +20,9 @@ export function Footer() {
 	const inactiveMaps = data?.maps.filter((m) => !m.isActive) || []
 
 	return (
-		<footer className="bg-accent">
-			<div className="container flex flex-wrap justify-evenly gap-12 py-8 sm:gap-24 sm:py-16">
-				<div>
+		<footer className="border-t bg-accent">
+			<div className="container grid grid-cols-4 gap-8 px-12 py-20 xl:grid-cols-12">
+				<div className="col-span-full sm:col-span-2">
 					<Logo className="size-36" />
 					<div className="mt-4 flex w-36 flex-wrap gap-4">
 						<TooltipProvider>
@@ -38,38 +38,78 @@ export function Footer() {
 						</TooltipProvider>
 					</div>
 				</div>
-				<FooterSection title="Links">
-					<FooterLink to="/">Home</FooterLink>
-					<FooterLink to="/users">Users</FooterLink>
-					<FooterLink to="/support">Support</FooterLink>
-					<FooterLink to="/about">About</FooterLink>
-					<FooterLink to="/privacy">Privacy</FooterLink>
-					<FooterLink to="/tos">TOS</FooterLink>
+				<FooterSection title="Links" className="col-span-full sm:col-span-2">
+					<ul className="grid grid-cols-[repeat(2,max-content)]">
+						<li>
+							<FooterLink to="/">Home</FooterLink>
+						</li>
+						<li>
+							<FooterLink to="/users">Users</FooterLink>
+						</li>
+						<li>
+							<FooterLink to="/support">Support</FooterLink>
+						</li>
+						<li>
+							<FooterLink to="/about">About</FooterLink>
+						</li>
+						<li>
+							<FooterLink to="/privacy">Privacy</FooterLink>
+						</li>
+						<li>
+							<FooterLink to="/tos">TOS</FooterLink>
+						</li>
+					</ul>
 				</FooterSection>
-				<FooterSection title="Maps">
-					{activeMaps.map((m) => (
-						<FooterLink key={m.name} to={`/map/${m.name}`} className="gap-2">
-							<img
-								alt=""
-								src={`/resources/map-logos/${m.logo?.id}`}
-								className="size-6"
-							/>
-							{m.label}
-						</FooterLink>
-					))}
-				</FooterSection>
+				{activeMaps.length > 0 ? (
+					<FooterSection
+						title="Maps"
+						className={cn(
+							'col-span-full',
+							inactiveMaps.length > 0
+								? 'md:col-span-2 xl:col-span-4'
+								: 'lg:col-span-8',
+						)}
+					>
+						<ul className="grid grid-cols-[repeat(auto-fit,minmax(12rem,max-content))]">
+							{activeMaps.map((m) => (
+								<li key={m.name}>
+									<FooterLink to={`/map/${m.name}`} className="gap-2">
+										<img
+											alt=""
+											src={`/resources/map-logos/${m.logo?.id}`}
+											className="size-6"
+										/>
+										{m.label}
+									</FooterLink>
+								</li>
+							))}
+						</ul>
+					</FooterSection>
+				) : null}
 				{inactiveMaps.length > 0 ? (
-					<FooterSection title="Inactive maps">
-						{inactiveMaps.map((m) => (
-							<FooterLink key={m.name} to={`/map/${m.name}`} className="gap-2">
-								<img
-									alt=""
-									src={`/resources/map-logos/${m.logo?.id}`}
-									className="size-6"
-								/>
-								{m.label}
-							</FooterLink>
-						))}
+					<FooterSection
+						title="Inactive maps"
+						className={cn(
+							'col-span-full',
+							activeMaps.length > 0
+								? 'md:col-span-2 xl:col-span-4'
+								: 'lg:col-span-8',
+						)}
+					>
+						<ul className="grid grid-cols-[repeat(auto-fit,minmax(12rem,max-content))]">
+							{inactiveMaps.map((m) => (
+								<li key={m.name}>
+									<FooterLink to={`/map/${m.name}`} className="gap-2">
+										<img
+											alt=""
+											src={`/resources/map-logos/${m.logo?.id}`}
+											className="size-6"
+										/>
+										{m.label}
+									</FooterLink>
+								</li>
+							))}
+						</ul>
 					</FooterSection>
 				) : null}
 			</div>
@@ -80,16 +120,16 @@ export function Footer() {
 function FooterSection({
 	children,
 	title,
+	className,
 }: {
 	children: React.ReactNode
 	title: string
+	className?: string
 }) {
 	return (
-		<div className="grid w-full grid-rows-[auto_1fr] place-content-center sm:w-auto">
+		<div className={cn('grid grid-rows-[auto_1fr]', className)}>
 			<p className="mb-2 font-bold">{title}</p>
-			<div className="flex max-h-full flex-col flex-wrap content-start gap-2 sm:max-h-36">
-				{children}
-			</div>
+			<div>{children}</div>
 		</div>
 	)
 }
