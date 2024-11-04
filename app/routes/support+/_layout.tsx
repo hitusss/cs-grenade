@@ -144,7 +144,7 @@ export default function SupportRoute() {
 					</ul>
 				</aside>
 			</div>
-			<div className="grid h-full w-full flex-1">
+			<main className="grid h-full w-full flex-1">
 				{location.pathname === '/support' ? (
 					<div className="grid h-full w-full place-content-center">
 						<p className="text-caption">
@@ -156,7 +156,7 @@ export default function SupportRoute() {
 					</div>
 				) : null}
 				<Outlet />
-			</div>
+			</main>
 		</div>
 	)
 }

@@ -8,7 +8,7 @@ export function AuthLayout({
 	children: React.ReactNode
 }) {
 	return (
-		<div className="grid min-h-full place-content-center pb-32 pt-20">
+		<main className="grid min-h-full place-content-center pb-32 pt-20">
 			<div className="w-full max-w-lg rounded-lg border px-6 py-12">
 				<div className="flex flex-col gap-3 break-words text-center">
 					<h1>{title}</h1>
@@ -16,6 +16,6 @@ export function AuthLayout({
 				</div>
 				<div className="mt-16 grid gap-6 px-8">{children}</div>
 			</div>
-		</div>
+		</main>
 	)
 }

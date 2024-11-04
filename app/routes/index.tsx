@@ -34,7 +34,7 @@ export default function IndexRoute() {
 			})) || []
 
 	return (
-		<div className="container py-8">
+		<main className="container py-8">
 			<div className="flex items-center justify-between">
 				<h1>Maps</h1>
 				{hasCreateMapPermission ? (
@@ -51,6 +51,6 @@ export default function IndexRoute() {
 					<MapsList maps={inactiveMaps} />
 				</>
 			) : null}
-		</div>
+		</main>
 	)
 }

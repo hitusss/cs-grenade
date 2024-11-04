@@ -62,7 +62,7 @@ export default function UsersRoute() {
 	}
 
 	return (
-		<div className="container mb-48 mt-36 flex flex-col items-center justify-center gap-6">
+		<main className="container mb-48 mt-36 flex flex-col items-center justify-center gap-6">
 			<h1>CS-Grenade Users</h1>
 			<div className="w-full max-w-[700px]">
 				<SearchBar status={data.status} autoFocus autoSubmit />
@@ -106,7 +106,7 @@ export default function UsersRoute() {
 					<ErrorList errors={['There was an error parsing the results']} />
 				) : null}
 			</div>
-		</div>
+		</main>
 	)
 }
 

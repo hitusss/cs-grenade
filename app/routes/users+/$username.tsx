@@ -61,7 +61,7 @@ export default function ProfileRoute() {
 	const isLoggedInUser = data.user.id === loggedInUser?.id
 
 	return (
-		<div className="container mb-48 mt-36 flex flex-col items-center justify-center">
+		<main className="container mb-48 mt-36 flex flex-col items-center justify-center">
 			<div className="container flex flex-col items-center rounded-lg border p-12">
 				<div className="relative w-52">
 					<div className="absolute -top-40">
@@ -145,7 +145,7 @@ export default function ProfileRoute() {
 					<Outlet />
 				</div>
 			) : null}
-		</div>
+		</main>
 	)
 }
 

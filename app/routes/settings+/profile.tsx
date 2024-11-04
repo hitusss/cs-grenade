@@ -87,9 +87,9 @@ export default function SettingsProfileRoute() {
 					</BreadcrumbList>
 				</Breadcrumb>
 			</div>
-			<div className="mx-auto mt-16 bg-muted px-6 py-8 md:container md:rounded-3xl">
+			<main className="mx-auto mt-16 bg-muted px-6 py-8 md:container md:rounded-3xl">
 				<Outlet />
-			</div>
+			</main>
 		</div>
 	)
 }

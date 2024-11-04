@@ -252,9 +252,9 @@ function App() {
 			<div className="flex h-screen flex-col justify-between">
 				<Header />
 
-				<main className="flex-1">
+				<div className="flex-1">
 					<Outlet />
-				</main>
+				</div>
 
 				<Footer />
 			</div>

@@ -171,9 +171,9 @@ export default function AdminLayout() {
 					<SidebarRail />
 				</Sidebar>
 			</div>
-			<div className="flex h-full w-full flex-col gap-4 p-4 md:p-8">
+			<main className="flex h-full w-full flex-col gap-4 p-4 md:p-8">
 				<Outlet />
-			</div>
+			</main>
 		</SidebarProvider>
 	)
 }

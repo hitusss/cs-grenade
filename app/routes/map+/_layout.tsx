@@ -9,9 +9,9 @@ export const handle: SEOHandle = {
 
 export default function MapLayout() {
 	return (
-		<div className="container min-h-full py-12">
+		<main className="container min-h-full py-12">
 			<Outlet />
-		</div>
+		</main>
 	)
 }
 
