@@ -17,6 +17,7 @@ import { checkHoneypot } from '#app/utils/honeypot.server.ts'
 import { uploadHandler, useIsPending } from '#app/utils/misc.tsx'
 import { redirectWithToast } from '#app/utils/toast.server.ts'
 import { MAX_SIZE, NewTicketSchema } from '#app/utils/validators/support.ts'
+import { SidebarTrigger } from '#app/components/ui/sidebar.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import {
 	ErrorList,
@@ -124,7 +125,8 @@ export default function SupportNewRoute() {
 	const isPending = useIsPending()
 
 	return (
-		<div className="grid grid-rows-[auto_1fr] justify-center gap-12">
+		<div className="relative grid grid-rows-[auto_1fr] justify-center gap-12 py-2">
+			<SidebarTrigger className="absolute left-2 top-4" />
 			<h2>Create a new support ticket</h2>
 			<Form method="POST" encType="multipart/form-data" {...getFormProps(form)}>
 				<MultipleImageField.Provider

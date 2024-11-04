@@ -28,6 +28,7 @@ import {
 import { unauthorized } from '#app/utils/permissions.server.ts'
 import { MAX_SIZE, TicketMessageSchema } from '#app/utils/validators/support.ts'
 import { Button } from '#app/components/ui/button.tsx'
+import { SidebarTrigger } from '#app/components/ui/sidebar.tsx'
 import { MessageForm } from '#app/components/message-form.tsx'
 import { Message, MessageContainer } from '#app/components/message.tsx'
 
@@ -252,7 +253,10 @@ export default function SupportTicketRoute() {
 	return (
 		<div className="flex h-full w-full flex-col gap-12 overflow-hidden">
 			<div className="flex flex-wrap items-center justify-between gap-6 border-b px-2 py-4">
-				<h2>{data.ticket.title}</h2>
+				<div className="flex items-center gap-2">
+					<SidebarTrigger />
+					<h2>{data.ticket.title}</h2>
+				</div>
 				{data.ticket.open ? (
 					<Form method="POST" encType="multipart/form-data">
 						<Button

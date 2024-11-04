@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { json, type LoaderFunctionArgs } from '@remix-run/node'
 import {
 	Link,
@@ -11,10 +11,24 @@ import { useEventSource } from 'remix-utils/sse/react'
 
 import { requireUserId } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
-import { cn } from '#app/utils/misc.tsx'
 import { useUser } from '#app/utils/user.ts'
 import { Button } from '#app/components/ui/button.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
+import {
+	Sidebar,
+	SidebarContent,
+	SidebarGroup,
+	SidebarGroupAction,
+	SidebarGroupContent,
+	SidebarGroupLabel,
+	SidebarHeader,
+	SidebarMenu,
+	SidebarMenuButton,
+	SidebarMenuItem,
+	SidebarProvider,
+	SidebarSeparator,
+	SidebarTrigger,
+} from '#app/components/ui/sidebar.tsx'
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const userId = await requireUserId(request)
@@ -52,20 +66,8 @@ export default function SupportRoute() {
 	const location = useLocation()
 	const { revalidate } = useRevalidator()
 
-	const [isOpen, setIsOpen] = useState(false)
-
 	const user = useUser()
 	const shouldRevalidate = useEventSource(`/events/support/${user.id}`)
-
-	useEffect(() => {
-		const lsValue = window.localStorage.getItem('support-sidebar')
-		if (!lsValue) return setIsOpen(true)
-		setIsOpen(lsValue === 'true')
-	}, [])
-
-	useEffect(() => {
-		window.localStorage.setItem('support-sidebar', JSON.stringify(isOpen))
-	}, [isOpen])
 
 	useEffect(() => {
 		revalidate()
@@ -73,80 +75,61 @@ export default function SupportRoute() {
 	}, [shouldRevalidate])
 
 	return (
-		<div className="container flex h-[90vh] py-4 lg:py-8">
-			<div
-				className={cn(
-					'relative h-full max-w-96 border-r px-4 pt-12 transition-all',
-					isOpen ? 'w-[calc(100%)]' : 'w-12',
-				)}
-			>
-				<Button
-					size="icon"
-					className="absolute right-2 top-2"
-					onClick={() => setIsOpen((prev) => !prev)}
-				>
-					<Icon
-						name="chevron-left"
-						className={cn('transition', isOpen ? 'rotate-0' : 'rotate-180')}
-					/>
-					<span className="sr-only">{isOpen ? 'Close' : 'Open'} sidebar</span>
-				</Button>
-				<aside
-					className={cn(
-						'flex h-full flex-col gap-4 transition-all',
-						isOpen ? 'w-[calc(100%)] opacity-100' : 'hidden w-0 opacity-0',
-					)}
-					style={{
-						transitionBehavior: 'allow-discrete',
-					}}
-				>
-					<h1>Support</h1>
-					<p className="mt-12 text-caption">Tickets</p>
-					<Button className="w-full" asChild>
-						<Link to="new">
-							<Icon name="plus"> New ticket </Icon>
-						</Link>
-					</Button>
-					<ul className="flex flex-col gap-2 overflow-y-auto py-2">
-						{data.tickets.map((ticket) => (
-							<li key={ticket.id}>
-								<Button
-									variant={
-										ticket.open
-											? location.pathname === `/support/${ticket.id}`
-												? 'default'
-												: 'secondary'
-											: 'secondary'
-									}
-									className={cn(
-										'h-auto w-full justify-start',
-										!ticket.open && 'opacity-25',
-									)}
-									asChild
-								>
-									<Link to={`${ticket.id}`}>
-										<div className="flex w-full flex-col gap-2 p-2">
-											<div className="flex justify-between gap-2">
-												<p className="text-caption">{ticket.title}</p>
-												{ticket._count.messages > 0 ? (
-													<span className="mt-2 grid size-3 animate-pulse place-items-center rounded-full bg-destructive text-sm text-destructive-foreground" />
-												) : null}
-											</div>
-											<div className="text-right">
-												<p>Last activity:</p>
-												<p>{new Date(ticket.updatedAt).toLocaleString()}</p>
-											</div>
-										</div>
-									</Link>
-								</Button>
-							</li>
-						))}
-					</ul>
-				</aside>
+		<SidebarProvider className="container my-2 h-[90vh] min-h-[90vh] overflow-hidden rounded-lg border p-0 lg:my-4">
+			<div className="relative">
+				<Sidebar variant="floating" className="absolute top-0 h-full p-0">
+					<SidebarHeader>
+						<h1 className="text-center">Support</h1>
+					</SidebarHeader>
+
+					<SidebarSeparator />
+					<SidebarContent>
+						<SidebarGroup>
+							<SidebarGroupLabel>Tickets</SidebarGroupLabel>
+							<SidebarGroupAction asChild>
+								<Link to="new">
+									<Icon name="plus" />
+									<span className="sr-only">Create new ticket</span>
+								</Link>
+							</SidebarGroupAction>
+							<SidebarGroupContent>
+								<SidebarMenu>
+									{data.tickets.map((ticket) => (
+										<SidebarMenuItem key={ticket.id}>
+											<SidebarMenuButton
+												isActive={location.pathname === `/support/${ticket.id}`}
+												className="h-auto"
+												asChild
+											>
+												<Link to={`${ticket.id}`}>
+													<div className="flex w-full flex-col gap-2 p-2">
+														<div className="flex justify-between gap-2">
+															<p className="text-caption">{ticket.title}</p>
+															{ticket._count.messages > 0 ? (
+																<span className="mt-2 grid size-3 animate-pulse place-items-center rounded-full bg-destructive text-sm text-destructive-foreground" />
+															) : null}
+														</div>
+														<div className="text-right">
+															<p>Last activity:</p>
+															<p>
+																{new Date(ticket.updatedAt).toLocaleString()}
+															</p>
+														</div>
+													</div>
+												</Link>
+											</SidebarMenuButton>
+										</SidebarMenuItem>
+									))}
+								</SidebarMenu>
+							</SidebarGroupContent>
+						</SidebarGroup>
+					</SidebarContent>
+				</Sidebar>
 			</div>
-			<main className="grid h-full w-full flex-1">
+			<main className="grid h-full w-full flex-1 p-2">
 				{location.pathname === '/support' ? (
-					<div className="grid h-full w-full place-content-center">
+					<div className="relative grid h-full w-full place-content-center">
+						<SidebarTrigger className="absolute left-2 top-4" />
 						<p className="text-caption">
 							Select any ticket to see the details.
 						</p>
@@ -157,6 +140,6 @@ export default function SupportRoute() {
 				) : null}
 				<Outlet />
 			</main>
-		</div>
+		</SidebarProvider>
 	)
 }
