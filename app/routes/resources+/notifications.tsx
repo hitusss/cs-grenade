@@ -58,17 +58,31 @@ export function Notifications() {
 	return (
 		<Popover>
 			<PopoverTrigger asChild>
-				<Button variant="ghost" size="icon" className="relative">
+				<Button
+					variant="ghost"
+					size="icon"
+					className="relative"
+					aria-label={`Notifications ${notificationCount > 0 ? `(${notificationCount} unread)` : ''}`}
+				>
 					<Icon name="bell" />
 					{notificationCount > 0 ? (
-						<span className="absolute right-0 top-0 grid size-5 place-items-center rounded-full bg-destructive text-xs text-destructive-foreground">
+						<span
+							className="absolute right-0 top-0 grid size-5 place-items-center rounded-full bg-destructive text-xs text-destructive-foreground"
+							aria-hidden="true"
+						>
 							{notificationCount >= 10 ? '9+' : notificationCount}
 						</span>
 					) : null}
 				</Button>
 			</PopoverTrigger>
-			<PopoverContent className="w-screen max-w-xl p-0">
-				<ul className="flex max-h-[50vh] min-h-[25vh] flex-col gap-1 overflow-y-auto p-1">
+			<PopoverContent
+				className="w-screen max-w-xl p-0"
+				aria-label="Notifications"
+			>
+				<ul
+					className="flex max-h-[50vh] min-h-[25vh] flex-col gap-1 overflow-y-auto p-1"
+					aria-live="polite"
+				>
 					{notifications.length > 0 ? (
 						notifications.map((notification) => (
 							<Notification
@@ -149,6 +163,7 @@ function Notification({
 					? 'bg-muted text-muted-foreground'
 					: 'bg-background text-foreground',
 			)}
+			aria-label={`${title} ${seen ? '(read)' : '(unread)'}`}
 		>
 			<p className="text-caption">{title}</p>
 			<p>{description}</p>
