@@ -23,7 +23,7 @@ export function MapNav({
 	currentValue: string
 }) {
 	return (
-		<div>
+		<nav aria-label={label}>
 			<p className="pl-2 text-caption">{label}</p>
 			<TooltipProvider>
 				<ul className="flex gap-2 rounded-md border p-2">
@@ -48,6 +48,6 @@ export function MapNav({
 					))}
 				</ul>
 			</TooltipProvider>
-		</div>
+		</nav>
 	)
 }
