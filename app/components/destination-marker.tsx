@@ -80,7 +80,7 @@ export function DestinationMarker({
 						>
 							{count ? count : null}
 						</span>
-						<span className="sr-only">{name}</span>
+						<span className="sr-only">destination: {name}</span>
 					</Link>
 				</TooltipTrigger>
 				<TooltipPortal>

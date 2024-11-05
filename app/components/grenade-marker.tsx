@@ -88,7 +88,7 @@ export function GrenadeMarker({
 								className,
 							)}
 						/>
-						<span className="sr-only">{name}</span>
+						<span className="sr-only">grenade: {name}</span>
 					</Link>
 				</TooltipTrigger>
 				<TooltipPortal>
