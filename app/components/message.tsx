@@ -36,7 +36,7 @@ export function Message({
 	}))
 
 	return (
-		<div
+		<li
 			className={cn(
 				'flex w-auto max-w-[95%] shrink-0 flex-col sm:max-w-[80%]',
 				{
@@ -93,7 +93,7 @@ export function Message({
 					{date.toLocaleString()}
 				</span>
 			) : null}
-		</div>
+		</li>
 	)
 }
 
@@ -104,7 +104,7 @@ export function MessageContainer({
 	children: React.ReactNode
 	messagesCount: number
 }) {
-	const messagesContainer = useRef<HTMLDivElement>(null)
+	const messagesContainer = useRef<HTMLUListElement>(null)
 
 	useEffect(() => {
 		if (!messagesContainer.current) return
@@ -126,11 +126,13 @@ export function MessageContainer({
 	}, [messagesCount])
 
 	return (
-		<div
+		<ul
 			ref={messagesContainer}
 			className="flex flex-1 flex-col gap-2 overflow-y-auto overscroll-contain"
+			aria-live="polite"
+			role="log"
 		>
 			{children}
-		</div>
+		</ul>
 	)
 }
