@@ -17,6 +17,7 @@ import {
 	DialogContent,
 	DialogFooter,
 	DialogHeader,
+	DialogTitle,
 	DialogTrigger,
 } from '#app/components/ui/dialog.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
@@ -222,7 +223,7 @@ export default function MapAdminDestinationChangesRequestRoute() {
 				</DialogTrigger>
 				<DialogContent>
 					<DialogHeader>
-						<h3>Destination changes request</h3>
+						<DialogTitle>Destination changes request</DialogTitle>
 					</DialogHeader>
 					<DiffView
 						name="Name"

@@ -17,6 +17,7 @@ import {
 	DialogContent,
 	DialogFooter,
 	DialogHeader,
+	DialogTitle,
 	DialogTrigger,
 } from '#app/components/ui/dialog.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
@@ -352,7 +353,7 @@ export default function MapAdminGrenadeChangesRequestRoute() {
 				</DialogTrigger>
 				<DialogContent className="max-h-[90vh] max-w-5xl overflow-auto">
 					<DialogHeader>
-						<h3>Grenade changes request</h3>
+						<DialogTitle>Grenade changes request</DialogTitle>
 					</DialogHeader>
 					<DiffView
 						name="Name"

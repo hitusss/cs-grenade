@@ -17,6 +17,7 @@ import {
 	DialogContent,
 	DialogFooter,
 	DialogHeader,
+	DialogTitle,
 	DialogTrigger,
 } from '#app/components/ui/dialog.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
@@ -190,7 +191,9 @@ export default function MapAdminGrenadeRequestRoute() {
 					</Button>
 				</DialogTrigger>
 				<DialogContent className="max-h-[90vh] max-w-5xl overflow-auto">
-					<DialogHeader>{data.grenade.name}</DialogHeader>
+					<DialogHeader>
+						<DialogTitle>{data.grenade.name}</DialogTitle>
+					</DialogHeader>
 					<p>{data.grenade.description}</p>
 					<ul className="flex flex-wrap gap-4">
 						{data.grenade.images.map((image, index) => (

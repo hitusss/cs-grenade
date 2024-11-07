@@ -15,6 +15,7 @@ import {
 	DialogContent,
 	DialogFooter,
 	DialogHeader,
+	DialogTitle,
 } from '#app/components/ui/dialog.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
@@ -188,7 +189,9 @@ export default function MapGrenadeRoute() {
 	return (
 		<Dialog open onOpenChange={() => !activeLightbox && navigate('..')}>
 			<DialogContent className="max-h-[90vh] max-w-5xl overflow-auto">
-				<DialogHeader>{data.grenade.name}</DialogHeader>
+				<DialogHeader>
+					<DialogTitle>{data.grenade.name}</DialogTitle>
+				</DialogHeader>
 				<p>{data.grenade.description}</p>
 				<ul className="flex flex-wrap gap-4">
 					{data.grenade.images.map((image, index) => (
