@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import {
 	json,
 	type HeadersFunction,
@@ -16,13 +17,13 @@ import {
 import { withSentry } from '@sentry/remix'
 import openLayersSheetUrl from 'ol/ol.css?url'
 import { HoneypotProvider } from 'remix-utils/honeypot/react'
+import { toast } from 'sonner'
 
 import { GeneralErrorBoundary } from './components/error-boundary.tsx'
 import { Footer } from './components/footer.tsx'
 import { Header } from './components/header.tsx'
 import { Lightbox, LightboxProvider } from './components/lightbox.tsx'
 import { EpicProgress } from './components/progress-bar.tsx'
-import { useToast } from './components/toaster.tsx'
 import { href as iconsHref } from './components/ui/icon.tsx'
 import { Toaster } from './components/ui/sonner.tsx'
 import {
@@ -245,7 +246,18 @@ export function Layout({ children }: { children: React.ReactNode }) {
 function App() {
 	const data = useLoaderData<typeof loader>()
 	const theme = useTheme()
-	useToast(data.toast)
+	const toastData = data.toast
+
+	useEffect(() => {
+		if (toastData) {
+			setTimeout(() => {
+				toast[toastData.type](toastData.title, {
+					id: toastData.id,
+					description: toastData.description,
+				})
+			}, 0)
+		}
+	}, [toastData])
 
 	return (
 		<>
