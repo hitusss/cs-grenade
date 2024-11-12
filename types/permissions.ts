@@ -1,6 +1,7 @@
 export const entities = [
 	'user',
 	'support',
+	'report',
 	'map',
 	'destination',
 	'grenade',
