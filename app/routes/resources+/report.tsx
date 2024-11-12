@@ -5,9 +5,10 @@ import { getFormProps, getTextareaProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { toast } from 'sonner'
 
-import { requireUserId } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { checkHoneypot } from '#app/utils/honeypot.server.ts'
+import { requireUserWithPermission } from '#app/utils/permissions.server.ts'
+import { userHasPermission } from '#app/utils/permissions.ts'
 import { useOptionalUser } from '#app/utils/user.ts'
 import { ReportSchema } from '#app/utils/validators/report.ts'
 import { Button } from '#app/components/ui/button.tsx'
@@ -38,7 +39,7 @@ type ReportDialogProps = {
 	  }
 )
 export async function action({ request }: ActionFunctionArgs) {
-	const userId = await requireUserId(request)
+	const userId = await requireUserWithPermission(request, 'create:report')
 
 	const formData = await request.formData()
 	checkHoneypot(formData)
@@ -70,6 +71,7 @@ export async function action({ request }: ActionFunctionArgs) {
 export function ReportDialog({ className, type, ...props }: ReportDialogProps) {
 	const fetcher = useFetcher<typeof action>()
 	const user = useOptionalUser()
+	const hasCreateReportPermission = userHasPermission(user, 'create:report')
 
 	const [open, setOpen] = useState(false)
 
@@ -90,7 +92,7 @@ export function ReportDialog({ className, type, ...props }: ReportDialogProps) {
 		}
 	}, [fetcher.data?.result.status])
 
-	if (!user) {
+	if (!user || !hasCreateReportPermission) {
 		return null
 	}
 
