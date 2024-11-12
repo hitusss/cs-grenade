@@ -37,6 +37,11 @@ const roles: Record<
 			'read:support:any',
 			'update:support:any',
 			'delete:support:any',
+			/* report */
+			'create:report:any',
+			'read:report:any',
+			'update:report:any',
+			'delete:report:any',
 			/* map */
 			'create:map:any',
 			'read:map:any',
@@ -87,6 +92,11 @@ const roles: Record<
 			'read:support:any',
 			'update:support:any',
 			'delete:support:any',
+			/* report */
+			'create:report:any',
+			'read:report:any',
+			'update:report:any',
+			'delete:report:any',
 			/* map */
 			'create:map:any',
 			'read:map:any',
@@ -130,6 +140,11 @@ const roles: Record<
 			'read:support:any',
 			'update:support:any',
 			'delete:support:any',
+			/* report */
+			'create:report:any',
+			'read:report:any',
+			'update:report:any',
+			'delete:report:any',
 			/* map */
 			'read:map:own',
 			/* destinatin */
@@ -170,6 +185,11 @@ const roles: Record<
 			'read:support:own',
 			'update:support:own',
 			'delete:support:own',
+			/* report */
+			'create:report:own',
+			'read:report:own',
+			'update:report:own',
+			'delete:report:own',
 			/* map */
 			'read:map:own',
 			/* destinatin */
@@ -201,6 +221,11 @@ const roles: Record<
 			'read:support:own',
 			'update:support:own',
 			'delete:support:own',
+			/* report */
+			'create:report:own',
+			'read:report:own',
+			'update:report:own',
+			'delete:report:own',
 			/* map */
 			'read:map:own',
 			/* destinatin */
