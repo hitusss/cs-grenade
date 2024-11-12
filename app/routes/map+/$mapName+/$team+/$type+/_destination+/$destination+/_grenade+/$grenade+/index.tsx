@@ -13,7 +13,6 @@ import { Button } from '#app/components/ui/button.tsx'
 import {
 	Dialog,
 	DialogContent,
-	DialogFooter,
 	DialogHeader,
 	DialogTitle,
 } from '#app/components/ui/dialog.tsx'
@@ -26,6 +25,7 @@ import {
 	TooltipTrigger,
 } from '#app/components/ui/tooltip.tsx'
 import { useLightbox } from '#app/components/lightbox.tsx'
+import { ReportDialog } from '#app/routes/resources+/report.tsx'
 
 import { type MapHandle } from '../../../../_layout.tsx'
 
@@ -46,6 +46,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 			id: grenadeId,
 		},
 		select: {
+			id: true,
 			verified: true,
 			name: true,
 			description: true,
@@ -205,7 +206,7 @@ export default function MapGrenadeRoute() {
 						</li>
 					))}
 				</ul>
-				<DialogFooter>
+				<div className="flex flex-wrap items-center justify-between gap-2">
 					<Form method="POST">
 						<TooltipProvider>
 							<Tooltip>
@@ -258,8 +259,10 @@ export default function MapGrenadeRoute() {
 						<Button asChild>
 							<Link to="edit">{canEdit ? 'Edit' : 'Request changes'}</Link>
 						</Button>
-					) : null}
-				</DialogFooter>
+					) : (
+						<ReportDialog type="grenade" grenadeId={data.grenade.id} />
+					)}
+				</div>
 			</DialogContent>
 		</Dialog>
 	)

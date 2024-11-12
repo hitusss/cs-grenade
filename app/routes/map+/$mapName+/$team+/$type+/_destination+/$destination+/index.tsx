@@ -13,6 +13,7 @@ import { Button } from '#app/components/ui/button.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { DestinationMarker } from '#app/components/destination-marker.tsx'
 import { MapBackButton } from '#app/components/map.tsx'
+import { ReportDialog } from '#app/routes/resources+/report.tsx'
 
 import { type MapHandle } from '../../_layout.tsx'
 
@@ -32,6 +33,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 			id: destinationId,
 		},
 		select: {
+			id: true,
 			verified: true,
 			userId: true,
 			x: true,
@@ -138,7 +140,13 @@ export default function MapDestinationRoute() {
 						<Button className="absolute right-0 top-0 z-10" asChild>
 							<Link to="edit">{canEdit ? 'Edit' : 'Request changes'}</Link>
 						</Button>
-					) : null}
+					) : (
+						<ReportDialog
+							type="destination"
+							destinationId={data.destination.id}
+							className="absolute right-0 top-0 z-10"
+						/>
+					)}
 					<Button className="absolute bottom-0 right-0 z-10" asChild>
 						<Link to="new">
 							{hasCreateGrenadePermission
