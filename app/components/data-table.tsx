@@ -136,11 +136,11 @@ export function DataTable<TData, TValue>({
 										))}
 									</TableRow>
 									{renderSubComponent !== undefined && row.getIsExpanded() ? (
-										<tr>
-											<td colSpan={row.getVisibleCells().length}>
+										<TableRow>
+											<TableCell colSpan={row.getVisibleCells().length}>
 												{renderSubComponent({ row })}
-											</td>
-										</tr>
+											</TableCell>
+										</TableRow>
 									) : null}
 								</Fragment>
 							))
