@@ -48,7 +48,7 @@ export function DataTable<TData, TValue>({
 }: {
 	columns: ColumnDef<TData, TValue>[]
 	data: TData[]
-	tableOptions?: TableOptions<TData>
+	tableOptions?: Partial<TableOptions<TData>>
 	renderSubComponent?: (props: { row: Row<TData> }) => React.ReactElement
 }) {
 	const navigate = useNavigate()
