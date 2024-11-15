@@ -89,8 +89,9 @@ export function ReportDialog({ className, type, ...props }: ReportDialogProps) {
 		if (fetcher.data?.result.status === 'success') {
 			setOpen(false)
 			toast.success('Your report has been submitted.')
+			fetcher.data = undefined
 		}
-	}, [fetcher.data?.result.status])
+	}, [fetcher, fetcher.data?.result.status])
 
 	if (!user || !hasCreateReportPermission) {
 		return null
