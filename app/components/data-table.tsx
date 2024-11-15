@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import { useNavigate, useSearchParams } from '@remix-run/react'
 import {
 	flexRender,
@@ -6,6 +6,7 @@ import {
 	useReactTable,
 	type Column,
 	type ColumnDef,
+	type Row,
 	type SortingState,
 	type TableOptions,
 	type Table as TableType,
@@ -43,10 +44,12 @@ export function DataTable<TData, TValue>({
 	columns,
 	data,
 	tableOptions,
+	renderSubComponent,
 }: {
 	columns: ColumnDef<TData, TValue>[]
 	data: TData[]
 	tableOptions?: TableOptions<TData>
+	renderSubComponent?: (props: { row: Row<TData> }) => React.ReactElement
 }) {
 	const navigate = useNavigate()
 	const [searchParams, setSearchParams] = useSearchParams()
@@ -121,19 +124,25 @@ export function DataTable<TData, TValue>({
 					<TableBody className="overflow-y-auto">
 						{table.getRowModel().rows?.length ? (
 							table.getRowModel().rows.map((row) => (
-								<TableRow
-									key={row.id}
-									data-state={row.getIsSelected() && 'selected'}
-								>
-									{row.getVisibleCells().map((cell) => (
-										<TableCell key={cell.id}>
-											{flexRender(
-												cell.column.columnDef.cell,
-												cell.getContext(),
-											)}
-										</TableCell>
-									))}
-								</TableRow>
+								<Fragment key={row.id}>
+									<TableRow data-state={row.getIsSelected() && 'selected'}>
+										{row.getVisibleCells().map((cell) => (
+											<TableCell key={cell.id}>
+												{flexRender(
+													cell.column.columnDef.cell,
+													cell.getContext(),
+												)}
+											</TableCell>
+										))}
+									</TableRow>
+									{renderSubComponent !== undefined && row.getIsExpanded() ? (
+										<tr>
+											<td colSpan={row.getVisibleCells().length}>
+												{renderSubComponent({ row })}
+											</td>
+										</tr>
+									) : null}
+								</Fragment>
 							))
 						) : (
 							<TableRow>
