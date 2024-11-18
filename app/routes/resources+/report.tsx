@@ -22,7 +22,7 @@ import {
 	DialogTrigger,
 } from '#app/components/ui/dialog.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
-import { TextareaField } from '#app/components/forms.tsx'
+import { ErrorList, TextareaField } from '#app/components/forms.tsx'
 
 type ReportDialogProps = {
 	className?: string
@@ -54,6 +54,27 @@ export async function action({ request }: ActionFunctionArgs) {
 				status: submission.status === 'error' ? 400 : 200,
 			},
 		)
+	}
+
+	let lastDay = Date.now() - 24 * 60 * 60 * 1000
+	const hasRecentlyReport = await prisma.report.count({
+		where: {
+			userId,
+			destinationId: submission.value.destinationId,
+			grenadeId: submission.value.grenadeId,
+			createdAt: {
+				gte: new Date(lastDay).toISOString(),
+			},
+		},
+	})
+	if (hasRecentlyReport > 0) {
+		return json({
+			result: submission.reply({
+				formErrors: [
+					"You can't report the same place twice in a day, please try again later.",
+				],
+			}),
+		})
 	}
 
 	await prisma.report.create({
@@ -129,6 +150,7 @@ export function ReportDialog({ className, type, ...props }: ReportDialogProps) {
 						}}
 						errors={fields.message.errors}
 					/>
+					<ErrorList errors={form.errors} />
 					<DialogFooter>
 						<DialogClose asChild>
 							<Button type="button" variant="ghost">
