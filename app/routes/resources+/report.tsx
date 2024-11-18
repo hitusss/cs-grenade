@@ -3,6 +3,7 @@ import { json, type ActionFunctionArgs } from '@remix-run/node'
 import { useFetcher } from '@remix-run/react'
 import { getFormProps, getTextareaProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
+import { HoneypotInputs } from 'remix-utils/honeypot/react'
 import { toast } from 'sonner'
 
 import { prisma } from '#app/utils/db.server.ts'
@@ -135,6 +136,7 @@ export function ReportDialog({ className, type, ...props }: ReportDialogProps) {
 					{...getFormProps(form)}
 					action="/resources/report"
 				>
+					<HoneypotInputs />
 					<input
 						name="destinationId"
 						value={props.destinationId}
