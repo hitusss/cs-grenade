@@ -1,15 +1,16 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { json, type ActionFunctionArgs } from '@remix-run/node'
 import { useFetcher } from '@remix-run/react'
 import { getFormProps, getTextareaProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
-import { toast } from 'sonner'
 
 import { prisma } from '#app/utils/db.server.ts'
 import { checkHoneypot } from '#app/utils/honeypot.server.ts'
+import { getReferrerRoute } from '#app/utils/misc.tsx'
 import { requireUserWithPermission } from '#app/utils/permissions.server.ts'
 import { userHasPermission } from '#app/utils/permissions.ts'
+import { redirectWithToast } from '#app/utils/toast.server.ts'
 import { useOptionalUser } from '#app/utils/user.ts'
 import { ReportSchema } from '#app/utils/validators/report.ts'
 import { Button } from '#app/components/ui/button.tsx'
@@ -41,6 +42,7 @@ type ReportDialogProps = {
 )
 export async function action({ request }: ActionFunctionArgs) {
 	const userId = await requireUserWithPermission(request, 'create:report')
+	const referrerRoute = getReferrerRoute(request)
 
 	const formData = await request.formData()
 	checkHoneypot(formData)
@@ -85,9 +87,19 @@ export async function action({ request }: ActionFunctionArgs) {
 		},
 	})
 
-	return json({
-		result: submission.reply(),
-	})
+	return redirectWithToast(
+		referrerRoute,
+		{
+			type: 'success',
+			title: 'Your report has been submitted.',
+			description: '',
+		},
+		{
+			headers: {
+				'X-Remix-Reload-Document': 'true',
+			},
+		},
+	)
 }
 
 export function ReportDialog({ className, type, ...props }: ReportDialogProps) {
@@ -106,14 +118,6 @@ export function ReportDialog({ className, type, ...props }: ReportDialogProps) {
 		},
 		shouldRevalidate: 'onBlur',
 	})
-
-	useEffect(() => {
-		if (fetcher.data?.result.status === 'success') {
-			setOpen(false)
-			toast.success('Your report has been submitted.')
-			fetcher.data = undefined
-		}
-	}, [fetcher, fetcher.data?.result.status])
 
 	if (!user || !hasCreateReportPermission) {
 		return null
