@@ -57,6 +57,7 @@ export default function AdminLayout() {
 		user,
 		'read:support:any',
 	)
+	const hasReadReportAnyPermission = userHasPermission(user, 'read:report:any')
 	const hasReadReviewDestinationRequestAnyPermission = userHasPermission(
 		user,
 		'read:review-destination-request:any',
@@ -107,6 +108,23 @@ export default function AdminLayout() {
 					to: 'support',
 					isActive: /\/admin\/support/.test(location.pathname),
 					permission: hasReadSupportAnyPermission,
+				},
+			],
+		},
+		{
+			title: 'Reports',
+			items: [
+				{
+					title: 'Destinations',
+					to: 'reports/destinations',
+					isActive: location.pathname === '/amidn/reports/destinations',
+					permission: hasReadReportAnyPermission,
+				},
+				{
+					title: 'Grenades',
+					to: 'reports/grenades',
+					isActive: location.pathname === '/amidn/reports/grenades',
+					permission: hasReadReportAnyPermission,
 				},
 			],
 		},
