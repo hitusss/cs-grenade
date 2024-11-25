@@ -8,7 +8,12 @@ import {
 
 import { Button } from './ui/button.tsx'
 import { Icon } from './ui/icon.tsx'
-import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip.tsx'
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from './ui/tooltip.tsx'
 
 type Report = {
 	id: string
@@ -29,21 +34,23 @@ function Report({ report }: { report: Report }) {
 				<p>{report.message}</p>
 				<Form method="post">
 					<input type="hidden" name="reportId" value={report.id} />
-					<Tooltip>
-						<TooltipTrigger>
-							<Button
-								type="submit"
-								name="intent"
-								value="delete-report"
-								variant="destructive"
-								size="icon"
-							>
-								<Icon name="trash" />
-								<span className="sr-only">Delete report</span>
-							</Button>
-						</TooltipTrigger>
-						<TooltipContent>Delete report</TooltipContent>
-					</Tooltip>
+					<TooltipProvider>
+						<Tooltip>
+							<TooltipTrigger>
+								<Button
+									type="submit"
+									name="intent"
+									value="delete-report"
+									variant="destructive"
+									size="icon"
+								>
+									<Icon name="trash" />
+									<span className="sr-only">Delete report</span>
+								</Button>
+							</TooltipTrigger>
+							<TooltipContent>Delete report</TooltipContent>
+						</Tooltip>
+					</TooltipProvider>
 				</Form>
 			</div>
 			<div className="flex items-center gap-2">
