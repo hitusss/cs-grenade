@@ -97,7 +97,7 @@ export function ContentFilter({ hideFilter }: ContentFilterProps) {
 					Filters
 					<Icon
 						name="chevron-down"
-						className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-180"
+						className="ml-auto transition-transform duration-200 group-data-[state=closed]/collapsible:rotate-90"
 					/>
 				</Button>
 			</CollapsibleTrigger>
