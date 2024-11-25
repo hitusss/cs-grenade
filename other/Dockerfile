@@ -1,7 +1,7 @@
 # This file is moved to the root directory before building the image
 
 # base node image
-FROM node:20-bookworm-slim as base
+FROM node:22-bookworm-slim as base
 
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
