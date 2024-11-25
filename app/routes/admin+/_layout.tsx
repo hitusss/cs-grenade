@@ -212,8 +212,8 @@ function SidebarNavGroup({ group }: { group: NavGroup }) {
 					<SidebarMenuButton tooltip={group.title}>
 						{group.title}
 						<Icon
-							name="chevron-right"
-							className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90"
+							name="chevron-left"
+							className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:-rotate-90"
 						/>
 					</SidebarMenuButton>
 				</CollapsibleTrigger>
