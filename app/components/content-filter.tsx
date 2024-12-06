@@ -29,16 +29,20 @@ import {
 } from './ui/select.tsx'
 
 type ContentFilterProps = {
-	hideFilter?: {
-		query?: boolean
-		map?: boolean
-		team?: boolean
-		type?: boolean
-		verified?: boolean
-	}
+	queryFilter?: boolean
+	mapFilter?: boolean
+	teamFilter?: boolean
+	typeFilter?: boolean
+	verifiedFilter?: boolean
 }
 
-export function ContentFilter({ hideFilter }: ContentFilterProps) {
+export function ContentFilter({
+	queryFilter,
+	mapFilter,
+	teamFilter,
+	typeFilter,
+	verifiedFilter,
+}: ContentFilterProps) {
 	const data = useRouteLoaderData<typeof rootLoader>('root')
 	const navigate = useNavigate()
 	const [searchParams, setSearchParams] = useSearchParams()
@@ -104,8 +108,8 @@ export function ContentFilter({ hideFilter }: ContentFilterProps) {
 			<CollapsibleContent asChild>
 				<Card className="mt-2">
 					<CardContent className="flex flex-col gap-4 p-6">
-						<div className="flex flex-wrap gap-4 [&>*]:w-full md:[&>*]:w-64">
-							{hideFilter?.query ? null : (
+						<search className="flex flex-wrap gap-4 [&>*]:w-full md:[&>*]:w-64">
+							{queryFilter ? (
 								<Input
 									type="search"
 									name="query"
@@ -113,8 +117,8 @@ export function ContentFilter({ hideFilter }: ContentFilterProps) {
 									defaultValue={query}
 									onChange={(e) => handleQueryChange(e.currentTarget.value)}
 								/>
-							)}
-							{hideFilter?.map ? null : (
+							) : null}
+							{mapFilter ? (
 								<Select
 									value={map}
 									onValueChange={(v) => handleFilterChange('map', v)}
@@ -168,8 +172,8 @@ export function ContentFilter({ hideFilter }: ContentFilterProps) {
 										) : null}
 									</SelectContent>
 								</Select>
-							)}
-							{hideFilter?.team ? null : (
+							) : null}
+							{teamFilter ? (
 								<Select
 									value={team}
 									onValueChange={(v) => handleFilterChange('team', v)}
@@ -203,8 +207,8 @@ export function ContentFilter({ hideFilter }: ContentFilterProps) {
 										))}
 									</SelectContent>
 								</Select>
-							)}
-							{hideFilter?.type ? null : (
+							) : null}
+							{typeFilter ? (
 								<Select
 									value={type}
 									onValueChange={(v) => handleFilterChange('type', v)}
@@ -238,8 +242,8 @@ export function ContentFilter({ hideFilter }: ContentFilterProps) {
 										))}
 									</SelectContent>
 								</Select>
-							)}
-							{hideFilter?.verified ? null : (
+							) : null}
+							{verifiedFilter ? (
 								<Select
 									value={verified}
 									onValueChange={(v) => handleFilterChange('verified', v)}
@@ -263,8 +267,8 @@ export function ContentFilter({ hideFilter }: ContentFilterProps) {
 										<SelectItem value="false">Unverified</SelectItem>
 									</SelectContent>
 								</Select>
-							)}
-						</div>
+							) : null}
+						</search>
 						<Button
 							variant="ghost"
 							className="self-end"
