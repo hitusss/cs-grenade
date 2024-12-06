@@ -302,7 +302,13 @@ export default function AdminContentDestinationsRoute() {
 				<SidebarTrigger />
 				<h2>Destinations</h2>
 			</div>
-			<ContentFilter />
+			<ContentFilter
+				queryFilter
+				mapFilter
+				teamFilter
+				typeFilter
+				verifiedFilter
+			/>
 			<DataTable columns={columns} data={data.destinations} />
 			<Pagination total={data.total} />
 		</>

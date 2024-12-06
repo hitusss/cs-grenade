@@ -325,7 +325,13 @@ export default function AdminContentGrenadesRoute() {
 				<SidebarTrigger />
 				<h2>Grenades</h2>
 			</div>
-			<ContentFilter />
+			<ContentFilter
+				queryFilter
+				mapFilter
+				teamFilter
+				typeFilter
+				verifiedFilter
+			/>
 			<DataTable columns={columns} data={data.grenades} />
 			<Pagination total={data.total} />
 		</>
