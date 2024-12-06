@@ -93,7 +93,7 @@ export default function ProfileFavoritesRoute() {
 
 	return (
 		<div>
-			<ContentFilter hideFilter={{ verified: true }} />
+			<ContentFilter queryFilter mapFilter teamFilter typeFilter />
 			<ul className="my-6 flex flex-wrap justify-center gap-4">
 				{favorites.map((f) => (
 					<li key={f.id}>

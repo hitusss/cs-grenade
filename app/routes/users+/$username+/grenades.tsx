@@ -94,7 +94,13 @@ export default function ProfileGrenadesRoute() {
 
 	return (
 		<div>
-			<ContentFilter hideFilter={{ verified: !data.isOwn }} />
+			<ContentFilter
+				queryFilter
+				mapFilter
+				teamFilter
+				typeFilter
+				verifiedFilter={data.isOwn}
+			/>
 			<ul className="my-6 flex flex-wrap justify-center gap-4">
 				{data.grenades.map((g) => (
 					<li key={g.id}>
