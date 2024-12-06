@@ -476,7 +476,7 @@ export default function AdminReportsGrenadesRoute() {
 				<SidebarTrigger />
 				<h2>Reports Grenades</h2>
 			</div>
-			<ContentFilter />
+			<ContentFilter queryFilter mapFilter teamFilter typeFilter />
 			<DataTable
 				columns={columns}
 				data={data.grenades}
