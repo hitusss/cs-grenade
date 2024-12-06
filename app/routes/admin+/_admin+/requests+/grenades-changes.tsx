@@ -321,7 +321,7 @@ export default function AdminRequestsGrenadesChangesRoute() {
 				<SidebarTrigger />
 				<h2>Grenades Changes Requests</h2>
 			</div>
-			<ContentFilter hideFilter={{ verified: true }} />
+			<ContentFilter queryFilter mapFilter teamFilter typeFilter />
 			<DataTable columns={columns} data={data.grenades} />
 			<Pagination total={data.total} />
 		</>

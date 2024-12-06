@@ -289,7 +289,7 @@ export default function AdminRequestsDestinationsRoute() {
 				<SidebarTrigger />
 				<h2>Destination Requests</h2>
 			</div>
-			<ContentFilter hideFilter={{ verified: true }} />
+			<ContentFilter queryFilter mapFilter teamFilter typeFilter />
 			<DataTable columns={columns} data={data.destinations} />
 			<Pagination total={data.total} />
 		</>
