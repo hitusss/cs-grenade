@@ -1,15 +1,4 @@
-import {
-	json,
-	redirect,
-	type ActionFunctionArgs,
-	type LoaderFunctionArgs,
-} from '@remix-run/node'
-import {
-	Form,
-	useActionData,
-	useLoaderData,
-	useNavigation,
-} from '@remix-run/react'
+import { data, Form, redirect, useNavigation } from 'react-router'
 import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
@@ -26,6 +15,7 @@ import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { ErrorList, OTPField } from '#app/components/forms.tsx'
 import { isCodeValid } from '#app/routes/_auth+/verify.server.ts'
 
+import { type Route } from './+types/profile.two-factor.verify.ts'
 import { type BreadcrumbHandle } from './profile.tsx'
 import { twoFAVerificationType } from './profile.two-factor.tsx'
 
@@ -47,7 +37,7 @@ const ActionSchema = z.discriminatedUnion('intent', [
 
 export const twoFAVerifyVerificationType = '2fa-verify'
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
 	const userId = await requireUserId(request)
 	const verification = await prisma.verification.findUnique({
 		where: {
@@ -77,10 +67,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		issuer,
 	})
 	const qrCode = await QRCode.toDataURL(otpUri)
-	return json({ otpUri, qrCode })
+	return data({ otpUri, qrCode })
 }
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request }: Route.ActionArgs) {
 	const userId = await requireUserId(request)
 	const formData = await request.formData()
 
@@ -106,7 +96,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	})
 
 	if (submission.status !== 'success') {
-		return json(
+		return data(
 			{ result: submission.reply() },
 			{ status: submission.status === 'error' ? 400 : 200 },
 		)
@@ -135,9 +125,10 @@ export async function action({ request }: ActionFunctionArgs) {
 	}
 }
 
-export default function SettingsProfileTwoFactorVerifyRoute() {
-	const data = useLoaderData<typeof loader>()
-	const actionData = useActionData<typeof action>()
+export default function SettingsProfileTwoFactorVerifyRoute({
+	loaderData,
+	actionData,
+}: Route.ComponentProps) {
 	const navigation = useNavigation()
 
 	const isPending = useIsPending()
@@ -156,7 +147,7 @@ export default function SettingsProfileTwoFactorVerifyRoute() {
 	return (
 		<div>
 			<div className="flex flex-col items-center gap-4">
-				<img alt="qr code" src={data.qrCode} className="h-56 w-56" />
+				<img alt="qr code" src={loaderData.qrCode} className="h-56 w-56" />
 				<p>Scan this QR code with your authenticator app.</p>
 				<p className="text-sm">
 					If you cannot scan the QR code, you can manually add this account to
@@ -167,7 +158,7 @@ export default function SettingsProfileTwoFactorVerifyRoute() {
 						className="whitespace-pre-wrap break-all text-sm"
 						aria-label="One-time Password URI"
 					>
-						{data.otpUri}
+						{loaderData.otpUri}
 					</pre>
 				</div>
 				<p className="text-sm">

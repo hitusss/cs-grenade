@@ -1,15 +1,5 @@
 import { useEffect } from 'react'
-import {
-	json,
-	type ActionFunctionArgs,
-	type LoaderFunctionArgs,
-} from '@remix-run/node'
-import {
-	Form,
-	useActionData,
-	useLoaderData,
-	useRevalidator,
-} from '@remix-run/react'
+import { data, Form, useRevalidator } from 'react-router'
 import { parseWithZod } from '@conform-to/zod'
 import { invariantResponse } from '@epic-web/invariant'
 import { parseFormData } from '@mjackson/form-data-parser'
@@ -32,6 +22,8 @@ import { SidebarTrigger } from '#app/components/ui/sidebar.tsx'
 import { MessageForm } from '#app/components/message-form.tsx'
 import { Message, MessageContainer } from '#app/components/message.tsx'
 
+import { type Route } from './+types/$id.ts'
+
 const NewTicketMessageSchema = TicketMessageSchema.merge(
 	z.object({
 		intent: z.literal('new-message'),
@@ -47,7 +39,7 @@ const TicketSchema = z.discriminatedUnion('intent', [
 	TicketCloseSchema,
 ])
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
+export async function loader({ request, params }: Route.LoaderArgs) {
 	const { id } = params
 
 	invariantResponse(id, 'Support ticket ID is required', { status: 400 })
@@ -117,10 +109,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 		emitter.emit(`support/${userId}`)
 	}
 
-	return json({ ticket })
+	return data({ ticket })
 }
 
-export async function action({ request, params }: ActionFunctionArgs) {
+export async function action({ request, params }: Route.ActionArgs) {
 	const { id } = params
 
 	invariantResponse(id, 'Ticket id is required', { status: 400 })
@@ -146,7 +138,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 		request,
 		uploadHandler({ maxPartSize: MAX_SIZE }),
 	)
-	checkHoneypot(formData)
+	await checkHoneypot(formData)
 
 	const submission = await parseWithZod(formData, {
 		schema: TicketSchema.transform(async (data) => {
@@ -170,7 +162,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 		async: true,
 	})
 	if (submission.status !== 'success') {
-		return json(
+		return data(
 			{ result: submission.reply() },
 			{
 				status: submission.status === 'error' ? 400 : 200,
@@ -226,7 +218,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	emitter.emit(`support/${ticket.userId}`)
 	emitter.emit(`support/ticket/${id}`)
 
-	return json(
+	return data(
 		{ result: submission.reply({ resetForm: true }) },
 		{
 			status: 200,
@@ -234,19 +226,20 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	)
 }
 
-export default function SupportTicketRoute() {
-	const data = useLoaderData<typeof loader>()
-	const actionData = useActionData<typeof action>()
+export default function SupportTicketRoute({
+	loaderData,
+	actionData,
+}: Route.ComponentProps) {
 	const { revalidate } = useRevalidator()
 	const shouldRevalidate = useEventSource(
-		`/events/support/ticket/${data.ticket.id}`,
+		`/events/support/ticket/${loaderData.ticket.id}`,
 	)
 
 	const closeDC = useDoubleCheck()
 	const isPending = useIsPending()
 
 	useEffect(() => {
-		revalidate()
+		void revalidate()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [shouldRevalidate])
 
@@ -255,9 +248,9 @@ export default function SupportTicketRoute() {
 			<div className="flex flex-wrap items-center justify-between gap-6 border-b px-2 py-4">
 				<div className="flex items-center gap-2">
 					<SidebarTrigger />
-					<h2>{data.ticket.title}</h2>
+					<h2>{loaderData.ticket.title}</h2>
 				</div>
-				{data.ticket.open ? (
+				{loaderData.ticket.open ? (
 					<Form method="POST" encType="multipart/form-data">
 						<Button
 							variant="destructive"
@@ -274,8 +267,8 @@ export default function SupportTicketRoute() {
 				) : null}
 			</div>
 			<div className="flex flex-1 flex-col gap-6 overflow-hidden px-1 md:px-4">
-				<MessageContainer messagesCount={data.ticket.messages.length}>
-					{data.ticket.messages.map((msg) => (
+				<MessageContainer messagesCount={loaderData.ticket.messages.length}>
+					{loaderData.ticket.messages.map((msg) => (
 						<Message
 							key={msg.id}
 							align={msg.isAdmin ? 'start' : 'end'}
@@ -286,7 +279,9 @@ export default function SupportTicketRoute() {
 						/>
 					))}
 				</MessageContainer>
-				{data.ticket.open ? <MessageForm result={actionData?.result} /> : null}
+				{loaderData.ticket.open ? (
+					<MessageForm result={actionData?.result} />
+				) : null}
 			</div>
 		</div>
 	)

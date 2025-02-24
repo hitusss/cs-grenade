@@ -1,12 +1,5 @@
 import { useEffect } from 'react'
-import { json, type LoaderFunctionArgs } from '@remix-run/node'
-import {
-	Link,
-	Outlet,
-	useLoaderData,
-	useLocation,
-	useRevalidator,
-} from '@remix-run/react'
+import { data, Link, Outlet, useLocation, useRevalidator } from 'react-router'
 import { useEventSource } from 'remix-utils/sse/react'
 
 import { requireUserId } from '#app/utils/auth.server.ts'
@@ -30,7 +23,9 @@ import {
 	SidebarTrigger,
 } from '#app/components/ui/sidebar.tsx'
 
-export async function loader({ request }: LoaderFunctionArgs) {
+import { type Route } from './+types/_layout.ts'
+
+export async function loader({ request }: Route.LoaderArgs) {
 	const userId = await requireUserId(request)
 
 	const tickets = await prisma.ticket.findMany({
@@ -58,11 +53,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		},
 	})
 
-	return json({ tickets })
+	return data({ tickets })
 }
 
-export default function SupportRoute() {
-	const data = useLoaderData<typeof loader>()
+export default function SupportRoute({ loaderData }: Route.ComponentProps) {
 	const location = useLocation()
 	const { revalidate } = useRevalidator()
 
@@ -70,7 +64,7 @@ export default function SupportRoute() {
 	const shouldRevalidate = useEventSource(`/events/support/${user.id}`)
 
 	useEffect(() => {
-		revalidate()
+		void revalidate()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [shouldRevalidate])
 
@@ -94,7 +88,7 @@ export default function SupportRoute() {
 							</SidebarGroupAction>
 							<SidebarGroupContent>
 								<SidebarMenu>
-									{data.tickets.map((ticket) => (
+									{loaderData.tickets.map((ticket) => (
 										<SidebarMenuItem key={ticket.id}>
 											<SidebarMenuButton
 												isActive={location.pathname === `/support/${ticket.id}`}

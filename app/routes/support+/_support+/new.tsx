@@ -1,5 +1,4 @@
-import { json, type ActionFunctionArgs } from '@remix-run/node'
-import { Form, useActionData } from '@remix-run/react'
+import { data, Form } from 'react-router'
 import {
 	getFormProps,
 	getInputProps,
@@ -26,17 +25,19 @@ import {
 	TextareaField,
 } from '#app/components/forms.tsx'
 
+import { type Route } from './+types/new.ts'
+
 export const handle: SEOHandle = {
 	getSitemapEntries: () => null,
 }
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request }: Route.ActionArgs) {
 	const userId = await requireUserId(request)
 	const formData = await parseFormData(
 		request,
 		uploadHandler({ maxPartSize: MAX_SIZE }),
 	)
-	checkHoneypot(formData)
+	await checkHoneypot(formData)
 
 	const submission = await parseWithZod(formData, {
 		schema: NewTicketSchema.transform(async (data) => {
@@ -57,7 +58,7 @@ export async function action({ request }: ActionFunctionArgs) {
 		async: true,
 	})
 	if (submission.status !== 'success') {
-		return json(
+		return data(
 			{ result: submission.reply() },
 			{
 				status: submission.status === 'error' ? 400 : 200,
@@ -109,9 +110,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	})
 }
 
-export default function SupportNewRoute() {
-	const actionData = useActionData<typeof action>()
-
+export default function SupportNewRoute({ actionData }: Route.ComponentProps) {
 	const [form, fields] = useForm({
 		id: 'new-ticket',
 		constraint: getZodConstraint(NewTicketSchema),

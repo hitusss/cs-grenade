@@ -1,10 +1,10 @@
-import { json, redirect, type LoaderFunctionArgs } from '@remix-run/node'
 import {
+	data,
 	Link,
-	useLoaderData,
+	redirect,
 	useNavigate,
 	useSearchParams,
-} from '@remix-run/react'
+} from 'react-router'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { type ColumnDef } from '@tanstack/react-table'
 import { z } from 'zod'
@@ -22,6 +22,8 @@ import {
 	SortSchema,
 } from '#app/components/data-table.tsx'
 import { Pagination } from '#app/components/pagination.tsx'
+
+import { type Route } from './+types/index.ts'
 
 const TicketResultSchema = z
 	.array(
@@ -129,7 +131,7 @@ export const handle: SEOHandle = {
 	getSitemapEntries: () => null,
 }
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
 	await requireUserWithPermission(request, 'read:support:any')
 
 	const searchParams = new URL(request.url).searchParams
@@ -214,11 +216,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		throw new Error(ticketsResult.error.message)
 	}
 
-	return json({ tickets: ticketsResult.data, total })
+	return data({ tickets: ticketsResult.data, total })
 }
 
-export default function AdminSupportRoute() {
-	const data = useLoaderData<typeof loader>()
+export default function AdminSupportRoute({
+	loaderData,
+}: Route.ComponentProps) {
 	const navigate = useNavigate()
 	const [searchParams, setSearchParams] = useSearchParams()
 
@@ -234,7 +237,7 @@ export default function AdminSupportRoute() {
 			prev.delete('page')
 			return prev
 		})
-		navigate({ search: searchParams.toString() })
+		void navigate({ search: searchParams.toString() })
 	}, 400)
 
 	return (
@@ -251,8 +254,8 @@ export default function AdminSupportRoute() {
 				onChange={(e) => handleQueryChange(e.target.value)}
 				className="max-w-64"
 			/>
-			<DataTable columns={columns} data={data.tickets} />
-			<Pagination total={data.total} />
+			<DataTable columns={columns} data={loaderData.tickets} />
+			<Pagination total={loaderData.total} />
 		</>
 	)
 }

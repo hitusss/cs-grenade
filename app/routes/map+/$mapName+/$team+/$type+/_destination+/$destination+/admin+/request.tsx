@@ -1,9 +1,4 @@
-import {
-	json,
-	type ActionFunctionArgs,
-	type LoaderFunctionArgs,
-} from '@remix-run/node'
-import { Form, useLoaderData, useSearchParams } from '@remix-run/react'
+import { data, Form, useSearchParams } from 'react-router'
 import { invariantResponse } from '@epic-web/invariant'
 
 import { prisma } from '#app/utils/db.server.ts'
@@ -16,6 +11,7 @@ import { DestinationMarker } from '#app/components/destination-marker.tsx'
 import { MapBackButton, MapTitle } from '#app/components/map.tsx'
 
 import { type MapHandle } from '../../../_layout.tsx'
+import { type Route } from './+types/request.ts'
 
 const DEFAULT_REDIRECT_TO = '/admin/requests/destinations'
 
@@ -25,7 +21,7 @@ export const handle: MapHandle = {
 	},
 }
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
+export async function loader({ request, params }: Route.LoaderArgs) {
 	await requireUserWithPermission(
 		request,
 		'create:review-destination-request:any',
@@ -49,10 +45,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 	invariantResponse(destination, 'Not fount', { status: 404 })
 
-	return json({ destination })
+	return data({ destination })
 }
 
-export async function action({ request, params }: ActionFunctionArgs) {
+export async function action({ request, params }: Route.ActionArgs) {
 	await requireUserWithPermission(
 		request,
 		'create:review-destination-request:any',
@@ -140,8 +136,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	})
 }
 
-export default function MapAdminDestinationRequestRoute() {
-	const data = useLoaderData<typeof loader>()
+export default function MapAdminDestinationRequestRoute({
+	loaderData,
+}: Route.ComponentProps) {
 	const [searchParams] = useSearchParams()
 
 	const isPending = useIsPending()
@@ -151,11 +148,11 @@ export default function MapAdminDestinationRequestRoute() {
 	return (
 		<>
 			<MapBackButton to={redirectTo} />
-			<MapTitle>{data.destination.name}</MapTitle>
+			<MapTitle>{loaderData.destination.name}</MapTitle>
 			<DestinationMarker
 				to=""
-				name={data.destination.name}
-				coords={{ x: data.destination.x, y: data.destination.y }}
+				name={loaderData.destination.name}
+				coords={{ x: loaderData.destination.x, y: loaderData.destination.y }}
 				highlight
 				disabled
 			/>

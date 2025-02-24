@@ -1,5 +1,4 @@
-import { json, type LoaderFunctionArgs } from '@remix-run/node'
-import { Link, useLoaderData } from '@remix-run/react'
+import { data, Link } from 'react-router'
 import { invariantResponse } from '@epic-web/invariant'
 
 import { grenadeLabels, type GrenadeType } from '#types/grenades-types.ts'
@@ -9,7 +8,9 @@ import { ContentCard } from '#app/components/content-card.tsx'
 import { ContentFilter } from '#app/components/content-filter.tsx'
 import { Pagination } from '#app/components/pagination.tsx'
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
+import { type Route } from './+types/favorites.ts'
+
+export async function loader({ request, params }: Route.LoaderArgs) {
 	const { username } = params
 
 	invariantResponse(username, 'Username is required')
@@ -84,12 +85,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 		take: perPage,
 	})
 
-	return json({ favorites, total })
+	return data({ favorites, total })
 }
-export default function ProfileFavoritesRoute() {
-	const data = useLoaderData<typeof loader>()
-
-	const favorites = data.favorites.map((f) => f.grenade)
+export default function ProfileFavoritesRoute({
+	loaderData,
+}: Route.ComponentProps) {
+	const favorites = loaderData.favorites.map((f) => f.grenade)
 
 	return (
 		<div>
@@ -128,7 +129,7 @@ export default function ProfileFavoritesRoute() {
 					</li>
 				))}
 			</ul>
-			<Pagination total={data.total} />
+			<Pagination total={loaderData.total} />
 		</div>
 	)
 }

@@ -1,18 +1,13 @@
 import { useState } from 'react'
 import {
-	json,
-	redirect,
-	type ActionFunctionArgs,
-	type LoaderFunctionArgs,
-} from '@remix-run/node'
-import {
+	data,
 	Form,
 	Link,
+	redirect,
 	useFetcher,
-	useLoaderData,
 	useSearchParams,
 	useSubmit,
-} from '@remix-run/react'
+} from 'react-router'
 import { invariantResponse } from '@epic-web/invariant'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 
@@ -42,11 +37,13 @@ import {
 } from '#app/components/ui/select.tsx'
 import { SidebarTrigger } from '#app/components/ui/sidebar.tsx'
 
+import { type Route } from './+types/index.ts'
+
 export const handle: SEOHandle = {
 	getSitemapEntries: () => null,
 }
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
 	await requireUserWithPermission(request, 'read:cache:any')
 	const searchParams = new URL(request.url).searchParams
 	const query = searchParams.get('query')
@@ -68,10 +65,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	} else {
 		cacheKeys = await getAllCacheKeys(limit)
 	}
-	return json({ cacheKeys, instance, instances, currentInstanceInfo })
+	return data({ cacheKeys, instance, instances, currentInstanceInfo })
 }
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request }: Route.ActionArgs) {
 	await requireUserWithPermission(request, 'delete:cache:any')
 	const formData = await request.formData()
 	const key = formData.get('cacheKey')
@@ -97,21 +94,20 @@ export async function action({ request }: ActionFunctionArgs) {
 			throw new Error(`Unknown cache type: ${type}`)
 		}
 	}
-	return json({ success: true })
+	return data({ success: true })
 }
 
-export default function AdminCacheRoute() {
-	const data = useLoaderData<typeof loader>()
+export default function AdminCacheRoute({ loaderData }: Route.ComponentProps) {
 	const [searchParams] = useSearchParams()
 	const submit = useSubmit()
 	const query = searchParams.get('query') ?? ''
 	const limit = searchParams.get('limit') ?? '100'
-	const instance = searchParams.get('instance') ?? data.instance
+	const instance = searchParams.get('instance') ?? loaderData.instance
 
 	const [selectedInstance, setSelectedInstance] = useState<string>(instance)
 
-	const handleFormChange = useDebounce((form: HTMLFormElement) => {
-		submit(form)
+	const handleFormChange = useDebounce(async (form: HTMLFormElement) => {
+		await submit(form)
 	}, 400)
 
 	return (
@@ -165,15 +161,15 @@ export default function AdminCacheRoute() {
 								<SelectValue placeholder="Instance" />
 							</SelectTrigger>
 							<SelectContent>
-								{Object.entries(data.instances).map(([inst, region]) => (
+								{Object.entries(loaderData.instances).map(([inst, region]) => (
 									<SelectItem key={inst} value={inst}>
 										{[
 											inst,
 											`(${region})`,
-											inst === data.currentInstanceInfo.currentInstance
+											inst === loaderData.currentInstanceInfo.currentInstance
 												? '(current)'
 												: '',
-											inst === data.currentInstanceInfo.primaryInstance
+											inst === loaderData.currentInstanceInfo.primaryInstance
 												? ' (primary)'
 												: '',
 										]
@@ -189,7 +185,7 @@ export default function AdminCacheRoute() {
 			<div className="flex h-full flex-col gap-4 overflow-hidden">
 				<h2>LRU Cache:</h2>
 				<ul className="flex flex-col gap-2 overflow-y-auto overscroll-contain">
-					{data.cacheKeys.lru.map((key) => (
+					{loaderData.cacheKeys.lru.map((key) => (
 						<CacheKeyRow
 							key={key}
 							cacheKey={key}
@@ -200,7 +196,7 @@ export default function AdminCacheRoute() {
 				</ul>
 				<h2>SQLite Cache:</h2>
 				<ul className="flex flex-col gap-2 overflow-y-auto overscroll-contain">
-					{data.cacheKeys.sqlite.map((key) => (
+					{loaderData.cacheKeys.sqlite.map((key) => (
 						<CacheKeyRow
 							key={key}
 							cacheKey={key}

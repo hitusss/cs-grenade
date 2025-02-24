@@ -1,5 +1,5 @@
 import { Fragment, useState } from 'react'
-import { useNavigate, useSearchParams } from '@remix-run/react'
+import { useNavigate, useSearchParams } from 'react-router'
 import {
 	flexRender,
 	getCoreRowModel,
@@ -78,7 +78,7 @@ export function DataTable<TData, TValue>({
 				prev.delete('page')
 				return prev
 			})
-			navigate({ search: searchParams.toString() })
+			void navigate({ search: searchParams.toString() })
 		},
 		manualSorting: true,
 		state: {

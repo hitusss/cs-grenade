@@ -1,18 +1,11 @@
 import {
-	json,
-	redirect,
-	type ActionFunctionArgs,
-	type LoaderFunctionArgs,
-	type MetaFunction,
-} from '@remix-run/node'
-import {
+	data,
 	Form,
 	Link,
-	useActionData,
-	useLoaderData,
+	redirect,
 	useSearchParams,
 	type Params,
-} from '@remix-run/react'
+} from 'react-router'
 import {
 	getFormProps,
 	getInputProps,
@@ -43,6 +36,7 @@ import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { AuthLayout } from '#app/components/auth-layout.tsx'
 import { CheckboxField, ErrorList, Field } from '#app/components/forms.tsx'
 
+import { type Route } from './+types/onboarding_.$provider.ts'
 import { onboardingEmailSessionKey } from './onboarding.tsx'
 
 export const providerIdKey = 'providerId'
@@ -91,11 +85,11 @@ export const handle: SEOHandle = {
 	getSitemapEntries: () => null,
 }
 
-export const meta: MetaFunction = () => {
+export const meta: Route.MetaFunction = () => {
 	return [{ title: 'Setup CS-Grenade Account' }]
 }
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
+export async function loader({ request, params }: Route.LoaderArgs) {
 	const { email } = await requireData({ request, params })
 	const connectionSession = await connectionSessionStorage.getSession(
 		request.headers.get('cookie'),
@@ -108,7 +102,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 	const formError = connectionSession.get(authenticator.sessionErrorKey)
 	const hasError = typeof formError === 'string'
 
-	return json({
+	return data({
 		email,
 		status: 'idle',
 		submission: {
@@ -119,7 +113,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 	})
 }
 
-export async function action({ request, params }: ActionFunctionArgs) {
+export async function action({ request, params }: Route.ActionArgs) {
 	const { email, providerId, providerName } = await requireData({
 		request,
 		params,
@@ -156,7 +150,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	})
 
 	if (submission.status !== 'success') {
-		return json(
+		return data(
 			{ result: submission.reply() },
 			{ status: submission.status === 'error' ? 400 : 200 },
 		)
@@ -187,9 +181,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	)
 }
 
-export default function OnboardingProviderRoute() {
-	const data = useLoaderData<typeof loader>()
-	const actionData = useActionData<typeof action>()
+export default function OnboardingProviderRoute({
+	loaderData,
+	actionData,
+}: Route.ComponentProps) {
 	const isPending = useIsPending()
 	const [searchParams] = useSearchParams()
 	const redirectTo = searchParams.get('redirectTo')
@@ -197,7 +192,7 @@ export default function OnboardingProviderRoute() {
 	const [form, fields] = useForm({
 		id: 'onboarding-provider-form',
 		constraint: getZodConstraint(SignupFormSchema),
-		lastResult: actionData?.result ?? data.submission,
+		lastResult: actionData?.result ?? loaderData.submission,
 		onValidate({ formData }) {
 			return parseWithZod(formData, { schema: SignupFormSchema })
 		},
@@ -206,7 +201,7 @@ export default function OnboardingProviderRoute() {
 
 	return (
 		<AuthLayout
-			title={`Welcome aboard ${data.email}!`}
+			title={`Welcome aboard ${loaderData.email}!`}
 			subtitle="Please enter your details."
 		>
 			<Form method="POST" {...getFormProps(form)}>

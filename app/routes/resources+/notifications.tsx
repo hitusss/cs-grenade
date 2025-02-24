@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { json, type LoaderFunctionArgs } from '@remix-run/node'
-import { Link, useFetcher, useSubmit } from '@remix-run/react'
+import { data, Link, useFetcher, useSubmit } from 'react-router'
 import { useEventSource } from 'remix-utils/sse/react'
 
 import { getUserId } from '#app/utils/auth.server.ts'
@@ -15,10 +14,12 @@ import {
 	PopoverTrigger,
 } from '#app/components/ui/popover.tsx'
 
-export async function loader({ request }: LoaderFunctionArgs) {
+import { type Route } from './+types/notifications.ts'
+
+export async function loader({ request }: Route.LoaderArgs) {
 	const userId = await getUserId(request)
 	if (!userId) {
-		return json({ notifications: [] })
+		return data({ notifications: [] })
 	}
 	const notifications = await prisma.notification.findMany({
 		where: {
@@ -36,7 +37,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 			createdAt: 'desc',
 		},
 	})
-	return json({ notifications })
+	return data({ notifications })
 }
 
 export function Notifications() {
@@ -45,7 +46,7 @@ export function Notifications() {
 	const shouldRevalidate = useEventSource(`/events/notifications/${user.id}`)
 
 	useEffect(() => {
-		fetcher.load('/resources/notifications')
+		void fetcher.load('/resources/notifications')
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [shouldRevalidate])
 
@@ -119,7 +120,7 @@ function Notification({
 	description: string | null
 	redirectTo: string | null
 	seen: boolean
-	createdAt: string
+	createdAt: Date
 }) {
 	const submit = useSubmit()
 	const ref = useRef<HTMLLIElement>(null)
@@ -134,7 +135,7 @@ function Notification({
 			(e) => {
 				if (e[0]?.isIntersecting) {
 					observer.unobserve(notificationElement)
-					submit(
+					void submit(
 						{
 							intent: 'seen',
 						},
@@ -183,7 +184,7 @@ function Notification({
 				variant="ghost"
 				className="absolute right-1 top-1 z-10"
 				onClick={() => {
-					submit(
+					void submit(
 						{
 							intent: 'delete',
 						},

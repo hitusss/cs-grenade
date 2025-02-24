@@ -1,15 +1,4 @@
-import {
-	json,
-	redirect,
-	type ActionFunctionArgs,
-	type LoaderFunctionArgs,
-} from '@remix-run/node'
-import {
-	Form,
-	useActionData,
-	useLoaderData,
-	useNavigation,
-} from '@remix-run/react'
+import { data, Form, redirect, useNavigation } from 'react-router'
 import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { invariantResponse } from '@epic-web/invariant'
@@ -30,6 +19,7 @@ import { Icon } from '#app/components/ui/icon.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { ErrorList, ImageField } from '#app/components/forms.tsx'
 
+import { type Route } from './+types/profile.photo.ts'
 import { type BreadcrumbHandle } from './profile.tsx'
 
 export const handle: BreadcrumbHandle & SEOHandle = {
@@ -59,7 +49,7 @@ const PhotoFormSchema = z.discriminatedUnion('intent', [
 	NewImageSchema,
 ])
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
 	const userId = await requireUserId(request)
 	const user = await prisma.user.findUnique({
 		where: { id: userId },
@@ -71,10 +61,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		},
 	})
 	invariantResponse(user, 'User not found', { status: 404 })
-	return json({ user })
+	return data({ user })
 }
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request }: Route.ActionArgs) {
 	const userId = await requireUserId(request)
 	const formData = await parseFormData(
 		request,
@@ -97,7 +87,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	})
 
 	if (submission.status !== 'success') {
-		return json(
+		return data(
 			{ result: submission.reply() },
 			{ status: submission.status === 'error' ? 400 : 200 },
 		)
@@ -121,12 +111,12 @@ export async function action({ request }: ActionFunctionArgs) {
 	return redirect('/settings/profile')
 }
 
-export default function SettingsProfilePhotoRoute() {
-	const data = useLoaderData<typeof loader>()
-
+export default function SettingsProfilePhotoRoute({
+	loaderData,
+	actionData,
+}: Route.ComponentProps) {
 	const doubleCheckDeleteImage = useDoubleCheck()
 
-	const actionData = useActionData<typeof action>()
 	const navigation = useNavigation()
 
 	const [form, fields] = useForm({
@@ -161,7 +151,9 @@ export default function SettingsProfilePhotoRoute() {
 					errors={fields.photoFile.errors}
 					size="lg"
 					existingImage={
-						data.user ? getUserImgSrc(data.user.image?.id) : undefined
+						loaderData.user
+							? getUserImgSrc(loaderData.user.image?.id)
+							: undefined
 					}
 					fullRounded
 				/>
@@ -169,7 +161,7 @@ export default function SettingsProfilePhotoRoute() {
 					<Button variant="ghost" className="peer-invalid:hidden" type="reset">
 						Reset
 					</Button>
-					{data.user.image?.id ? (
+					{loaderData.user.image?.id ? (
 						<StatusButton
 							className="peer-valid:hidden"
 							variant="destructive"

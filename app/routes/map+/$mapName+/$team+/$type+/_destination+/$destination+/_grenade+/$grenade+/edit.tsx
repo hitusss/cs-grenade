@@ -1,15 +1,4 @@
-import {
-	json,
-	type ActionFunctionArgs,
-	type LoaderFunctionArgs,
-} from '@remix-run/node'
-import {
-	Form,
-	Link,
-	useActionData,
-	useLoaderData,
-	useNavigate,
-} from '@remix-run/react'
+import { data, Form, Link, useNavigate } from 'react-router'
 import { parseWithZod } from '@conform-to/zod'
 import { invariantResponse } from '@epic-web/invariant'
 import { parseFormData } from '@mjackson/form-data-parser'
@@ -48,6 +37,7 @@ import { GrenadeForm } from '#app/components/grenade-form.tsx'
 import { MapBackButton } from '#app/components/map.tsx'
 
 import { type MapHandle } from '../../../../_layout.tsx'
+import { type Route } from './+types/edit.ts'
 import {
 	cancelEditGrenadeRequest,
 	deleteGrenade,
@@ -69,7 +59,7 @@ export const handle: MapHandle = {
 	},
 }
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
+export async function loader({ request, params }: Route.LoaderArgs) {
 	const userId = await requireUserId(request)
 	const userPermissions = await getUserPermissions(userId)
 
@@ -115,10 +105,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 		})
 	}
 
-	return json({ grenade })
+	return data({ grenade })
 }
 
-export async function action({ request, params }: ActionFunctionArgs) {
+export async function action({ request, params }: Route.ActionArgs) {
 	const userId = await requireUserId(request)
 
 	const { grenade: grenadeId } = params
@@ -138,7 +128,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 		request,
 		uploadHandler({ maxPartSize: MAX_SIZE }),
 	)
-	checkHoneypot(formData)
+	await checkHoneypot(formData)
 
 	const submission = await parseWithZod(formData, {
 		schema: GrenadeSchema.transform(async (data) => {
@@ -181,7 +171,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 		async: true,
 	})
 	if (submission.status !== 'success') {
-		return json(
+		return data(
 			{ result: submission.reply() },
 			{
 				status: submission.status === 'error' ? 400 : 200,
@@ -219,7 +209,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 			})
 		}
 		default: {
-			return json(
+			return data(
 				{
 					result: submission.reply({
 						formErrors: ['Invalid intent'],
@@ -233,15 +223,16 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	}
 }
 
-export default function MapEditGrenadeRoute() {
-	const data = useLoaderData<typeof loader>()
-	const actionData = useActionData<typeof action>()
+export default function MapEditGrenadeRoute({
+	loaderData,
+	actionData,
+}: Route.ComponentProps) {
 	const navigate = useNavigate()
 
 	const isPending = useIsPending()
 
 	const user = useUser()
-	const isUserGrenade = data.grenade.userId === user.id
+	const isUserGrenade = loaderData.grenade.userId === user.id
 	const hasUpdateGrenadePermission = userHasPermission(user, 'update:grenade')
 	const hasDeleteGrenadePermission = userHasPermission(
 		user,
@@ -250,7 +241,7 @@ export default function MapEditGrenadeRoute() {
 
 	const deleteDC = useDoubleCheck()
 
-	if (data.grenade.grenadeChanges) {
+	if (loaderData.grenade.grenadeChanges) {
 		return (
 			<Dialog open onOpenChange={() => navigate('..')}>
 				<DialogContent>
@@ -314,11 +305,11 @@ export default function MapEditGrenadeRoute() {
 						: 'Request Grenade Changes'
 				}
 				defaultValue={{
-					name: data.grenade.name,
-					description: data.grenade.description,
-					x: data.grenade.x,
-					y: data.grenade.y,
-					images: data.grenade.images.map((i) => ({
+					name: loaderData.grenade.name,
+					description: loaderData.grenade.description,
+					x: loaderData.grenade.x,
+					y: loaderData.grenade.y,
+					images: loaderData.grenade.images.map((i) => ({
 						id: i.id,
 						description: i.description,
 					})),

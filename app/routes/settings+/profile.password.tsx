@@ -1,10 +1,4 @@
-import {
-	json,
-	redirect,
-	type ActionFunctionArgs,
-	type LoaderFunctionArgs,
-} from '@remix-run/node'
-import { Form, Link, useActionData } from '@remix-run/react'
+import { data, Form, Link, redirect } from 'react-router'
 import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
@@ -24,6 +18,7 @@ import { Icon } from '#app/components/ui/icon.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { ErrorList, Field } from '#app/components/forms.tsx'
 
+import { type Route } from './+types/profile.password.ts'
 import { type BreadcrumbHandle } from './profile.tsx'
 
 export const handle: BreadcrumbHandle & SEOHandle = {
@@ -57,13 +52,13 @@ async function requirePassword(userId: string) {
 	}
 }
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
 	const userId = await requireUserId(request)
 	await requirePassword(userId)
-	return json({})
+	return data({})
 }
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request }: Route.ActionArgs) {
 	const userId = await requireUserId(request)
 	await requirePassword(userId)
 	const formData = await request.formData()
@@ -85,7 +80,7 @@ export async function action({ request }: ActionFunctionArgs) {
 		),
 	})
 	if (submission.status !== 'success') {
-		return json(
+		return data(
 			{
 				result: submission.reply({
 					hideFields: ['currentPassword', 'newPassword', 'confirmNewPassword'],
@@ -120,8 +115,9 @@ export async function action({ request }: ActionFunctionArgs) {
 	)
 }
 
-export default function SettingsProfilePasswordRoute() {
-	const actionData = useActionData<typeof action>()
+export default function SettingsProfilePasswordRoute({
+	actionData,
+}: Route.ComponentProps) {
 	const isPending = useIsPending()
 
 	const [form, fields] = useForm({

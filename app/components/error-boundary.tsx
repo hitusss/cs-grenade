@@ -1,20 +1,21 @@
+import { useEffect, type ReactElement } from 'react'
 import {
 	isRouteErrorResponse,
 	Link,
 	useParams,
 	useRouteError,
 	type ErrorResponse,
-} from '@remix-run/react'
-import { captureRemixErrorBoundaryError } from '@sentry/remix'
+} from 'react-router'
+import { captureException } from '@sentry/react'
 
-import { getErrorMessage } from '#app/utils/misc.tsx'
+import { getErrorMessage } from '#app/utils/misc'
 
 import { Icon, type IconName } from './ui/icon.tsx'
 
 type StatusHandler = (info: {
 	error: ErrorResponse
 	params: Record<string, string | undefined>
-}) => JSX.Element | null
+}) => ReactElement | null
 
 export function GeneralErrorBoundary({
 	defaultStatusHandler = ({ error }) => <ErrorComponent error={error} />,
@@ -25,17 +26,18 @@ export function GeneralErrorBoundary({
 }: {
 	defaultStatusHandler?: StatusHandler
 	statusHandlers?: Record<number, StatusHandler>
-	unexpectedErrorHandler?: (error: unknown) => JSX.Element | null
+	unexpectedErrorHandler?: (error: unknown) => ReactElement | null
 }) {
 	const error = useRouteError()
-	captureRemixErrorBoundaryError(error)
 	const params = useParams()
-
-	console.log(error)
 
 	if (typeof document !== 'undefined') {
 		console.error(error)
 	}
+
+	useEffect(() => {
+		captureException(error)
+	}, [error])
 
 	return (
 		<div className="container grid h-full place-items-center p-20">

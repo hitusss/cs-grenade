@@ -1,5 +1,4 @@
-import { json, type LoaderFunctionArgs } from '@remix-run/node'
-import { Link, Outlet, useLocation } from '@remix-run/react'
+import { data, Link, Outlet, useLocation } from 'react-router'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 
 import { requireUserWithPermission } from '#app/utils/permissions.server.ts'
@@ -26,6 +25,8 @@ import {
 	SidebarSeparator,
 } from '#app/components/ui/sidebar.tsx'
 
+import { type Route } from './+types/_layout.ts'
+
 type NavGroup = {
 	title: string
 	items: NavItem[]
@@ -42,9 +43,9 @@ export const handle: SEOHandle = {
 	getSitemapEntries: () => null,
 }
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
 	await requireUserWithPermission(request, 'read:admin:any')
-	return json({})
+	return data({})
 }
 
 export default function AdminLayout() {

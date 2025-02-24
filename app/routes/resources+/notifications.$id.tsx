@@ -1,10 +1,12 @@
-import { json, type ActionFunctionArgs } from '@remix-run/node'
+import { data } from 'react-router'
 import { invariantResponse } from '@epic-web/invariant'
 
 import { requireUserId } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 
-export async function action({ request, params }: ActionFunctionArgs) {
+import { type Route } from './+types/notifications.$id.ts'
+
+export async function action({ request, params }: Route.ActionArgs) {
 	const userId = await requireUserId(request)
 
 	invariantResponse(params.id, 'Notification id is required', { status: 400 })
@@ -38,5 +40,5 @@ export async function action({ request, params }: ActionFunctionArgs) {
 			break
 	}
 
-	return json({})
+	return data({})
 }

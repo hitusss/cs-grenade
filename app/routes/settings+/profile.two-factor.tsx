@@ -1,4 +1,4 @@
-import { Outlet } from '@remix-run/react'
+import { Outlet } from 'react-router'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 
 import { Icon } from '#app/components/ui/icon.tsx'

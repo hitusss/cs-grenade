@@ -1,9 +1,10 @@
-import { type LoaderFunctionArgs } from '@remix-run/node'
 import { invariantResponse } from '@epic-web/invariant'
 
 import { prisma } from '#app/utils/db.server.ts'
 
-export async function loader({ params }: LoaderFunctionArgs) {
+import { type Route } from './+types/grenade-changes-images.$imageId.ts'
+
+export async function loader({ params }: Route.LoaderArgs) {
 	invariantResponse(params.imageId, 'Image ID is required', { status: 400 })
 	const image = await prisma.grenadeImageChanges.findUnique({
 		where: { id: params.imageId },

@@ -1,13 +1,14 @@
-import { PassThrough } from 'stream'
+import { PassThrough } from 'node:stream'
+import { styleText } from 'node:util'
 import {
-	createReadableStreamFromReadable,
+	ServerRouter,
 	type ActionFunctionArgs,
 	type HandleDocumentRequestFunction,
 	type LoaderFunctionArgs,
-} from '@remix-run/node'
-import { RemixServer } from '@remix-run/react'
-import * as Sentry from '@sentry/remix'
-import chalk from 'chalk'
+} from 'react-router'
+import { createReadableStreamFromReadable } from '@react-router/node'
+import { contentSecurity } from '@nichtsam/helmet/content'
+import * as Sentry from '@sentry/node'
 import { isbot } from 'isbot'
 import { renderToPipeableStream } from 'react-dom/server'
 
@@ -16,10 +17,12 @@ import { getInstanceInfo } from './utils/litefs.server.ts'
 import { NonceProvider } from './utils/nonce-provider.ts'
 import { makeTimings } from './utils/timing.server.ts'
 
-const ABORT_DELAY = 5000
+export const streamTimeout = 5000
 
 init()
 global.ENV = getEnv()
+
+const MODE = process.env.NODE_ENV ?? 'development'
 
 type DocRequestArgs = Parameters<HandleDocumentRequestFunction>
 
@@ -28,7 +31,7 @@ export default async function handleRequest(...args: DocRequestArgs) {
 		request,
 		responseStatusCode,
 		responseHeaders,
-		remixContext,
+		reactRouterContext,
 		loadContext,
 	] = args
 	const { currentInstance, primaryInstance } = await getInstanceInfo()
@@ -54,13 +57,48 @@ export default async function handleRequest(...args: DocRequestArgs) {
 
 		const { pipe, abort } = renderToPipeableStream(
 			<NonceProvider value={nonce}>
-				<RemixServer context={remixContext} url={request.url} />
+				<ServerRouter
+					nonce={nonce}
+					context={reactRouterContext}
+					url={request.url}
+				/>
 			</NonceProvider>,
 			{
 				[callbackName]: () => {
 					const body = new PassThrough()
 					responseHeaders.set('Content-Type', 'text/html')
 					responseHeaders.append('Server-Timing', timings.toString())
+
+					contentSecurity(responseHeaders, {
+						crossOriginEmbedderPolicy: false,
+						contentSecurityPolicy: {
+							reportOnly: false,
+							directives: {
+								fetch: {
+									'connect-src': [
+										MODE === 'development' ? 'ws:' : undefined,
+										process.env.SENTRY_DSN ? '*.sentry.io' : undefined,
+										"'self'",
+									],
+									'font-src': ["'self'"],
+									'frame-src': ["'self'"],
+									'img-src': [
+										"'self'",
+										'data:',
+										'avatars.githubusercontent.com/',
+										'cdn.discordapp.com/avatars/',
+									],
+									'script-src': [
+										"'strict-dynamic'",
+										"'self'",
+										`'nonce-${nonce}'`,
+									],
+									'script-src-attr': [`'nonce-${nonce}'`],
+								},
+							},
+						},
+					})
+
 					resolve(
 						new Response(createReadableStreamFromReadable(body), {
 							headers: responseHeaders,
@@ -79,7 +117,7 @@ export default async function handleRequest(...args: DocRequestArgs) {
 			},
 		)
 
-		setTimeout(abort, ABORT_DELAY)
+		setTimeout(abort, streamTimeout + 5000)
 	})
 }
 
@@ -103,15 +141,10 @@ export function handleError(
 		return
 	}
 	if (error instanceof Error) {
-		console.error(chalk.red(error.stack))
-		void Sentry.captureRemixServerException(
-			error,
-			'remix.server',
-			request,
-			true,
-		)
+		console.error(styleText('red', String(error.stack)))
+		void Sentry.captureException(error)
 	} else {
-		console.error(chalk.red(error))
+		console.error(error)
 		Sentry.captureException(error)
 	}
 }

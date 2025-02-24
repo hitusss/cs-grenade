@@ -1,5 +1,4 @@
-import { json, redirect, type LoaderFunctionArgs } from '@remix-run/node'
-import { Link, useLoaderData, useLocation } from '@remix-run/react'
+import { data, Link, redirect, useLocation } from 'react-router'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { type Prisma } from '@prisma/client'
 import { type ColumnDef } from '@tanstack/react-table'
@@ -31,6 +30,8 @@ import {
 	SortSchema,
 } from '#app/components/data-table.tsx'
 import { Pagination } from '#app/components/pagination.tsx'
+
+import { type Route } from './+types/grenades.ts'
 
 const columns: ColumnDef<{
 	type: string
@@ -194,7 +195,7 @@ export const handle: SEOHandle = {
 	getSitemapEntries: () => null,
 }
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
 	await requireUserWithPermission(request, 'read:review-grenade-request:any')
 
 	const searchParams = new URL(request.url).searchParams
@@ -299,12 +300,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		skip: page * perPage - perPage,
 	})
 
-	return json({ grenades, total })
+	return data({ grenades, total })
 }
 
-export default function AdminRequestsGrenadesRoute() {
-	const data = useLoaderData<typeof loader>()
-
+export default function AdminRequestsGrenadesRoute({
+	loaderData,
+}: Route.ComponentProps) {
 	return (
 		<>
 			<div className="flex items-center gap-4">
@@ -312,8 +313,8 @@ export default function AdminRequestsGrenadesRoute() {
 				<h2>Grenade Requests</h2>
 			</div>
 			<ContentFilter queryFilter mapFilter teamFilter typeFilter />
-			<DataTable columns={columns} data={data.grenades} />
-			<Pagination total={data.total} />
+			<DataTable columns={columns} data={loaderData.grenades} />
+			<Pagination total={loaderData.total} />
 		</>
 	)
 }

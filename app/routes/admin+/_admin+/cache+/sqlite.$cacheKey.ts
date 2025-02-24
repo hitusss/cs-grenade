@@ -1,4 +1,4 @@
-import { json, type LoaderFunctionArgs } from '@remix-run/node'
+import { data } from 'react-router'
 import { invariantResponse } from '@epic-web/invariant'
 
 import { cache } from '#app/utils/cache.server.ts'
@@ -9,7 +9,9 @@ import {
 } from '#app/utils/litefs.server.ts'
 import { requireUserWithPermission } from '#app/utils/permissions.server.ts'
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
+import { type Route } from './+types/sqlite.$cacheKey.ts'
+
+export async function loader({ request, params }: Route.LoaderArgs) {
 	await requireUserWithPermission(request, 'read:cache:any')
 	const searchParams = new URL(request.url).searchParams
 	const currentInstanceInfo = await getInstanceInfo()
@@ -20,7 +22,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 	const { cacheKey } = params
 	invariantResponse(cacheKey, 'cacheKey is required')
-	return json({
+	return data({
 		instance: {
 			hostname: instance,
 			region: allInstances[instance],

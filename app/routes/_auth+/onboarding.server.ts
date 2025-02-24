@@ -1,4 +1,4 @@
-import { redirect } from '@remix-run/node'
+import { redirect } from 'react-router'
 import { invariant } from '@epic-web/invariant'
 
 import { verifySessionStorage } from '#app/utils/verification.server.ts'

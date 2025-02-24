@@ -1,10 +1,4 @@
-import {
-	json,
-	redirect,
-	type ActionFunctionArgs,
-	type LoaderFunctionArgs,
-} from '@remix-run/node'
-import { Link, useLoaderData, useSubmit } from '@remix-run/react'
+import { data, Link, redirect, useSubmit } from 'react-router'
 import { parseWithZod } from '@conform-to/zod'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { type Prisma } from '@prisma/client'
@@ -40,6 +34,8 @@ import {
 	SortSchema,
 } from '#app/components/data-table.tsx'
 import { Pagination } from '#app/components/pagination.tsx'
+
+import { type Route } from './+types/maps.ts'
 
 const ToggleActiveIntent = z.object({
 	mapName: z.string(),
@@ -179,7 +175,7 @@ const columns: ColumnDef<{
 										formData.append('intent', 'toggleActive')
 										formData.append('mapName', row.original.name)
 										formData.append('isActive', String(row.original.isActive))
-										submit(formData, { method: 'post' })
+										void submit(formData, { method: 'post' })
 									}}
 								>
 									Toggle Active
@@ -199,7 +195,7 @@ export const handle: SEOHandle = {
 	getSitemapEntries: () => null,
 }
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
 	await requireUserWithPermission(request, 'read:admin:any')
 
 	const searchParams = new URL(request.url).searchParams
@@ -252,10 +248,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		take: perPage,
 	})
 
-	return json({ maps, total })
+	return data({ maps, total })
 }
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request }: Route.ActionArgs) {
 	const formData = await request.formData()
 
 	const submission = await parseWithZod(formData, {
@@ -263,7 +259,7 @@ export async function action({ request }: ActionFunctionArgs) {
 		async: true,
 	})
 	if (submission.status !== 'success') {
-		return json(
+		return data(
 			{ result: submission.reply() },
 			{
 				status: submission.status === 'error' ? 400 : 200,
@@ -279,10 +275,10 @@ export async function action({ request }: ActionFunctionArgs) {
 				where: { name: submission.value.mapName },
 				data: { isActive: !isActive },
 			})
-			return json({ result: submission.reply() })
+			return data({ result: submission.reply() })
 		}
 		default: {
-			return json(
+			return data(
 				{
 					result: submission.reply({
 						formErrors: ['Invalid intent'],
@@ -296,17 +292,17 @@ export async function action({ request }: ActionFunctionArgs) {
 	}
 }
 
-export default function AdminContentMapsRoute() {
-	const data = useLoaderData<typeof loader>()
-
+export default function AdminContentMapsRoute({
+	loaderData,
+}: Route.ComponentProps) {
 	return (
 		<>
 			<div className="flex items-center gap-4">
 				<SidebarTrigger />
 				<h2>Maps</h2>
 			</div>
-			<DataTable columns={columns} data={data.maps} />
-			<Pagination total={data.total} />
+			<DataTable columns={columns} data={loaderData.maps} />
+			<Pagination total={loaderData.total} />
 		</>
 	)
 }

@@ -1,4 +1,4 @@
-import { Link, useRouteLoaderData } from '@remix-run/react'
+import { Link, useRouteLoaderData } from 'react-router'
 
 import { cn } from '#app/utils/misc.tsx'
 import { type loader as rootLoader } from '#app/root.tsx'

@@ -1,5 +1,4 @@
-import { json, type LoaderFunctionArgs } from '@remix-run/node'
-import { Form, Link, useLoaderData } from '@remix-run/react'
+import { data, Form, Link } from 'react-router'
 import { invariantResponse } from '@epic-web/invariant'
 
 import { getUserId, requireUserId } from '#app/utils/auth.server.ts'
@@ -16,6 +15,7 @@ import { MapBackButton } from '#app/components/map.tsx'
 import { ReportDialog } from '#app/routes/resources+/report.tsx'
 
 import { type MapHandle } from '../../_layout.tsx'
+import { type Route } from './+types/index.ts'
 
 export const handle: MapHandle = {
 	map: {
@@ -23,7 +23,7 @@ export const handle: MapHandle = {
 	},
 }
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
+export async function loader({ request, params }: Route.LoaderArgs) {
 	const { destination: destinationId } = params
 
 	const userId = await getUserId(request)
@@ -49,10 +49,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 		})
 	}
 
-	return json({ destination })
+	return data({ destination })
 }
 
-export async function action({ request, params }: LoaderFunctionArgs) {
+export async function action({ request, params }: Route.ActionArgs) {
 	const { destination: destinationId } = params
 	const userId = await requireUserId(request)
 
@@ -86,9 +86,9 @@ export async function action({ request, params }: LoaderFunctionArgs) {
 	})
 }
 
-export default function MapDestinationRoute() {
-	const data = useLoaderData<typeof loader>()
-
+export default function MapDestinationRoute({
+	loaderData,
+}: Route.ComponentProps) {
 	const isPending = useIsPending()
 	const cancelDC = useDoubleCheck()
 
@@ -104,7 +104,7 @@ export default function MapDestinationRoute() {
 
 	const hasCreateGrenadePermission = userHasPermission(user, 'create:grenade')
 
-	const isUserDestination = data.destination.userId === user?.id
+	const isUserDestination = loaderData.destination.userId === user?.id
 	const canEdit =
 		hasUpdateDestinationAnyPermission ||
 		(isUserDestination && hasUpdateDestinationOwnPermission)
@@ -112,12 +112,15 @@ export default function MapDestinationRoute() {
 	return (
 		<>
 			<MapBackButton />
-			{!data.destination.verified ? (
+			{!loaderData.destination.verified ? (
 				<Form method="POST">
 					<DestinationMarker
 						to=""
 						name=""
-						coords={{ x: data.destination.x, y: data.destination.y }}
+						coords={{
+							x: loaderData.destination.x,
+							y: loaderData.destination.y,
+						}}
 						highlight
 						disabled
 					/>
@@ -143,7 +146,7 @@ export default function MapDestinationRoute() {
 					) : (
 						<ReportDialog
 							type="destination"
-							destinationId={data.destination.id}
+							destinationId={loaderData.destination.id}
 							className="absolute right-0 top-0 z-10"
 						/>
 					)}

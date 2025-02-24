@@ -1,4 +1,4 @@
-import { Link, useRouteLoaderData } from '@remix-run/react'
+import { Link, useRouteLoaderData } from 'react-router'
 
 import { userHasPermission } from '#app/utils/permissions.ts'
 import { useOptionalUser } from '#app/utils/user.ts'

@@ -1,15 +1,4 @@
-import {
-	json,
-	type ActionFunctionArgs,
-	type LoaderFunctionArgs,
-} from '@remix-run/node'
-import {
-	Form,
-	Link,
-	useActionData,
-	useLoaderData,
-	useNavigate,
-} from '@remix-run/react'
+import { data, Form, Link, useNavigate } from 'react-router'
 import { parseWithZod } from '@conform-to/zod'
 import { invariantResponse } from '@epic-web/invariant'
 import { z } from 'zod'
@@ -42,6 +31,7 @@ import { DestinationForm } from '#app/components/destination-form.tsx'
 import { MapBackButton } from '#app/components/map.tsx'
 
 import { type MapHandle } from '../../_layout.tsx'
+import { type Route } from './+types/edit.ts'
 import {
 	cancelEditDestinationRequest,
 	deleteDestination,
@@ -63,7 +53,7 @@ export const handle: MapHandle = {
 	},
 }
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
+export async function loader({ request, params }: Route.LoaderArgs) {
 	const userId = await requireUserId(request)
 	const userPermissions = await getUserPermissions(userId)
 
@@ -96,10 +86,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 		})
 	}
 
-	return json({ destination })
+	return data({ destination })
 }
 
-export async function action({ request, params }: ActionFunctionArgs) {
+export async function action({ request, params }: Route.ActionArgs) {
 	const userId = await requireUserId(request)
 
 	const { destination: destinationId } = params
@@ -116,14 +106,14 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	invariantResponse(destination, 'Not found', { status: 404 })
 
 	const formData = await request.formData()
-	checkHoneypot(formData)
+	await checkHoneypot(formData)
 
 	const submission = await parseWithZod(formData, {
 		schema: DestinationSchema,
 		async: true,
 	})
 	if (submission.status !== 'success') {
-		return json(
+		return data(
 			{ result: submission.reply() },
 			{
 				status: submission.status === 'error' ? 400 : 200,
@@ -160,7 +150,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 			})
 		}
 		default: {
-			return json(
+			return data(
 				{
 					result: submission.reply({
 						formErrors: ['Invalid intent'],
@@ -174,15 +164,16 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	}
 }
 
-export default function MapEditDestinationRoute() {
-	const data = useLoaderData<typeof loader>()
-	const actionData = useActionData<typeof action>()
+export default function MapEditDestinationRoute({
+	loaderData,
+	actionData,
+}: Route.ComponentProps) {
 	const navigate = useNavigate()
 
 	const isPending = useIsPending()
 
 	const user = useUser()
-	const isUserDestination = data.destination.userId === user.id
+	const isUserDestination = loaderData.destination.userId === user.id
 	const hasUpdateDestinationPermission = userHasPermission(
 		user,
 		'update:destination',
@@ -194,7 +185,7 @@ export default function MapEditDestinationRoute() {
 
 	const deleteDC = useDoubleCheck()
 
-	if (data.destination.destinationChanges) {
+	if (loaderData.destination.destinationChanges) {
 		return (
 			<Dialog open onOpenChange={() => navigate('..')}>
 				<DialogContent>
@@ -253,9 +244,9 @@ export default function MapEditDestinationRoute() {
 				}
 				type="edit"
 				defaultValue={{
-					name: data.destination.name,
-					x: data.destination.x,
-					y: data.destination.y,
+					name: loaderData.destination.name,
+					x: loaderData.destination.x,
+					y: loaderData.destination.y,
 				}}
 				result={actionData?.result}
 			>

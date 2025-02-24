@@ -1,4 +1,4 @@
-import { redirect } from '@remix-run/node'
+import { redirect } from 'react-router'
 import { createId as cuid } from '@paralleldrive/cuid2'
 import { GitHubStrategy } from 'remix-auth-github'
 import { z } from 'zod'

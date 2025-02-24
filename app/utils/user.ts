@@ -1,5 +1,4 @@
-import { type SerializeFrom } from '@remix-run/node'
-import { useRouteLoaderData } from '@remix-run/react'
+import { useRouteLoaderData } from 'react-router'
 
 import { type loader as rootLoader } from '#app/root.tsx'
 
@@ -31,7 +30,9 @@ export function getUserFullName(
 	return 'Deleted user'
 }
 
-function isUser(user: any): user is SerializeFrom<typeof rootLoader>['user'] {
+function isUser(
+	user: any,
+): user is Awaited<ReturnType<typeof rootLoader>>['data']['user'] {
 	return user && typeof user === 'object' && typeof user.id === 'string'
 }
 

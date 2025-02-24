@@ -5,7 +5,7 @@
 // ensure the user gets the right status code and we can display a nicer error
 // message for them than the Remix and/or browser default.
 
-import { useLocation } from '@remix-run/react'
+import { useLocation } from 'react-router'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 
 import {

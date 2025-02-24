@@ -1,9 +1,4 @@
-import {
-	json,
-	type ActionFunctionArgs,
-	type LoaderFunctionArgs,
-} from '@remix-run/node'
-import { Form, useLoaderData, useSearchParams } from '@remix-run/react'
+import { data, Form, useSearchParams } from 'react-router'
 import { invariantResponse } from '@epic-web/invariant'
 
 import { prisma } from '#app/utils/db.server.ts'
@@ -27,6 +22,7 @@ import { useLightbox } from '#app/components/lightbox.tsx'
 import { MapBackButton } from '#app/components/map.tsx'
 
 import { type MapHandle } from '../../../../../_layout.tsx'
+import { type Route } from './+types/changes-request.ts'
 
 const DEFAULT_REDIRECT_TO = '/admin/requests/grenades-changes'
 
@@ -39,7 +35,7 @@ export const handle: MapHandle = {
 	},
 }
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
+export async function loader({ request, params }: Route.LoaderArgs) {
 	await requireUserWithPermission(request, 'update:review-grenade-request:any')
 
 	const { grenade: grenadeId } = params
@@ -99,13 +95,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 		status: 404,
 	})
 
-	return json({
+	return data({
 		grenade,
 		grenadeChanges,
 	})
 }
 
-export async function action({ request, params }: ActionFunctionArgs) {
+export async function action({ request, params }: Route.ActionArgs) {
 	await requireUserWithPermission(request, 'update:review-grenade-request:any')
 
 	const { grenade: grenadeId } = params
@@ -203,7 +199,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 					} else {
 						const imageData: {
 							contentType?: string
-							blob?: Buffer
+							blob?: Uint8Array
 							description?: string
 							order?: string
 						} = {}
@@ -283,8 +279,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	})
 }
 
-export default function MapAdminGrenadeChangesRequestRoute() {
-	const data = useLoaderData<typeof loader>()
+export default function MapAdminGrenadeChangesRequestRoute({
+	loaderData,
+}: Route.ComponentProps) {
 	const [searchParams] = useSearchParams()
 
 	const isPending = useIsPending()
@@ -292,19 +289,20 @@ export default function MapAdminGrenadeChangesRequestRoute() {
 	const redirectTo = searchParams.get('redirectTo') ?? DEFAULT_REDIRECT_TO
 
 	const hasChangedPosition =
-		data.grenade.x !== data.grenadeChanges.x ||
-		data.grenade.y !== data.grenadeChanges.y
-	const hasChangedName = data.grenade.name !== data.grenadeChanges.name
+		loaderData.grenade.x !== loaderData.grenadeChanges.x ||
+		loaderData.grenade.y !== loaderData.grenadeChanges.y
+	const hasChangedName =
+		loaderData.grenade.name !== loaderData.grenadeChanges.name
 	const hasChangedDescription =
-		data.grenade.description !== data.grenadeChanges.description
-	const hasDeletedDescription = data.grenadeChanges.description === null
+		loaderData.grenade.description !== loaderData.grenadeChanges.description
+	const hasDeletedDescription = loaderData.grenadeChanges.description === null
 
-	const imagesLength = data.grenade.images.reduce(
+	const imagesLength = loaderData.grenade.images.reduce(
 		(acc, img) => (img.order ? (+img.order > acc ? +img.order : acc) : acc),
 		0,
 	)
 	const imagesChangesLength =
-		data.grenadeChanges.grenadeImageChanges?.reduce(
+		loaderData.grenadeChanges.grenadeImageChanges?.reduce(
 			(acc, img) => (img.order ? (+img.order > acc ? +img.order : acc) : acc),
 			0,
 		) || 0
@@ -315,14 +313,14 @@ export default function MapAdminGrenadeChangesRequestRoute() {
 			<GrenadeMarker
 				to=""
 				destination={{
-					x: data.grenade.x,
-					y: data.grenade.y,
+					x: loaderData.grenade.x,
+					y: loaderData.grenade.y,
 				}}
 				coords={{
-					x: data.grenade.x,
-					y: data.grenade.y,
+					x: loaderData.grenade.x,
+					y: loaderData.grenade.y,
 				}}
-				name={data.grenade.name}
+				name={loaderData.grenade.name}
 				highlight={!hasChangedPosition}
 				disabled
 				className={cn({
@@ -333,14 +331,14 @@ export default function MapAdminGrenadeChangesRequestRoute() {
 				<GrenadeMarker
 					to=""
 					destination={{
-						x: data.grenadeChanges.x,
-						y: data.grenadeChanges.y,
+						x: loaderData.grenadeChanges.x,
+						y: loaderData.grenadeChanges.y,
 					}}
 					coords={{
-						x: data.grenadeChanges.x,
-						y: data.grenadeChanges.y,
+						x: loaderData.grenadeChanges.x,
+						y: loaderData.grenadeChanges.y,
 					}}
-					name={data.grenadeChanges.name}
+					name={loaderData.grenadeChanges.name}
 					disabled
 					className={'border-diff-green bg-diff-green/50'}
 				/>
@@ -357,15 +355,17 @@ export default function MapAdminGrenadeChangesRequestRoute() {
 					</DialogHeader>
 					<DiffView
 						name="Name"
-						oldValue={data.grenade.name}
-						newValue={hasChangedName ? data.grenadeChanges.name : undefined}
+						oldValue={loaderData.grenade.name}
+						newValue={
+							hasChangedName ? loaderData.grenadeChanges.name : undefined
+						}
 					/>
 					<DiffView
 						name="Description"
-						oldValue={data.grenade.description}
+						oldValue={loaderData.grenade.description}
 						newValue={
 							hasChangedDescription
-								? data.grenadeChanges.description
+								? loaderData.grenadeChanges.description
 								: undefined
 						}
 						deleted={hasDeletedDescription}
@@ -377,8 +377,8 @@ export default function MapAdminGrenadeChangesRequestRoute() {
 							<ImageDiffView
 								key={i}
 								index={i}
-								image={data.grenade.images[i]}
-								imagesChanges={data.grenadeChanges.grenadeImageChanges}
+								image={loaderData.grenade.images[i]}
+								imagesChanges={loaderData.grenadeChanges.grenadeImageChanges}
 							/>
 						))}
 

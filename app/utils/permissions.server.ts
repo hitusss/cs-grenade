@@ -1,4 +1,4 @@
-import { json } from '@remix-run/node'
+import { data } from 'react-router'
 
 import { type PermissionString } from '#types/permissions.ts'
 
@@ -10,7 +10,7 @@ export function unauthorized({
 	message,
 	...rest
 }: { message: string } & Record<string, unknown>) {
-	return json(
+	return data(
 		{
 			error: 'Unauthorized',
 			message,

@@ -1,5 +1,4 @@
-import { json, type ActionFunctionArgs } from '@remix-run/node'
-import { useFetcher, useFetchers } from '@remix-run/react'
+import { data, useFetcher, useFetchers } from 'react-router'
 import {
 	getFormProps,
 	getInputProps,
@@ -37,12 +36,14 @@ import {
 } from '#app/components/ui/tooltip.tsx'
 import { ErrorList } from '#app/components/forms.tsx'
 
+import { type Route } from './+types/theme-switch.ts'
+
 const ThemeFormSchema = z.object({
 	mode: z.enum(modes),
 	color: z.enum(colors),
 })
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request }: Route.ActionArgs) {
 	const formData = await request.formData()
 	const submission = parseWithZod(formData, {
 		schema: ThemeFormSchema,
@@ -56,7 +57,7 @@ export async function action({ request }: ActionFunctionArgs) {
 		headers: setTheme(mode, color),
 	}
 
-	return json({ result: submission.reply() }, responseInit)
+	return data({ result: submission.reply() }, responseInit)
 }
 
 export function ThemeSwitch() {

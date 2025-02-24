@@ -1,4 +1,4 @@
-import { json } from '@remix-run/node'
+import { data } from 'react-router'
 import { invariant } from '@epic-web/invariant'
 import * as E from '@react-email/components'
 
@@ -28,7 +28,7 @@ export async function handleVerification({
 	)
 	const newEmail = verifySession.get(newEmailAddressSessionKey)
 	if (!newEmail) {
-		return json(
+		return data(
 			{
 				result: submission.reply({
 					formErrors: [

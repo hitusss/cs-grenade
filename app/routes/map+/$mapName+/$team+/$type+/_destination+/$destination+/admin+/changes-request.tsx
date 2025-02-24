@@ -1,9 +1,4 @@
-import {
-	json,
-	type ActionFunctionArgs,
-	type LoaderFunctionArgs,
-} from '@remix-run/node'
-import { Form, useLoaderData, useSearchParams } from '@remix-run/react'
+import { data, Form, useSearchParams } from 'react-router'
 import { invariantResponse } from '@epic-web/invariant'
 
 import { prisma } from '#app/utils/db.server.ts'
@@ -26,6 +21,7 @@ import { DiffView } from '#app/components/diff.tsx'
 import { MapBackButton } from '#app/components/map.tsx'
 
 import { type MapHandle } from '../../../_layout.tsx'
+import { type Route } from './+types/changes-request.ts'
 
 const DEFAULT_REDIRECT_TO = '/admin/requests/destinations-changes'
 
@@ -37,7 +33,7 @@ export const handle: MapHandle = {
 	},
 }
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
+export async function loader({ request, params }: Route.LoaderArgs) {
 	await requireUserWithPermission(
 		request,
 		'update:review-destination-request:any',
@@ -76,10 +72,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 		status: 404,
 	})
 
-	return json({ destination, destinationChanges })
+	return data({ destination, destinationChanges })
 }
 
-export async function action({ request, params }: ActionFunctionArgs) {
+export async function action({ request, params }: Route.ActionArgs) {
 	await requireUserWithPermission(
 		request,
 		'update:review-destination-request:any',
@@ -174,8 +170,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	})
 }
 
-export default function MapAdminDestinationChangesRequestRoute() {
-	const data = useLoaderData<typeof loader>()
+export default function MapAdminDestinationChangesRequestRoute({
+	loaderData,
+}: Route.ComponentProps) {
 	const [searchParams] = useSearchParams()
 
 	const isPending = useIsPending()
@@ -183,9 +180,10 @@ export default function MapAdminDestinationChangesRequestRoute() {
 	const redirectTo = searchParams.get('redirectTo') ?? DEFAULT_REDIRECT_TO
 
 	const hasChangedPosition =
-		data.destination.x !== data.destinationChanges.x ||
-		data.destination.y !== data.destinationChanges.y
-	const hasChangedName = data.destination.name !== data.destinationChanges.name
+		loaderData.destination.x !== loaderData.destinationChanges.x ||
+		loaderData.destination.y !== loaderData.destinationChanges.y
+	const hasChangedName =
+		loaderData.destination.name !== loaderData.destinationChanges.name
 
 	return (
 		<>
@@ -193,10 +191,10 @@ export default function MapAdminDestinationChangesRequestRoute() {
 			<DestinationMarker
 				to=""
 				coords={{
-					x: data.destination.x,
-					y: data.destination.y,
+					x: loaderData.destination.x,
+					y: loaderData.destination.y,
 				}}
-				name={data.destination.name}
+				name={loaderData.destination.name}
 				highlight={!hasChangedPosition}
 				disabled
 				className={cn({
@@ -207,10 +205,10 @@ export default function MapAdminDestinationChangesRequestRoute() {
 				<DestinationMarker
 					to=""
 					coords={{
-						x: data.destinationChanges.x,
-						y: data.destinationChanges.y,
+						x: loaderData.destinationChanges.x,
+						y: loaderData.destinationChanges.y,
 					}}
-					name={data.destinationChanges.name}
+					name={loaderData.destinationChanges.name}
 					disabled
 					className={'border-diff-green bg-diff-green/50'}
 				/>
@@ -227,8 +225,8 @@ export default function MapAdminDestinationChangesRequestRoute() {
 					</DialogHeader>
 					<DiffView
 						name="Name"
-						oldValue={data.destination.name}
-						newValue={hasChangedName ? data.destination.name : undefined}
+						oldValue={loaderData.destination.name}
+						newValue={hasChangedName ? loaderData.destination.name : undefined}
 					/>
 					<DialogFooter>
 						<Form method="POST" className="flex items-center gap-2">

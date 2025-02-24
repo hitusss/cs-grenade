@@ -3,7 +3,7 @@
  * are needed by the server, but are only known by the browser.
  */
 import * as React from 'react'
-import { useRevalidator } from '@remix-run/react'
+import { useRevalidator } from 'react-router'
 import { getHintUtils } from '@epic-web/client-hints'
 import {
 	clientHint as colorSchemeHint,

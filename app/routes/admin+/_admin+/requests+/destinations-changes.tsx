@@ -1,5 +1,4 @@
-import { json, redirect, type LoaderFunctionArgs } from '@remix-run/node'
-import { Link, useLoaderData, useLocation } from '@remix-run/react'
+import { data, Link, redirect, useLocation } from 'react-router'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { type Prisma } from '@prisma/client'
 import { type ColumnDef } from '@tanstack/react-table'
@@ -31,6 +30,8 @@ import {
 	SortSchema,
 } from '#app/components/data-table.tsx'
 import { Pagination } from '#app/components/pagination.tsx'
+
+import { type Route } from './+types/destinations-changes.ts'
 
 const columns: ColumnDef<{
 	id: string
@@ -181,7 +182,7 @@ export const handle: SEOHandle = {
 	getSitemapEntries: () => null,
 }
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
 	await requireUserWithPermission(
 		request,
 		'read:review-destination-request:any',
@@ -287,12 +288,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		skip: page * perPage - perPage,
 	})
 
-	return json({ destinations, total })
+	return data({ destinations, total })
 }
 
-export default function AdminRequestsDestinationsChangesRoute() {
-	const data = useLoaderData<typeof loader>()
-
+export default function AdminRequestsDestinationsChangesRoute({
+	loaderData,
+}: Route.ComponentProps) {
 	return (
 		<>
 			<div className="flex items-center gap-4">
@@ -300,8 +301,8 @@ export default function AdminRequestsDestinationsChangesRoute() {
 				<h2>Destinations Changes Requests</h2>
 			</div>
 			<ContentFilter queryFilter mapFilter teamFilter typeFilter />
-			<DataTable columns={columns} data={data.destinations} />
-			<Pagination total={data.total} />
+			<DataTable columns={columns} data={loaderData.destinations} />
+			<Pagination total={loaderData.total} />
 		</>
 	)
 }

@@ -1,6 +1,6 @@
 import 'dotenv/config'
 
-import * as fs from 'fs'
+import * as fs from 'node:fs'
 import sourceMapSupport from 'source-map-support'
 
 sourceMapSupport.install({

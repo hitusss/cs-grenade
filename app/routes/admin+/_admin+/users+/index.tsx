@@ -1,16 +1,12 @@
 import {
-	redirect,
-	type ActionFunctionArgs,
-	type LoaderFunctionArgs,
-} from '@remix-run/node'
-import {
-	json,
+	data,
 	Link,
+	redirect,
 	useLoaderData,
 	useNavigate,
 	useSearchParams,
 	useSubmit,
-} from '@remix-run/react'
+} from 'react-router'
 import { parseWithZod } from '@conform-to/zod'
 import { invariantResponse } from '@epic-web/invariant'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
@@ -58,6 +54,8 @@ import {
 	SortSchema,
 } from '#app/components/data-table.tsx'
 import { Pagination } from '#app/components/pagination.tsx'
+
+import { type Route } from './+types/index.ts'
 
 const ToggleRoleIntent = z.object({
 	intent: z.literal('toggleRole'),
@@ -136,7 +134,7 @@ const columns: ColumnDef<{
 		id: 'actions',
 		cell: ({ row }) => {
 			// eslint-disable-next-line react-hooks/rules-of-hooks
-			const data = useLoaderData<typeof loader>()
+			const loaderData = useLoaderData<typeof loader>()
 			// eslint-disable-next-line react-hooks/rules-of-hooks
 			const submit = useSubmit()
 			// eslint-disable-next-line react-hooks/rules-of-hooks
@@ -170,7 +168,7 @@ const columns: ColumnDef<{
 						{hasUpdateUserAnyPermission ? (
 							<DropdownMenuGroup>
 								<DropdownMenuLabel>Toggle Groups</DropdownMenuLabel>
-								{data.roles.map((role) => (
+								{loaderData.roles.map((role) => (
 									<DropdownMenuCheckboxItem
 										key={role.name}
 										checked={row.original.roles.some(
@@ -183,7 +181,7 @@ const columns: ColumnDef<{
 											formData.append('role', role.name)
 											formData.append('value', String(value))
 
-											submit(formData, { method: 'post' })
+											void submit(formData, { method: 'post' })
 										}}
 										className="capitalize"
 										disabled={!userHasRolePriority(user, role.priority)}
@@ -206,7 +204,7 @@ export const handle: SEOHandle = {
 	getSitemapEntries: () => null,
 }
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
 	await requireUserWithPermission(request, 'read:user:any')
 	const searchParams = new URL(request.url).searchParams
 	const query = searchParams.get('query')
@@ -309,10 +307,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		},
 	})
 
-	return json({ total, users, roles })
+	return data({ total, users, roles })
 }
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request }: Route.ActionArgs) {
 	await requireUserWithPermission(request, 'update:user:any')
 
 	const formData = await request.formData()
@@ -322,7 +320,7 @@ export async function action({ request }: ActionFunctionArgs) {
 		async: true,
 	})
 	if (submission.status !== 'success') {
-		return json(
+		return data(
 			{ result: submission.reply() },
 			{
 				status: submission.status === 'error' ? 400 : 200,
@@ -365,10 +363,10 @@ export async function action({ request }: ActionFunctionArgs) {
 				},
 			})
 
-			return json({ result: submission.reply() })
+			return data({ result: submission.reply() })
 		}
 		default: {
-			return json(
+			return data(
 				{
 					result: submission.reply({
 						formErrors: ['Invalid intent'],
@@ -382,8 +380,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	}
 }
 
-export default function AdminUsersRoute() {
-	const data = useLoaderData<typeof loader>()
+export default function AdminUsersRoute({ loaderData }: Route.ComponentProps) {
 	const navigate = useNavigate()
 	const [searchParams, setSearchParams] = useSearchParams()
 
@@ -396,7 +393,7 @@ export default function AdminUsersRoute() {
 			prev.delete('page')
 			return prev
 		})
-		navigate({ search: searchParams.toString() })
+		void navigate({ search: searchParams.toString() })
 	}, 400)
 
 	return (
@@ -427,7 +424,7 @@ export default function AdminUsersRoute() {
 									prev.delete('page')
 									return prev
 								})
-								navigate({ search: searchParams.toString() })
+								void navigate({ search: searchParams.toString() })
 							}}
 						>
 							<SelectTrigger className="w-56">
@@ -435,7 +432,7 @@ export default function AdminUsersRoute() {
 							</SelectTrigger>
 							<SelectContent>
 								<SelectItem value="Any">Any</SelectItem>
-								{data.roles.map((role) => (
+								{loaderData.roles.map((role) => (
 									<SelectItem
 										key={role.name}
 										value={role.name}
@@ -449,8 +446,8 @@ export default function AdminUsersRoute() {
 					</div>
 				</div>
 			</div>
-			<DataTable columns={columns} data={data.users} />
-			<Pagination total={data.total} />
+			<DataTable columns={columns} data={loaderData.users} />
+			<Pagination total={loaderData.total} />
 		</>
 	)
 }

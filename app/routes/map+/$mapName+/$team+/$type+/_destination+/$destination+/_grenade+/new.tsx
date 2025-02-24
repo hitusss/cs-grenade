@@ -1,9 +1,4 @@
-import {
-	json,
-	type ActionFunctionArgs,
-	type LoaderFunctionArgs,
-} from '@remix-run/node'
-import { Link, useActionData } from '@remix-run/react'
+import { data, Link } from 'react-router'
 import { parseWithZod } from '@conform-to/zod'
 import { invariantResponse } from '@epic-web/invariant'
 
@@ -22,6 +17,7 @@ import { GrenadeForm } from '#app/components/grenade-form.tsx'
 import { MapBackButton, MapTitle } from '#app/components/map.tsx'
 
 import { type MapHandle } from '../../../_layout.tsx'
+import { type Route } from './+types/new.ts'
 
 export const handle: MapHandle = {
 	map: {
@@ -30,12 +26,12 @@ export const handle: MapHandle = {
 	},
 }
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
 	await requireUserId(request)
-	return json({})
+	return data({})
 }
 
-export async function action({ request, params }: ActionFunctionArgs) {
+export async function action({ request, params }: Route.ActionArgs) {
 	const userId = await requireUserId(request)
 	const userPermissions = await getUserPermissions(userId)
 	const hasCreateGrenadePermission = userHasPermission(
@@ -51,7 +47,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	invariantResponse(destination, 'Destination is required', { status: 400 })
 
 	const formData = await request.formData()
-	checkHoneypot(formData)
+	await checkHoneypot(formData)
 
 	const submission = await parseWithZod(formData, {
 		schema: GrenadeSchema.transform(async (data) => {
@@ -91,7 +87,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 		async: true,
 	})
 	if (submission.status !== 'success') {
-		return json(
+		return data(
 			{ result: submission.reply() },
 			{
 				status: submission.status === 'error' ? 400 : 200,
@@ -135,9 +131,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	})
 }
 
-export default function MapNewGrenadeRoute() {
-	const actionData = useActionData<typeof action>()
-
+export default function MapNewGrenadeRoute({
+	actionData,
+}: Route.ComponentProps) {
 	const isPending = useIsPending()
 
 	const user = useUser()

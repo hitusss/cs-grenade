@@ -1,5 +1,4 @@
-import { json, type LoaderFunctionArgs } from '@remix-run/node'
-import { Link, useLoaderData } from '@remix-run/react'
+import { data, Link } from 'react-router'
 import { invariantResponse } from '@epic-web/invariant'
 
 import { grenadeLabels, type GrenadeType } from '#types/grenades-types.ts'
@@ -10,7 +9,9 @@ import { ContentCard } from '#app/components/content-card.tsx'
 import { ContentFilter } from '#app/components/content-filter.tsx'
 import { Pagination } from '#app/components/pagination.tsx'
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
+import { type Route } from './+types/grenades.ts'
+
+export async function loader({ request, params }: Route.LoaderArgs) {
 	const { username } = params
 	invariantResponse(username, 'Username is required')
 	const user = await prisma.user.findUnique({
@@ -87,11 +88,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 		take: perPage,
 	})
 
-	return json({ grenades, total, isOwn: user.id === userId })
+	return data({ grenades, total, isOwn: user.id === userId })
 }
-export default function ProfileGrenadesRoute() {
-	const data = useLoaderData<typeof loader>()
-
+export default function ProfileGrenadesRoute({
+	loaderData,
+}: Route.ComponentProps) {
 	return (
 		<div>
 			<ContentFilter
@@ -99,10 +100,10 @@ export default function ProfileGrenadesRoute() {
 				mapFilter
 				teamFilter
 				typeFilter
-				verifiedFilter={data.isOwn}
+				verifiedFilter={loaderData.isOwn}
 			/>
 			<ul className="my-6 flex flex-wrap justify-center gap-4">
-				{data.grenades.map((g) => (
+				{loaderData.grenades.map((g) => (
 					<li key={g.id}>
 						<Link
 							to={`/map/${g.map.name}/${g.team}/${g.type}/${g.destination.id}/${g.id}`}
@@ -135,7 +136,7 @@ export default function ProfileGrenadesRoute() {
 					</li>
 				))}
 			</ul>
-			<Pagination total={data.total} />
+			<Pagination total={loaderData.total} />
 		</div>
 	)
 }

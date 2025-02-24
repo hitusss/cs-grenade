@@ -1,5 +1,5 @@
 import { useId } from 'react'
-import { Form, useSearchParams, useSubmit } from '@remix-run/react'
+import { Form, useSearchParams, useSubmit } from 'react-router'
 
 import { useDebounce, useIsPending } from '#app/utils/misc.tsx'
 
@@ -25,8 +25,8 @@ export function SearchBar({
 		formAction: '/users',
 	})
 
-	const handleFormChange = useDebounce((form: HTMLFormElement) => {
-		submit(form)
+	const handleFormChange = useDebounce(async (form: HTMLFormElement) => {
+		await submit(form)
 	}, 400)
 
 	return (

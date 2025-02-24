@@ -1,10 +1,4 @@
-import {
-	json,
-	redirect,
-	type ActionFunctionArgs,
-	type LoaderFunctionArgs,
-} from '@remix-run/node'
-import { Form, Link, useActionData } from '@remix-run/react'
+import { data, Form, Link, redirect } from 'react-router'
 import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
@@ -18,6 +12,7 @@ import { Icon } from '#app/components/ui/icon.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { ErrorList, Field } from '#app/components/forms.tsx'
 
+import { type Route } from './+types/profile.password_.create.ts'
 import { type BreadcrumbHandle } from './profile.tsx'
 
 export const handle: BreadcrumbHandle & SEOHandle = {
@@ -37,13 +32,13 @@ async function requireNoPassword(userId: string) {
 	}
 }
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
 	const userId = await requireUserId(request)
 	await requireNoPassword(userId)
-	return json({})
+	return data({})
 }
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request }: Route.ActionArgs) {
 	const userId = await requireUserId(request)
 	await requireNoPassword(userId)
 	const formData = await request.formData()
@@ -52,7 +47,7 @@ export async function action({ request }: ActionFunctionArgs) {
 		schema: CreatePasswordForm,
 	})
 	if (submission.status !== 'success') {
-		return json(
+		return data(
 			{
 				result: submission.reply({
 					hideFields: ['password', 'confirmPassword'],
@@ -79,8 +74,9 @@ export async function action({ request }: ActionFunctionArgs) {
 	return redirect(`/settings/profile`, { status: 302 })
 }
 
-export default function SettingsProfilePasswordCreateRoute() {
-	const actionData = useActionData<typeof action>()
+export default function SettingsProfilePasswordCreateRoute({
+	actionData,
+}: Route.ComponentProps) {
 	const isPending = useIsPending()
 
 	const [form, fields] = useForm({

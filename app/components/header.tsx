@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import { Form, Link, useSubmit } from '@remix-run/react'
+import { Form, Link, useSubmit } from 'react-router'
 
 import { userHasPermission } from '#app/utils/permissions.ts'
 import {
@@ -115,7 +115,7 @@ function UserDropdown() {
 						// this prevents the menu from closing before the form submission is completed
 						onSelect={(event) => {
 							event.preventDefault()
-							submit(formRef.current)
+							void submit(formRef.current)
 						}}
 					>
 						<Form action="/logout" method="POST" ref={formRef}>

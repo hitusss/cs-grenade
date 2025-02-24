@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { Link } from '@remix-run/react'
+import { Link } from 'react-router'
 import { Overlay } from 'ol'
 
 import { cn } from '#app/utils/misc.tsx'

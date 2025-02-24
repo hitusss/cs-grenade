@@ -1,24 +1,18 @@
 import { useEffect } from 'react'
 import {
-	json,
-	type HeadersFunction,
-	type LinksFunction,
-	type LoaderFunctionArgs,
-	type MetaFunction,
-} from '@remix-run/node'
-import {
+	data,
 	Links,
 	Meta,
 	Outlet,
 	Scripts,
 	ScrollRestoration,
 	useLoaderData,
-} from '@remix-run/react'
-import { withSentry } from '@sentry/remix'
+} from 'react-router'
 import openLayersSheetUrl from 'ol/ol.css?url'
 import { HoneypotProvider } from 'remix-utils/honeypot/react'
 import { toast } from 'sonner'
 
+import { type Route } from './+types/root.ts'
 import { GeneralErrorBoundary } from './components/error-boundary.tsx'
 import { Footer } from './components/footer.tsx'
 import { Header } from './components/header.tsx'
@@ -44,7 +38,7 @@ import { type Color, type Mode } from './utils/theme.ts'
 import { makeTimings, time } from './utils/timing.server.ts'
 import { getToast } from './utils/toast.server.ts'
 
-export const links: LinksFunction = () => {
+export const links: Route.LinksFunction = () => {
 	return [
 		// Preload svg sprite as a resource to avoid render blocking
 		{ rel: 'preload', href: iconsHref, as: 'image' },
@@ -68,7 +62,7 @@ export const links: LinksFunction = () => {
 	].filter(Boolean)
 }
 
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
+export const meta: Route.MetaFunction = ({ data }) => {
 	if (!data) {
 		return getSocialMetas({
 			url: '',
@@ -80,7 +74,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 	})
 }
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
 	const timings = makeTimings('root loader')
 	const userId = await time(() => getUserId(request), {
 		timings,
@@ -116,7 +110,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	const user = userId
 		? await time(
 				() =>
-					prisma.user.findUniqueOrThrow({
+					prisma.user.findUnique({
 						select: {
 							id: true,
 							name: true,
@@ -144,9 +138,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		await logout({ request, redirectTo: '/' })
 	}
 	const { toast, headers: toastHeaders } = await getToast(request)
-	const honeyProps = honeypot.getInputProps()
+	const honeyProps = await honeypot.getInputProps()
 
-	return json(
+	return data(
 		{
 			maps,
 			user,
@@ -171,7 +165,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	)
 }
 
-export const headers: HeadersFunction = ({ loaderHeaders }) => {
+export const headers: Route.HeadersFunction = ({ loaderHeaders }) => {
 	const headers = {
 		'Server-Timing': loaderHeaders.get('Server-Timing') ?? '',
 	}
@@ -189,7 +183,7 @@ function Document({
 	nonce: string
 	mode?: Mode
 	color?: Color
-	env?: Record<string, string>
+	env?: Record<string, string | undefined>
 }) {
 	const allowIndexing = ENV.ALLOW_INDEXING !== 'false'
 	return (
@@ -228,7 +222,7 @@ function Document({
 
 export function Layout({ children }: { children: React.ReactNode }) {
 	// if there was an error running the loader, data could be missing
-	const data = useLoaderData<typeof loader | null>()
+	const loaderData = useLoaderData<typeof loader | null>()
 	const nonce = useNonce()
 	const theme = useOptionalTheme()
 	return (
@@ -236,7 +230,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 			nonce={nonce}
 			mode={theme.mode}
 			color={theme.color}
-			env={data?.ENV}
+			env={loaderData?.ENV}
 		>
 			{children}
 		</Document>
@@ -244,9 +238,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 function App() {
-	const data = useLoaderData<typeof loader>()
+	const loaderData = useLoaderData<typeof loader>()
 	const theme = useTheme()
-	const toastData = data.toast
+	const toastData = loaderData.toast
 
 	useEffect(() => {
 		if (toastData) {
@@ -278,9 +272,9 @@ function App() {
 }
 
 function AppWithProviders() {
-	const data = useLoaderData<typeof loader>()
+	const loaderData = useLoaderData<typeof loader>()
 	return (
-		<HoneypotProvider {...data.honeyProps}>
+		<HoneypotProvider {...loaderData.honeyProps}>
 			<LightboxProvider>
 				<App />
 			</LightboxProvider>
@@ -288,7 +282,7 @@ function AppWithProviders() {
 	)
 }
 
-export default withSentry(AppWithProviders)
+export default AppWithProviders
 
 export function ErrorBoundary() {
 	return <GeneralErrorBoundary />

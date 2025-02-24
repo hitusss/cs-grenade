@@ -1,9 +1,10 @@
-import { type LoaderFunctionArgs } from '@remix-run/node'
 import fsExtra from 'fs-extra'
 import satori from 'satori'
 
 import { prisma } from '#app/utils/db.server.ts'
 import { toSlug } from '#app/utils/misc.tsx'
+
+import { type Route } from './+types/social-image.ts'
 
 const mapLogoPositions: Array<{
 	top?: string
@@ -34,7 +35,7 @@ const mapLogoPositions: Array<{
 	},
 ]
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
 	const url = new URL(request.url)
 	const searchParams = url.searchParams
 

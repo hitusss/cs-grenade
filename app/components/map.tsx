@@ -6,7 +6,7 @@ import {
 	useRef,
 	useState,
 } from 'react'
-import { Link } from '@remix-run/react'
+import { Link } from 'react-router'
 import { Map as OlMap, View } from 'ol'
 import { getCenter } from 'ol/extent'
 import ImageLayer from 'ol/layer/Image'

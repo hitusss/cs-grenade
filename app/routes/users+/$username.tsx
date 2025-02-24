@@ -1,13 +1,13 @@
-import { json, type LoaderFunctionArgs } from '@remix-run/node'
 import {
+	data,
 	Form,
 	Link,
 	Outlet,
 	useLoaderData,
 	useLocation,
 	useParams,
-	type MetaFunction,
-} from '@remix-run/react'
+	type LoaderFunctionArgs,
+} from 'react-router'
 import { invariantResponse } from '@epic-web/invariant'
 
 import { prisma } from '#app/utils/db.server.ts'
@@ -23,7 +23,9 @@ import {
 	GeneralErrorBoundary,
 } from '#app/components/error-boundary.tsx'
 
-export const meta: MetaFunction<typeof loader> = ({ data, params }) => {
+import { type Route } from './+types/$username.ts'
+
+export const meta: Route.MetaFunction = ({ data, params }) => {
 	const displayName = data?.user.name ?? params.username
 	return [
 		{ title: `${displayName} | CS-Grenade` },
@@ -50,15 +52,15 @@ export async function loader({ params }: LoaderFunctionArgs) {
 
 	invariantResponse(user, 'User not found', { status: 404 })
 
-	return json({ user, userJoinedDisplay: user.createdAt.toLocaleDateString() })
+	return data({ user, userJoinedDisplay: user.createdAt.toLocaleDateString() })
 }
 
 export default function ProfileRoute() {
-	const data = useLoaderData<typeof loader>()
+	const loaderData = useLoaderData<typeof loader>()
 	const params = useParams()
 	const location = useLocation()
 	const loggedInUser = useOptionalUser()
-	const isLoggedInUser = data.user.id === loggedInUser?.id
+	const isLoggedInUser = loaderData.user.id === loggedInUser?.id
 
 	return (
 		<main className="container mb-48 mt-36 flex flex-col items-center justify-center">
@@ -67,8 +69,8 @@ export default function ProfileRoute() {
 					<div className="absolute -top-40">
 						<div className="relative">
 							<img
-								src={getUserImgSrc(data.user.image?.id)}
-								alt={getUserDisplayName(data.user)}
+								src={getUserImgSrc(loaderData.user.image?.id)}
+								alt={getUserDisplayName(loaderData.user)}
 								className="h-52 w-52 rounded-full object-cover"
 							/>
 						</div>
@@ -77,10 +79,12 @@ export default function ProfileRoute() {
 
 				<div className="mt-16 flex flex-col items-center">
 					<div className="flex flex-wrap items-center justify-center gap-4">
-						<h1 className="text-center">{getUserDisplayName(data.user)}</h1>
+						<h1 className="text-center">
+							{getUserDisplayName(loaderData.user)}
+						</h1>
 					</div>
 					<p className="mt-2 text-center text-muted-foreground">
-						Joined {data.userJoinedDisplay}
+						Joined {loaderData.userJoinedDisplay}
 					</p>
 					{isLoggedInUser ? (
 						<Form action="/logout" method="POST" className="mt-3">

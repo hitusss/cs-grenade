@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { useNavigate, useSearchParams } from '@remix-run/react'
+import { useNavigate, useSearchParams } from 'react-router'
 
 import { range } from '#app/utils/misc.tsx'
 
@@ -128,7 +128,7 @@ export function Pagination({
 						prev.delete('page')
 						return prev
 					})
-					navigate({ search: searchParams.toString() })
+					void navigate({ search: searchParams.toString() })
 				}}
 			>
 				<SelectTrigger className="w-24">
@@ -152,7 +152,7 @@ export function Pagination({
 									prev.set('page', String(page - 1))
 									return prev
 								})
-								navigate({ search: searchParams.toString() })
+								void navigate({ search: searchParams.toString() })
 							}}
 						/>
 					</PaginationItem>
@@ -169,7 +169,7 @@ export function Pagination({
 											prev.set('page', String(p))
 											return prev
 										})
-										navigate({ search: searchParams.toString() })
+										void navigate({ search: searchParams.toString() })
 									}}
 									isActive={p === page}
 								>
@@ -186,7 +186,7 @@ export function Pagination({
 									prev.set('page', String(page + 1))
 									return prev
 								})
-								navigate({ search: searchParams.toString() })
+								void navigate({ search: searchParams.toString() })
 							}}
 						/>
 					</PaginationItem>

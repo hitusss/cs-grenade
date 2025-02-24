@@ -1,4 +1,4 @@
-import { redirect } from '@remix-run/node'
+import { redirect } from 'react-router'
 import { createId as cuid } from '@paralleldrive/cuid2'
 import { DiscordStrategy } from 'remix-auth-discord'
 import { z } from 'zod'

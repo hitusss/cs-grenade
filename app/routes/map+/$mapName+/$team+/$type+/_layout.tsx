@@ -1,10 +1,5 @@
 import { useEffect, useRef } from 'react'
-import {
-	json,
-	type LoaderFunctionArgs,
-	type MetaFunction,
-} from '@remix-run/node'
-import { Outlet, useLoaderData, useMatches } from '@remix-run/react'
+import { data, Outlet, useMatches } from 'react-router'
 import { invariantResponse } from '@epic-web/invariant'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { serverOnly$ } from 'vite-env-only/macros'
@@ -19,6 +14,8 @@ import { GrenadeMarker } from '#app/components/grenade-marker.tsx'
 import { MapNav } from '#app/components/map-nav.tsx'
 import { Map } from '#app/components/map.tsx'
 import { type loader as rootLoader } from '#app/root.tsx'
+
+import { type Route } from './+types/_layout.ts'
 
 export const MapHandle = z
 	.object({
@@ -101,13 +98,10 @@ const MapHandleMatch = z
 		}
 	})
 
-export const meta: MetaFunction<
-	typeof loader,
-	{
-		root: typeof rootLoader
-	}
-> = ({ data, matches }) => {
-	const rootData = matches.find((m) => m.id === 'root')
+export const meta: Route.MetaFunction = ({ data, matches }) => {
+	const rootData = matches.find((m) => m?.id === 'root') as
+		| Awaited<ReturnType<typeof rootLoader>>
+		| undefined
 
 	if (!data || !rootData) {
 		return getSocialMetas({
@@ -140,7 +134,7 @@ export const handle = serverOnly$({
 	},
 } satisfies SEOHandle)
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ params }: Route.LoaderArgs) {
 	const { mapName, team, type } = params
 
 	invariantResponse(mapName, 'Map name is required')
@@ -185,11 +179,10 @@ export async function loader({ params }: LoaderFunctionArgs) {
 
 	invariantResponse(map, 'Not Found', { status: 404 })
 
-	return json({ mapName, team, type, map })
+	return data({ mapName, team, type, map })
 }
 
-export default function MapLayout() {
-	const data = useLoaderData<typeof loader>()
+export default function MapLayout({ loaderData }: Route.ComponentProps) {
 	const matches = useMatches()
 	const containerRef = useRef<HTMLDivElement>(null)
 
@@ -197,7 +190,9 @@ export default function MapLayout() {
 	if (!result.success) throw new Error(result.error.errors[0]?.message)
 	const mapHandle = result.data
 	const currentDestination = mapHandle?.currentDestination
-		? data.map.destinations.find((d) => d.id === mapHandle.currentDestination)
+		? loaderData.map.destinations.find(
+				(d) => d.id === mapHandle.currentDestination,
+			)
 		: undefined
 
 	useEffect(() => {
@@ -211,31 +206,31 @@ export default function MapLayout() {
 			className="grid place-items-center duration-500 animate-in fade-in zoom-in"
 		>
 			<div className="grid gap-6">
-				<h1>{data.map.label}</h1>
+				<h1>{loaderData.map.label}</h1>
 				<div className="flex w-full flex-wrap items-center justify-start gap-6">
 					<MapNav
 						label="Team"
 						items={teams.map((t) => ({
 							value: t,
-							to: `/map/${data.mapName}/${t}/${data.type}`,
+							to: `/map/${loaderData.mapName}/${t}/${loaderData.type}`,
 							label: teamLabels[t],
 							img: `/img/teams/${t}.png`,
 						}))}
-						currentValue={data.team}
+						currentValue={loaderData.team}
 					/>
 					<MapNav
 						label="Grenade"
 						items={grenadeTypes.map((g) => ({
 							value: g,
-							to: `/map/${data.mapName}/${data.team}/${g}`,
+							to: `/map/${loaderData.mapName}/${loaderData.team}/${g}`,
 							label: grenadeLabels[g],
 							img: `/img/grenades/${g}.png`,
 						}))}
-						currentValue={data.type}
+						currentValue={loaderData.type}
 					/>
 				</div>
-				<Map imageId={data.map.radar?.id}>
-					{data.map.destinations
+				<Map imageId={loaderData.map.radar?.id}>
+					{loaderData.map.destinations
 						.filter((d) =>
 							currentDestination
 								? mapHandle?.hideCurrentDestination

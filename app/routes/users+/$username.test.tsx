@@ -1,7 +1,7 @@
 /**
  * @vitest-environment jsdom
  */
-import { createRemixStub } from '@remix-run/testing'
+import { createRoutesStub } from 'react-router'
 import { faker } from '@faker-js/faker'
 import { render, screen } from '@testing-library/react'
 import setCookieParser from 'set-cookie-parser'
@@ -24,7 +24,7 @@ test('The user profile when not logged in as self', async () => {
 		select: { id: true, username: true, name: true },
 		data: { ...createUser(), image: { create: userImage } },
 	})
-	const App = createRemixStub([
+	const App = createRoutesStub([
 		{
 			path: '/users/:username',
 			Component: UsernameRoute,
@@ -66,14 +66,14 @@ test('The user profile when logged in as self', async () => {
 		[parsedCookie.name]: parsedCookie.value,
 	}).toString()
 
-	const App = createRemixStub([
+	const App = createRoutesStub([
 		{
 			id: 'root',
 			path: '/',
 			loader: async (args) => {
 				// add the cookie header to the request
 				args.request.headers.set('cookie', cookieHeader)
-				return rootLoader(args)
+				return rootLoader({ ...args, context: args.context })
 			},
 			children: [
 				{

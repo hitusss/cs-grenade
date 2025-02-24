@@ -1,4 +1,4 @@
-import { json } from '@remix-run/node'
+import { data } from 'react-router'
 import { type Submission } from '@conform-to/react'
 import { parseWithZod } from '@conform-to/zod'
 import { z } from 'zod'
@@ -163,7 +163,7 @@ export async function validateRequest(
 	})
 
 	if (submission.status !== 'success') {
-		return json(
+		return data(
 			{ result: submission.reply() },
 			{ status: submission.status === 'error' ? 400 : 200 },
 		)

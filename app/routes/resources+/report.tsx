@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import { json, type ActionFunctionArgs } from '@remix-run/node'
-import { useFetcher } from '@remix-run/react'
+import { data, useFetcher } from 'react-router'
 import { getFormProps, getTextareaProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
@@ -26,6 +25,8 @@ import {
 import { Icon } from '#app/components/ui/icon.tsx'
 import { ErrorList, TextareaField } from '#app/components/forms.tsx'
 
+import { type Route } from './+types/report.ts'
+
 type ReportDialogProps = {
 	className?: string
 	destinationId?: string
@@ -40,18 +41,18 @@ type ReportDialogProps = {
 			grenadeId: string
 	  }
 )
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request }: Route.ActionArgs) {
 	const userId = await requireUserWithPermission(request, 'create:report')
 	const referrerRoute = getReferrerRoute(request)
 
 	const formData = await request.formData()
-	checkHoneypot(formData)
+	await checkHoneypot(formData)
 
 	const submission = parseWithZod(formData, {
 		schema: ReportSchema,
 	})
 	if (submission.status !== 'success') {
-		return json(
+		return data(
 			{ result: submission.reply() },
 			{
 				status: submission.status === 'error' ? 400 : 200,
@@ -71,7 +72,7 @@ export async function action({ request }: ActionFunctionArgs) {
 		},
 	})
 	if (hasRecentlyReport > 0) {
-		return json({
+		return data({
 			result: submission.reply({
 				formErrors: [
 					"You can't report the same place twice in a day, please try again later.",

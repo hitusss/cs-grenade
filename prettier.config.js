@@ -6,7 +6,8 @@ export default {
 	plugins: ['@ianvs/prettier-plugin-sort-imports', ...defaultConfig.plugins],
 	importOrder: [
 		'^(react/(.*)$)|^(react$)',
-		'^(@remix-run/(.*)$)|^(@remix-run$)',
+		'^(react-router/(.*)$)|^(react-router$)',
+		'^(@react-router/(.*)$)|^(@react-router$)',
 		'<THIRD_PARTY_MODULES>',
 		'',
 		'^#types/(.*)$',

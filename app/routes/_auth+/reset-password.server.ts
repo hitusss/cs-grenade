@@ -1,4 +1,4 @@
-import { json, redirect } from '@remix-run/node'
+import { data, redirect } from 'react-router'
 import { invariant } from '@epic-web/invariant'
 
 import { prisma } from '#app/utils/db.server.ts'
@@ -20,7 +20,7 @@ export async function handleVerification({ submission }: VerifyFunctionArgs) {
 	// we don't want to say the user is not found if the email is not found
 	// because that would allow an attacker to check if an email is registered
 	if (!user) {
-		return json(
+		return data(
 			{ result: submission.reply({ fieldErrors: { code: ['Invalid code'] } }) },
 			{ status: 400 },
 		)

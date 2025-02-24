@@ -1,10 +1,4 @@
-import {
-	json,
-	redirect,
-	type ActionFunctionArgs,
-	type LoaderFunctionArgs,
-} from '@remix-run/node'
-import { Form, Link, useLoaderData } from '@remix-run/react'
+import { data, Form, Link, redirect } from 'react-router'
 import { parseWithZod } from '@conform-to/zod'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { type Prisma } from '@prisma/client'
@@ -40,6 +34,8 @@ import {
 } from '#app/components/data-table.tsx'
 import { Pagination } from '#app/components/pagination.tsx'
 import { ReportsList } from '#app/components/report.tsx'
+
+import { type Route } from './+types/destinations.ts'
 
 const DeleteReport = z.object({
 	reportId: z.string(),
@@ -262,7 +258,7 @@ export const handle: SEOHandle = {
 	getSitemapEntries: () => null,
 }
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
 	await requireUserWithPermission(request, 'read:admin:any')
 
 	const searchParams = new URL(request.url).searchParams
@@ -394,10 +390,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		take: perPage,
 	})
 
-	return json({ destinations, total })
+	return data({ destinations, total })
 }
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request }: Route.ActionArgs) {
 	const formData = await request.formData()
 
 	const submission = await parseWithZod(formData, {
@@ -405,7 +401,7 @@ export async function action({ request }: ActionFunctionArgs) {
 		async: true,
 	})
 	if (submission.status !== 'success') {
-		return json(
+		return data(
 			{ result: submission.reply() },
 			{
 				status: submission.status === 'error' ? 400 : 200,
@@ -421,7 +417,7 @@ export async function action({ request }: ActionFunctionArgs) {
 					id: submission.value.reportId,
 				},
 			})
-			return json({ result: submission.reply() })
+			return data({ result: submission.reply() })
 		}
 		case 'delete-all-reports': {
 			await requireUserWithPermission(request, 'delete:report:any')
@@ -430,10 +426,10 @@ export async function action({ request }: ActionFunctionArgs) {
 					destinationId: submission.value.destinationId,
 				},
 			})
-			return json({ result: submission.reply() })
+			return data({ result: submission.reply() })
 		}
 		default: {
-			return json(
+			return data(
 				{
 					result: submission.reply({
 						formErrors: ['Invalid intent'],
@@ -447,9 +443,9 @@ export async function action({ request }: ActionFunctionArgs) {
 	}
 }
 
-export default function AdminReportsDestinationsRoute() {
-	const data = useLoaderData<typeof loader>()
-
+export default function AdminReportsDestinationsRoute({
+	loaderData,
+}: Route.ComponentProps) {
 	return (
 		<>
 			<div className="flex items-center gap-4">
@@ -459,7 +455,7 @@ export default function AdminReportsDestinationsRoute() {
 			<ContentFilter queryFilter mapFilter teamFilter typeFilter />
 			<DataTable
 				columns={columns}
-				data={data.destinations}
+				data={loaderData.destinations}
 				tableOptions={{
 					getRowCanExpand: () => true,
 					getExpandedRowModel: getExpandedRowModel(),
@@ -468,7 +464,7 @@ export default function AdminReportsDestinationsRoute() {
 					<ReportsList reports={row.original.reports} />
 				)}
 			/>
-			<Pagination total={data.total} />
+			<Pagination total={loaderData.total} />
 		</>
 	)
 }

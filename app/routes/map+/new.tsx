@@ -1,9 +1,4 @@
-import {
-	json,
-	type ActionFunctionArgs,
-	type LoaderFunctionArgs,
-} from '@remix-run/node'
-import { useActionData } from '@remix-run/react'
+import { data } from 'react-router'
 import { parseWithZod } from '@conform-to/zod'
 import { parseFormData } from '@mjackson/form-data-parser'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
@@ -17,23 +12,25 @@ import { redirectWithToast } from '#app/utils/toast.server.ts'
 import { MapSchema, MAX_SIZE } from '#app/utils/validators/map.ts'
 import { MapForm } from '#app/components/map-form.tsx'
 
+import { type Route } from './+types/new.ts'
+
 export const handle: SEOHandle = {
 	getSitemapEntries: () => null,
 }
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
 	await requireUserWithPermission(request, 'create:map')
-	return json({})
+	return data({})
 }
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request }: Route.ActionArgs) {
 	const userId = await requireUserWithPermission(request, 'create:map')
 
 	const formData = await parseFormData(
 		request,
 		uploadHandler({ maxPartSize: MAX_SIZE }),
 	)
-	checkHoneypot(formData)
+	await checkHoneypot(formData)
 
 	const submission = await parseWithZod(formData, {
 		schema: MapSchema.transform(async (data) => {
@@ -59,7 +56,7 @@ export async function action({ request }: ActionFunctionArgs) {
 		async: true,
 	})
 	if (submission.status !== 'success') {
-		return json(
+		return data(
 			{ result: submission.reply() },
 			{
 				status: submission.status === 'error' ? 400 : 200,
@@ -93,9 +90,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	})
 }
 
-export default function MapNewRoute() {
-	const actionData = useActionData<typeof action>()
-
+export default function MapNewRoute({ actionData }: Route.ComponentProps) {
 	return (
 		<div className="mx-auto max-w-2xl">
 			<h1>New Map</h1>

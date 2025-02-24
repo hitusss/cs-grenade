@@ -1,9 +1,4 @@
-import {
-	json,
-	type ActionFunctionArgs,
-	type LoaderFunctionArgs,
-} from '@remix-run/node'
-import { Link, useFetcher, useLoaderData } from '@remix-run/react'
+import { data, Link, useFetcher } from 'react-router'
 import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { invariantResponse } from '@epic-web/invariant'
@@ -22,6 +17,7 @@ import { Icon } from '#app/components/ui/icon.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { ErrorList, Field } from '#app/components/forms.tsx'
 
+import { type Info, type Route } from './+types/profile.index.ts'
 import { twoFAVerificationType } from './profile.two-factor.tsx'
 
 export const handle: SEOHandle = {
@@ -33,7 +29,7 @@ const ProfileFormSchema = z.object({
 	username: UsernameSchema,
 })
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
 	const userId = await requireUserId(request)
 	const user = await prisma.user.findUniqueOrThrow({
 		where: { id: userId },
@@ -67,7 +63,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		where: { userId },
 	})
 
-	return json({
+	return data({
 		user,
 		hasPassword: Boolean(password),
 		isTwoFactorEnabled: Boolean(twoFactorVerification),
@@ -83,7 +79,7 @@ const profileUpdateActionIntent = 'update-profile'
 const signOutOfSessionsActionIntent = 'sign-out-of-sessions'
 const deleteDataActionIntent = 'delete-data'
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request }: Route.ActionArgs) {
 	const userId = await requireUserId(request)
 	const formData = await request.formData()
 	const intent = formData.get('intent')
@@ -103,16 +99,16 @@ export async function action({ request }: ActionFunctionArgs) {
 	}
 }
 
-export default function SettingsProfileMainRoute() {
-	const data = useLoaderData<typeof loader>()
-
+export default function SettingsProfileMainRoute({
+	loaderData,
+}: Route.ComponentProps) {
 	return (
 		<div className="flex flex-col gap-12">
 			<div className="flex justify-center">
 				<div className="relative h-52 w-52">
 					<img
-						src={getUserImgSrc(data.user.image?.id)}
-						alt={getUserDisplayName(data.user)}
+						src={getUserImgSrc(loaderData.user.image?.id)}
+						alt={getUserDisplayName(loaderData.user)}
 						className="h-full w-full rounded-full object-cover"
 					/>
 					<Button
@@ -131,18 +127,18 @@ export default function SettingsProfileMainRoute() {
 					</Button>
 				</div>
 			</div>
-			<UpdateProfile />
+			<UpdateProfile loaderData={loaderData} />
 
 			<div className="col-span-6 my-6 h-1 border-b-[1.5px] border-foreground" />
 			<div className="col-span-full flex flex-col gap-6">
 				<div>
 					<Link to="change-email">
-						<Icon name="mail">Change email from {data.user.email}</Icon>
+						<Icon name="mail">Change email from {loaderData.user.email}</Icon>
 					</Link>
 				</div>
 				<div>
 					<Link to="two-factor">
-						{data.isTwoFactorEnabled ? (
+						{loaderData.isTwoFactorEnabled ? (
 							<Icon name="lock">2FA is enabled</Icon>
 						) : (
 							<Icon name="lock-open">Enable 2FA</Icon>
@@ -150,9 +146,9 @@ export default function SettingsProfileMainRoute() {
 					</Link>
 				</div>
 				<div>
-					<Link to={data.hasPassword ? 'password' : 'password/create'}>
+					<Link to={loaderData.hasPassword ? 'password' : 'password/create'}>
 						<Icon name="rectangle-ellipsis">
-							{data.hasPassword ? 'Change Password' : 'Create a Password'}
+							{loaderData.hasPassword ? 'Change Password' : 'Create a Password'}
 						</Icon>
 					</Link>
 				</div>
@@ -161,7 +157,7 @@ export default function SettingsProfileMainRoute() {
 						<Icon name="link">Manage connections</Icon>
 					</Link>
 				</div>
-				<SignOutOfSessions />
+				<SignOutOfSessions loaderData={loaderData} />
 				<DeleteData />
 			</div>
 		</div>
@@ -186,31 +182,29 @@ async function profileUpdateAction({ userId, formData }: ProfileActionArgs) {
 		}),
 	})
 	if (submission.status !== 'success') {
-		return json(
+		return data(
 			{ result: submission.reply() },
 			{ status: submission.status === 'error' ? 400 : 200 },
 		)
 	}
 
-	const data = submission.value
+	const profileData = submission.value
 
 	await prisma.user.update({
 		select: { username: true },
 		where: { id: userId },
 		data: {
-			name: data.name,
-			username: data.username,
+			name: profileData.name,
+			username: profileData.username,
 		},
 	})
 
-	return json({
+	return data({
 		result: submission.reply(),
 	})
 }
 
-function UpdateProfile() {
-	const data = useLoaderData<typeof loader>()
-
+function UpdateProfile({ loaderData }: { loaderData: Info['loaderData'] }) {
 	const fetcher = useFetcher<typeof profileUpdateAction>()
 
 	const [form, fields] = useForm({
@@ -221,8 +215,8 @@ function UpdateProfile() {
 			return parseWithZod(formData, { schema: ProfileFormSchema })
 		},
 		defaultValue: {
-			username: data.user.username,
-			name: data.user.name,
+			username: loaderData.user.username,
+			name: loaderData.user.name,
 		},
 	})
 
@@ -279,15 +273,14 @@ async function signOutOfSessionsAction({ request, userId }: ProfileActionArgs) {
 			id: { not: sessionId },
 		},
 	})
-	return json({ status: 'success' } as const)
+	return data({ status: 'success' } as const)
 }
 
-function SignOutOfSessions() {
-	const data = useLoaderData<typeof loader>()
+function SignOutOfSessions({ loaderData }: { loaderData: Info['loaderData'] }) {
 	const dc = useDoubleCheck()
 
 	const fetcher = useFetcher<typeof signOutOfSessionsAction>()
-	const otherSessionsCount = data.user._count.sessions - 1
+	const otherSessionsCount = loaderData.user._count.sessions - 1
 	return (
 		<div>
 			{otherSessionsCount ? (

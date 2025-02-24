@@ -1,8 +1,4 @@
-import {
-	useNavigate,
-	useRouteLoaderData,
-	useSearchParams,
-} from '@remix-run/react'
+import { useNavigate, useRouteLoaderData, useSearchParams } from 'react-router'
 
 import { grenadeLabels, grenadeTypes } from '#types/grenades-types.ts'
 import { teamLabels, teams } from '#types/teams.ts'
@@ -62,7 +58,7 @@ export function ContentFilter({
 			prev.delete('page')
 			return prev
 		})
-		navigate({ search: searchParams.toString() })
+		void navigate({ search: searchParams.toString() })
 	}
 
 	const handleFilterDelete = (key: string) => {
@@ -71,7 +67,7 @@ export function ContentFilter({
 			prev.delete('page')
 			return prev
 		})
-		navigate({ search: searchParams.toString() })
+		void navigate({ search: searchParams.toString() })
 	}
 
 	const handleFIlterReset = () => {
@@ -84,7 +80,7 @@ export function ContentFilter({
 			prev.delete('page')
 			return prev
 		})
-		navigate({ search: searchParams.toString() })
+		void navigate({ search: searchParams.toString() })
 	}
 
 	const handleQueryChange = useDebounce((value: string) => {

@@ -1,9 +1,4 @@
-import {
-	json,
-	type ActionFunctionArgs,
-	type LoaderFunctionArgs,
-} from '@remix-run/node'
-import { useActionData, useLoaderData } from '@remix-run/react'
+import { data } from 'react-router'
 import { parseWithZod } from '@conform-to/zod'
 import { invariantResponse } from '@epic-web/invariant'
 import { parseFormData } from '@mjackson/form-data-parser'
@@ -16,7 +11,9 @@ import { redirectWithToast } from '#app/utils/toast.server.ts'
 import { EditMapSchema, MAX_SIZE } from '#app/utils/validators/map.ts'
 import { MapForm } from '#app/components/map-form.tsx'
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
+import { type Route } from './+types/edit.ts'
+
+export async function loader({ request, params }: Route.LoaderArgs) {
 	await requireUserWithPermission(request, 'update:map')
 
 	const mapName = params.mapName
@@ -46,10 +43,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 	invariantResponse(map, 'Not found', { status: 404 })
 
-	return json({ map })
+	return data({ map })
 }
 
-export async function action({ request, params }: ActionFunctionArgs) {
+export async function action({ request, params }: Route.ActionArgs) {
 	await requireUserWithPermission(request, 'update:map')
 
 	const mapName = params.mapName
@@ -60,7 +57,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 		request,
 		uploadHandler({ maxPartSize: MAX_SIZE }),
 	)
-	checkHoneypot(formData)
+	await checkHoneypot(formData)
 
 	const submission = await parseWithZod(formData, {
 		schema: EditMapSchema.transform(async (data) => {
@@ -89,7 +86,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 		async: true,
 	})
 	if (submission.status !== 'success') {
-		return json(
+		return data(
 			{ result: submission.reply() },
 			{
 				status: submission.status === 'error' ? 400 : 200,
@@ -153,20 +150,20 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	})
 }
 
-export default function MapEditRoute() {
-	const data = useLoaderData<typeof loader>()
-	const actionData = useActionData<typeof action>()
-
+export default function MapEditRoute({
+	loaderData,
+	actionData,
+}: Route.ComponentProps) {
 	return (
 		<div className="mx-auto max-w-2xl">
 			<h1>Edit Map</h1>
 			<MapForm
 				type="edit"
 				defaultValue={{
-					label: data.map.label,
-					image: data.map.image?.id,
-					logo: data.map.logo?.id,
-					radar: data.map.radar?.id,
+					label: loaderData.map.label,
+					image: loaderData.map.image?.id,
+					logo: loaderData.map.logo?.id,
+					radar: loaderData.map.radar?.id,
 				}}
 				result={actionData?.result}
 			/>

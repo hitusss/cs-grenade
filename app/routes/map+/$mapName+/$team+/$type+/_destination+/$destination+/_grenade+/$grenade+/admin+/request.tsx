@@ -1,9 +1,4 @@
-import {
-	json,
-	type ActionFunctionArgs,
-	type LoaderFunctionArgs,
-} from '@remix-run/node'
-import { Form, useLoaderData, useSearchParams } from '@remix-run/react'
+import { data, Form, useSearchParams } from 'react-router'
 import { invariantResponse } from '@epic-web/invariant'
 
 import { prisma } from '#app/utils/db.server.ts'
@@ -26,6 +21,7 @@ import { useLightbox } from '#app/components/lightbox.tsx'
 import { MapBackButton, MapTitle } from '#app/components/map.tsx'
 
 import { type MapHandle } from '../../../../../_layout.tsx'
+import { type Route } from './+types/request.ts'
 
 const DEFAULT_REDIRECT_TO = '/admin/requests/grenades'
 
@@ -36,7 +32,7 @@ export const handle: MapHandle = {
 	},
 }
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
+export async function loader({ request, params }: Route.LoaderArgs) {
 	await requireUserWithPermission(request, 'create:review-grenade-request:any')
 
 	const { grenade: grenadeId } = params
@@ -67,10 +63,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 	invariantResponse(grenade, 'Not fount', { status: 404 })
 
-	return json({ grenade })
+	return data({ grenade })
 }
 
-export async function action({ request, params }: ActionFunctionArgs) {
+export async function action({ request, params }: Route.ActionArgs) {
 	await requireUserWithPermission(request, 'create:review-grenade-request:any')
 
 	const { grenade: grenadeId } = params
@@ -156,8 +152,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	})
 }
 
-export default function MapAdminGrenadeRequestRoute() {
-	const data = useLoaderData<typeof loader>()
+export default function MapAdminGrenadeRequestRoute({
+	loaderData,
+}: Route.ComponentProps) {
 	const [searchParams] = useSearchParams()
 
 	const isPending = useIsPending()
@@ -165,7 +162,7 @@ export default function MapAdminGrenadeRequestRoute() {
 
 	const redirectTo = searchParams.get('redirectTo') ?? DEFAULT_REDIRECT_TO
 
-	const grenadeImages = data.grenade.images.map((image) => ({
+	const grenadeImages = loaderData.grenade.images.map((image) => ({
 		src: `/resources/grenade-images/${image.id}`,
 		alt: image.description ?? undefined,
 		caption: image.description ?? undefined,
@@ -174,12 +171,12 @@ export default function MapAdminGrenadeRequestRoute() {
 	return (
 		<>
 			<MapBackButton to={redirectTo} />
-			<MapTitle>{data.grenade.name}</MapTitle>
+			<MapTitle>{loaderData.grenade.name}</MapTitle>
 			<GrenadeMarker
 				to=""
-				destination={{ x: data.grenade.x, y: data.grenade.y }}
-				coords={{ x: data.grenade.x, y: data.grenade.y }}
-				name={data.grenade.name}
+				destination={{ x: loaderData.grenade.x, y: loaderData.grenade.y }}
+				coords={{ x: loaderData.grenade.x, y: loaderData.grenade.y }}
+				name={loaderData.grenade.name}
 				highlight
 				disabled
 			/>
@@ -192,11 +189,11 @@ export default function MapAdminGrenadeRequestRoute() {
 				</DialogTrigger>
 				<DialogContent className="max-h-[90vh] max-w-5xl overflow-auto">
 					<DialogHeader>
-						<DialogTitle>{data.grenade.name}</DialogTitle>
+						<DialogTitle>{loaderData.grenade.name}</DialogTitle>
 					</DialogHeader>
-					<p>{data.grenade.description}</p>
+					<p>{loaderData.grenade.description}</p>
 					<ul className="flex flex-wrap gap-4">
-						{data.grenade.images.map((image, index) => (
+						{loaderData.grenade.images.map((image, index) => (
 							<li key={image.id} className="w-48 space-y-1 md:w-64">
 								<img
 									src={`/resources/grenade-images/${image.id}`}

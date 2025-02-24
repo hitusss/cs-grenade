@@ -1,5 +1,4 @@
-import { json, type LoaderFunctionArgs } from '@remix-run/node'
-import { Form, Link, useLoaderData, useNavigate } from '@remix-run/react'
+import { data, Form, Link, useNavigate } from 'react-router'
 import { invariantResponse } from '@epic-web/invariant'
 
 import { getUserId, requireUserId } from '#app/utils/auth.server.ts'
@@ -28,6 +27,7 @@ import { useLightbox } from '#app/components/lightbox.tsx'
 import { ReportDialog } from '#app/routes/resources+/report.tsx'
 
 import { type MapHandle } from '../../../../_layout.tsx'
+import { type Route } from './+types/index.ts'
 
 export const handle: MapHandle = {
 	map: {
@@ -36,7 +36,7 @@ export const handle: MapHandle = {
 	},
 }
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
+export async function loader({ request, params }: Route.LoaderArgs) {
 	const { grenade: grenadeId } = params
 
 	const userId = await getUserId(request)
@@ -81,10 +81,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 		})
 	}
 
-	return json({ grenade })
+	return data({ grenade })
 }
 
-export async function action({ request, params }: LoaderFunctionArgs) {
+export async function action({ request, params }: Route.ActionArgs) {
 	const { grenade: grenadeId } = params
 	invariantResponse(grenadeId, 'Grenade is required')
 
@@ -157,8 +157,7 @@ export async function action({ request, params }: LoaderFunctionArgs) {
 	}
 }
 
-export default function MapGrenadeRoute() {
-	const data = useLoaderData<typeof loader>()
+export default function MapGrenadeRoute({ loaderData }: Route.ComponentProps) {
 	const navigate = useNavigate()
 
 	const isPending = useIsPending()
@@ -176,12 +175,12 @@ export default function MapGrenadeRoute() {
 		'update:grenade:any',
 	)
 
-	const isUserGrenade = user?.id === data.grenade.userId
+	const isUserGrenade = user?.id === loaderData.grenade.userId
 	const canEdit =
 		hasUpdateGrenadeAnyPermission ||
 		(isUserGrenade && hasUpdateGrenadeOwnPermission)
 
-	const grenadeImages = data.grenade.images.map((image) => ({
+	const grenadeImages = loaderData.grenade.images.map((image) => ({
 		src: `/resources/grenade-images/${image.id}`,
 		alt: image.description ?? undefined,
 		caption: image.description ?? undefined,
@@ -191,11 +190,11 @@ export default function MapGrenadeRoute() {
 		<Dialog open onOpenChange={() => !activeLightbox && navigate('..')}>
 			<DialogContent className="max-h-[90vh] max-w-5xl overflow-auto">
 				<DialogHeader>
-					<DialogTitle>{data.grenade.name}</DialogTitle>
+					<DialogTitle>{loaderData.grenade.name}</DialogTitle>
 				</DialogHeader>
-				<p>{data.grenade.description}</p>
+				<p>{loaderData.grenade.description}</p>
 				<ul className="flex flex-wrap gap-4">
-					{data.grenade.images.map((image, index) => (
+					{loaderData.grenade.images.map((image, index) => (
 						<li key={image.id} className="w-48 space-y-1 md:w-64">
 							<img
 								src={`/resources/grenade-images/${image.id}`}
@@ -213,34 +212,36 @@ export default function MapGrenadeRoute() {
 								<TooltipTrigger asChild>
 									<Button
 										variant={
-											data.grenade.favorites.length > 0 ? 'default' : 'outline'
+											loaderData.grenade.favorites.length > 0
+												? 'default'
+												: 'outline'
 										}
 										size="icon"
 										type="submit"
 										name="intent"
 										value={
-											data.grenade.favorites.length > 0
+											loaderData.grenade.favorites.length > 0
 												? 'remove-favorite'
 												: 'add-favorite'
 										}
 									>
 										<Icon name="star" />
 										<span className="sr-only">
-											{data.grenade.favorites.length > 0
+											{loaderData.grenade.favorites.length > 0
 												? 'Remove from favorite'
 												: 'Add to favorite'}
 										</span>
 									</Button>
 								</TooltipTrigger>
 								<TooltipContent>
-									{data.grenade.favorites.length > 0
+									{loaderData.grenade.favorites.length > 0
 										? 'Remove from favorite'
 										: 'Add to favorite'}
 								</TooltipContent>
 							</Tooltip>
 						</TooltipProvider>
 					</Form>
-					{!data.grenade.verified ? (
+					{!loaderData.grenade.verified ? (
 						<Form method="POST">
 							<StatusButton
 								variant="destructive"
@@ -255,12 +256,12 @@ export default function MapGrenadeRoute() {
 							</StatusButton>
 						</Form>
 					) : null}
-					{data.grenade.verified && (isUserGrenade || canEdit) ? (
+					{loaderData.grenade.verified && (isUserGrenade || canEdit) ? (
 						<Button asChild>
 							<Link to="edit">{canEdit ? 'Edit' : 'Request changes'}</Link>
 						</Button>
 					) : (
-						<ReportDialog type="grenade" grenadeId={data.grenade.id} />
+						<ReportDialog type="grenade" grenadeId={loaderData.grenade.id} />
 					)}
 				</div>
 			</DialogContent>
