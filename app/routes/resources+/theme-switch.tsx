@@ -167,7 +167,7 @@ export function ThemeSwitch() {
 												>
 													<div>
 														<span
-															className={`${color} size-4 rounded-full bg-primary`}
+															className={`${color} size-4 rounded-full bg-[var(--primary)]`}
 														>
 															<span className="sr-only">{color}</span>
 														</span>

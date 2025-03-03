@@ -3,7 +3,7 @@ import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '#app/utils/misc.tsx'
 
-const cardVariants = cva('rounded-lg border shadow-sm', {
+const cardVariants = cva('rounded-lg border shadow-xs', {
 	variants: {
 		variant: {
 			default: 'bg-card text-card-foreground',

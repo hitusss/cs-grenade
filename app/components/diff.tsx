@@ -13,7 +13,7 @@ export function DiffView({ name, oldValue, newValue, deleted }: DiffViewProps) {
 	return (
 		<div>
 			<p className="text-caption">{name}</p>
-			<div className="flex flex-wrap [&>*]:flex-1">
+			<div className="flex flex-wrap *:flex-1">
 				<DiffCell
 					isDeleted={Boolean(oldValue) && (deleted || newValue !== undefined)}
 				>

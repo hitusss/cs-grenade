@@ -108,7 +108,7 @@ export default function ProfileRoute() {
 					</div>
 				</div>
 
-				<div className="mt-8 grid max-w-full grid-cols-[repeat(auto-fit,_minmax(8rem,_12rem))] justify-center rounded-md bg-secondary/40 backdrop-blur">
+				<div className="mt-8 grid max-w-full grid-cols-[repeat(auto-fit,minmax(8rem,12rem))] justify-center rounded-md bg-secondary/40 backdrop-blur-sm">
 					<Button
 						variant={
 							location.pathname.endsWith('favorites') ? 'default' : 'ghost'

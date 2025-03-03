@@ -104,7 +104,7 @@ export function ContentFilter({
 			<CollapsibleContent asChild>
 				<Card className="mt-2">
 					<CardContent className="flex flex-col gap-4 p-6">
-						<search className="flex flex-wrap gap-4 [&>*]:w-full md:[&>*]:w-64">
+						<search className="flex flex-wrap gap-4 *:w-full md:*:w-64">
 							{queryFilter ? (
 								<Input
 									type="search"

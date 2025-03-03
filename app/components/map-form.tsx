@@ -106,7 +106,7 @@ export function MapForm({ type, defaultValue, result }: MapFormProps) {
 					}
 				/>
 			</div>
-			<div className="mt-4 flex gap-4 [&>*]:flex-1">
+			<div className="mt-4 flex gap-4 *:flex-1">
 				{type === 'edit' ? (
 					<Button variant="ghost" type="reset">
 						Reset

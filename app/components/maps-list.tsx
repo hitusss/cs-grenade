@@ -34,7 +34,7 @@ export default function MapsList({
 						>
 							<img
 								src={`/resources/map-images/${map.imageId}`}
-								className="absolute -z-10 h-full w-full object-cover brightness-75 transition-all duration-500 group-hover:scale-150 group-hover:blur-sm group-hover:brightness-50"
+								className="absolute -z-10 h-full w-full object-cover brightness-75 transition-all duration-500 group-hover:scale-150 group-hover:blur-xs group-hover:brightness-50"
 							/>
 							<img
 								src={`/resources/map-logos/${map.logoId}`}

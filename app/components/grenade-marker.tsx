@@ -78,11 +78,11 @@ export function GrenadeMarker({
 						aria-hidden={disabled}
 						tabIndex={disabled ? -1 : 0}
 						onClick={(e) => disabled && e.preventDefault()}
-						className="group outline-none"
+						className="group outline-hidden"
 					>
 						<span
 							className={cn(
-								'block size-5 rounded-full border-2 ring-offset-background transition-all duration-300 animate-in zoom-in group-focus-visible:outline-none group-focus-visible:ring-2 group-focus-visible:ring-ring group-focus-visible:ring-offset-2',
+								'block size-5 rounded-full border-2 ring-offset-background transition-all duration-300 animate-in zoom-in group-focus-visible:outline-hidden group-focus-visible:ring-2 group-focus-visible:ring-ring group-focus-visible:ring-offset-2',
 								highlight ? 'bg-primary/75' : 'bg-destructive/75',
 								disabled && 'cursor-default',
 								className,

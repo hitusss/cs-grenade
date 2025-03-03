@@ -280,7 +280,7 @@ export function ImageField({
 							size,
 							fullRounded,
 						}),
-						'relative ring-offset-background focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2',
+						'relative ring-offset-background focus-within:outline-hidden focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2',
 						className,
 					)}
 				>
