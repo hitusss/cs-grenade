@@ -28,7 +28,7 @@ function createDiscordUser(code?: string | null) {
 		refreshToken: `${code}_mock_refresh_token`,
 		profile: {
 			id: faker.string.uuid(),
-			username: faker.internet.userName(),
+			username: faker.internet.username(),
 			global_name: faker.person.fullName(),
 			avatar: faker.number.hex({ min: 1000000, max: 1000000000000 }),
 			email: faker.internet.email(),
