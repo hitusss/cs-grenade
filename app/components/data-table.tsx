@@ -219,7 +219,7 @@ export function DataTableColumnHeader<TData, TValue>({
 					<Button
 						variant="ghost"
 						size="sm"
-						className="-ml-3 h-8 data-[state=open]:bg-accent"
+						className="data-[state=open]:bg-accent -ml-3 h-8"
 					>
 						<span>{title}</span>
 						{column.getIsSorted() === 'desc' ? (
@@ -235,14 +235,14 @@ export function DataTableColumnHeader<TData, TValue>({
 					<DropdownMenuItem onClick={() => column.toggleSorting(false)}>
 						<Icon
 							name="arrow-up"
-							className="mr-2 h-3.5 w-3.5 text-muted-foreground/70"
+							className="text-muted-foreground/70 mr-2 h-3.5 w-3.5"
 						/>
 						Asc
 					</DropdownMenuItem>
 					<DropdownMenuItem onClick={() => column.toggleSorting(true)}>
 						<Icon
 							name="arrow-down"
-							className="mr-2 h-3.5 w-3.5 text-muted-foreground/70"
+							className="text-muted-foreground/70 mr-2 h-3.5 w-3.5"
 						/>
 						Desc
 					</DropdownMenuItem>
@@ -252,7 +252,7 @@ export function DataTableColumnHeader<TData, TValue>({
 							<DropdownMenuItem onClick={() => column.toggleVisibility(false)}>
 								<Icon
 									name="eye-off"
-									className="mr-2 h-3.5 w-3.5 text-muted-foreground/70"
+									className="text-muted-foreground/70 mr-2 h-3.5 w-3.5"
 								/>
 								Hide
 							</DropdownMenuItem>

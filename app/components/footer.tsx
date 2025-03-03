@@ -20,7 +20,7 @@ export function Footer() {
 	const inactiveMaps = data?.maps.filter((m) => !m.isActive) || []
 
 	return (
-		<footer className="border-t bg-accent">
+		<footer className="bg-accent border-t">
 			<div className="container grid grid-cols-4 gap-8 px-12 py-20 xl:grid-cols-12">
 				<div className="col-span-full sm:col-span-2">
 					<Logo className="size-36" />

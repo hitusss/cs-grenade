@@ -61,7 +61,7 @@ export function Message({
 					>
 						{getUserDisplayName(user)}
 					</p>
-					<div className="max-w-full break-words rounded-md bg-secondary px-6 py-3 text-secondary-foreground">
+					<div className="bg-secondary text-secondary-foreground max-w-full rounded-md px-6 py-3 break-words">
 						{message}
 						<ul className="mt-1 flex flex-wrap gap-2 px-1">
 							{images.map((img, index) => (

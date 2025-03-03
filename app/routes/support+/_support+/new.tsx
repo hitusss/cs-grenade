@@ -125,7 +125,7 @@ export default function SupportNewRoute({ actionData }: Route.ComponentProps) {
 
 	return (
 		<div className="relative grid grid-rows-[auto_1fr] justify-center gap-12 py-2">
-			<SidebarTrigger className="absolute left-2 top-4" />
+			<SidebarTrigger className="absolute top-4 left-2" />
 			<h2>Create a new support ticket</h2>
 			<Form method="POST" encType="multipart/form-data" {...getFormProps(form)}>
 				<MultipleImageField.Provider

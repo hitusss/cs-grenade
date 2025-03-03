@@ -68,7 +68,7 @@ export function Notifications() {
 					<Icon name="bell" />
 					{notificationCount > 0 ? (
 						<span
-							className="absolute right-0 top-0 grid size-5 place-items-center rounded-full bg-destructive text-xs text-destructive-foreground"
+							className="bg-destructive text-destructive-foreground absolute top-0 right-0 grid size-5 place-items-center rounded-full text-xs"
 							aria-hidden="true"
 						>
 							{notificationCount >= 10 ? '9+' : notificationCount}
@@ -97,7 +97,7 @@ export function Notifications() {
 							/>
 						))
 					) : (
-						<div className="grid flex-1 place-items-center text-xl text-muted-foreground">
+						<div className="text-muted-foreground grid flex-1 place-items-center text-xl">
 							You don't have any notification
 						</div>
 					)}
@@ -159,7 +159,7 @@ function Notification({
 		<li
 			ref={ref}
 			className={cn(
-				'relative isolate select-none rounded-md px-5 py-3 shadow-md',
+				'relative isolate rounded-md px-5 py-3 shadow-md select-none',
 				seen
 					? 'bg-muted text-muted-foreground'
 					: 'bg-background text-foreground',
@@ -182,7 +182,7 @@ function Notification({
 			<Button
 				size="icon"
 				variant="ghost"
-				className="absolute right-1 top-1 z-10"
+				className="absolute top-1 right-1 z-10"
 				onClick={() => {
 					void submit(
 						{

@@ -149,7 +149,7 @@ export default function LoginRoute({ actionData }: Route.ComponentProps) {
 						Log in
 					</StatusButton>
 				</Form>
-				<ul className="grid gap-6 border-b-2 border-t-2 border-border py-3">
+				<ul className="border-border grid gap-6 border-t-2 border-b-2 py-3">
 					{providerNames.map((providerName) => (
 						<li key={providerName}>
 							<ProviderConnectionForm

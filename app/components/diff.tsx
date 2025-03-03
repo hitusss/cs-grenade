@@ -37,7 +37,7 @@ function DiffCell({
 	return (
 		<div
 			className={cn('flex items-center gap-1 p-1', {
-				'border-b-2 border-t-2': isNew || isDeleted,
+				'border-t-2 border-b-2': isNew || isDeleted,
 				'border-diff-green bg-diff-green/50': isNew,
 				'border-diff-red bg-diff-red/50': isDeleted,
 			})}

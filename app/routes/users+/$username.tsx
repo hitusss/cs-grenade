@@ -63,7 +63,7 @@ export default function ProfileRoute() {
 	const isLoggedInUser = loaderData.user.id === loggedInUser?.id
 
 	return (
-		<main className="container mb-48 mt-36 flex flex-col items-center justify-center">
+		<main className="container mt-36 mb-48 flex flex-col items-center justify-center">
 			<div className="container flex flex-col items-center rounded-lg border p-12">
 				<div className="relative w-52">
 					<div className="absolute -top-40">
@@ -83,7 +83,7 @@ export default function ProfileRoute() {
 							{getUserDisplayName(loaderData.user)}
 						</h1>
 					</div>
-					<p className="mt-2 text-center text-muted-foreground">
+					<p className="text-muted-foreground mt-2 text-center">
 						Joined {loaderData.userJoinedDisplay}
 					</p>
 					{isLoggedInUser ? (
@@ -108,7 +108,7 @@ export default function ProfileRoute() {
 					</div>
 				</div>
 
-				<div className="mt-8 grid max-w-full grid-cols-[repeat(auto-fit,minmax(8rem,12rem))] justify-center rounded-md bg-secondary/40 backdrop-blur-sm">
+				<div className="bg-secondary/40 mt-8 grid max-w-full grid-cols-[repeat(auto-fit,minmax(8rem,12rem))] justify-center rounded-md backdrop-blur-sm">
 					<Button
 						variant={
 							location.pathname.endsWith('favorites') ? 'default' : 'ghost'

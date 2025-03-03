@@ -258,7 +258,7 @@ export function GrenadeForm({
 																index,
 															})}
 															disabled={images.length <= 1}
-															className="absolute right-0 top-0 text-foreground-destructive"
+															className="text-foreground-destructive absolute top-0 right-0"
 														>
 															<Icon name="x" />
 														</Button>

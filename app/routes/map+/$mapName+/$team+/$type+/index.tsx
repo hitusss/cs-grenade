@@ -14,7 +14,7 @@ export default function MapRoute() {
 	return (
 		<>
 			{user ? (
-				<Button className="absolute bottom-0 right-0 z-10" asChild>
+				<Button className="absolute right-0 bottom-0 z-10" asChild>
 					<Link to="new">
 						{hasCreateDestinationPermission ? 'Create' : 'Request'} new
 						destination

@@ -53,7 +53,7 @@ const columns: ColumnDef<TickerResultType[number]>[] = [
 		cell: ({ row }) =>
 			row.original.messages > 0 ? (
 				<div className="flex items-center gap-2">
-					<span className="block size-4 animate-pulse rounded-full bg-destructive" />
+					<span className="bg-destructive block size-4 animate-pulse rounded-full" />
 					{row.original.messages}
 				</div>
 			) : null,

@@ -8,9 +8,9 @@ export function AuthLayout({
 	children: React.ReactNode
 }) {
 	return (
-		<main className="grid min-h-full place-content-center pb-32 pt-20">
+		<main className="grid min-h-full place-content-center pt-20 pb-32">
 			<div className="w-full max-w-lg rounded-lg border px-6 py-12">
-				<div className="flex flex-col gap-3 break-words text-center">
+				<div className="flex flex-col gap-3 text-center break-words">
 					<h1>{title}</h1>
 					<p className="text-muted-foreground">{subtitle}</p>
 				</div>

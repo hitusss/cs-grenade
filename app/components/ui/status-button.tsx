@@ -45,7 +45,7 @@ export const StatusButton = React.forwardRef<
 		error: (
 			<div
 				role="status"
-				className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-destructive"
+				className="bg-destructive inline-flex h-6 w-6 items-center justify-center rounded-full"
 			>
 				<Icon name="x" className="text-destructive-foreground" title="error" />
 			</div>

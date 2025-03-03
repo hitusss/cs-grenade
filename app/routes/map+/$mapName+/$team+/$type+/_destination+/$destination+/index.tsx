@@ -131,7 +131,7 @@ export default function MapDestinationRoute({
 							name: 'intent',
 							value: 'cancel',
 						})}
-						className="absolute bottom-0 right-0 z-10"
+						className="absolute right-0 bottom-0 z-10"
 						status={isPending ? 'pending' : 'idle'}
 					>
 						{cancelDC.doubleCheck ? 'Are you sure?' : 'Cancel request'}
@@ -140,17 +140,17 @@ export default function MapDestinationRoute({
 			) : (
 				<>
 					{canEdit || isUserDestination ? (
-						<Button className="absolute right-0 top-0 z-10" asChild>
+						<Button className="absolute top-0 right-0 z-10" asChild>
 							<Link to="edit">{canEdit ? 'Edit' : 'Request changes'}</Link>
 						</Button>
 					) : (
 						<ReportDialog
 							type="destination"
 							destinationId={loaderData.destination.id}
-							className="absolute right-0 top-0 z-10"
+							className="absolute top-0 right-0 z-10"
 						/>
 					)}
-					<Button className="absolute bottom-0 right-0 z-10" asChild>
+					<Button className="absolute right-0 bottom-0 z-10" asChild>
 						<Link to="new">
 							{hasCreateGrenadePermission
 								? 'Create grenade'

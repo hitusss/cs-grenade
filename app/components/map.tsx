@@ -96,7 +96,7 @@ export function Map({
 			<TooltipProvider delayDuration={0}>
 				<div
 					ref={mapRef}
-					className="relative isolate aspect-square w-full rounded-xl border-8 border-primary bg-primary sm:h-[75vw] sm:max-h-[75vh] sm:w-[75vh] sm:max-w-[75vw] [&_a]:rounded-none [&_a]:shadow-none [&_button]:rounded-none [&_button]:shadow-none"
+					className="border-primary bg-primary relative isolate aspect-square w-full rounded-xl border-8 sm:h-[75vw] sm:max-h-[75vh] sm:w-[75vh] sm:max-w-[75vw] [&_a]:rounded-none [&_a]:shadow-none [&_button]:rounded-none [&_button]:shadow-none"
 				>
 					{children}
 				</div>
@@ -146,8 +146,8 @@ export function MapBackButton({ to = '..' }: { to?: string }) {
 
 export function MapTitle({ children }: { children: React.ReactNode }) {
 	return (
-		<div className="absolute left-1/2 top-0 z-10 -translate-x-1/2 bg-primary px-4 py-2 text-primary-foreground">
-			<h2 className="text-center text-h5">{children}</h2>
+		<div className="bg-primary text-primary-foreground absolute top-0 left-1/2 z-10 -translate-x-1/2 px-4 py-2">
+			<h2 className="text-h5 text-center">{children}</h2>
 		</div>
 	)
 }

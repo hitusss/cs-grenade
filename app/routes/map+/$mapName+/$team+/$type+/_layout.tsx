@@ -203,7 +203,7 @@ export default function MapLayout({ loaderData }: Route.ComponentProps) {
 	return (
 		<div
 			ref={containerRef}
-			className="grid place-items-center duration-500 animate-in fade-in zoom-in"
+			className="animate-in fade-in zoom-in grid place-items-center duration-500"
 		>
 			<div className="grid gap-6">
 				<h1>{loaderData.map.label}</h1>

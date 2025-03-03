@@ -345,7 +345,7 @@ export default function MapAdminGrenadeChangesRequestRoute({
 			) : null}
 			<Dialog>
 				<DialogTrigger asChild>
-					<Button className="absolute bottom-0 right-0 z-10">
+					<Button className="absolute right-0 bottom-0 z-10">
 						Open content
 					</Button>
 				</DialogTrigger>

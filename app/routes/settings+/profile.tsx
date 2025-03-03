@@ -56,7 +56,7 @@ export default function SettingsProfileRoute() {
 		.filter(Boolean)
 
 	return (
-		<div className="m-auto mb-24 mt-16 max-w-3xl">
+		<div className="m-auto mt-16 mb-24 max-w-3xl">
 			<div className="container">
 				<Breadcrumb>
 					<BreadcrumbList>
@@ -88,7 +88,7 @@ export default function SettingsProfileRoute() {
 					</BreadcrumbList>
 				</Breadcrumb>
 			</div>
-			<main className="mx-auto mt-16 bg-muted px-6 py-8 md:container md:rounded-3xl">
+			<main className="bg-muted mx-auto mt-16 px-6 py-8 md:container md:rounded-3xl">
 				<Outlet />
 			</main>
 		</div>

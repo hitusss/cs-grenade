@@ -29,7 +29,7 @@ type Report = {
 
 function Report({ report }: { report: Report }) {
 	return (
-		<li className="grid gap-2 rounded bg-accent px-4 py-2 text-accent-foreground">
+		<li className="bg-accent text-accent-foreground grid gap-2 rounded px-4 py-2">
 			<div className="flex justify-between gap-4">
 				<p>{report.message}</p>
 				<Form method="post">

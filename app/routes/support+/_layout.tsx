@@ -100,7 +100,7 @@ export default function SupportRoute({ loaderData }: Route.ComponentProps) {
 														<div className="flex justify-between gap-2">
 															<p className="text-caption">{ticket.title}</p>
 															{ticket._count.messages > 0 ? (
-																<span className="mt-2 grid size-3 animate-pulse place-items-center rounded-full bg-destructive text-sm text-destructive-foreground" />
+																<span className="bg-destructive text-destructive-foreground mt-2 grid size-3 animate-pulse place-items-center rounded-full text-sm" />
 															) : null}
 														</div>
 														<div className="text-right">
@@ -123,7 +123,7 @@ export default function SupportRoute({ loaderData }: Route.ComponentProps) {
 			<main className="grid h-full w-full flex-1 p-2">
 				{location.pathname === '/support' ? (
 					<div className="relative grid h-full w-full place-content-center">
-						<SidebarTrigger className="absolute left-2 top-4" />
+						<SidebarTrigger className="absolute top-4 left-2" />
 						<p className="text-caption">
 							Select any ticket to see the details.
 						</p>

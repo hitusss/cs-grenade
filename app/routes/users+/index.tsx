@@ -62,7 +62,7 @@ export default function UsersRoute({ loaderData }: Route.ComponentProps) {
 	}
 
 	return (
-		<main className="container mb-48 mt-36 flex flex-col items-center justify-center gap-6">
+		<main className="container mt-36 mb-48 flex flex-col items-center justify-center gap-6">
 			<h1>CS-Grenade Users</h1>
 			<div className="w-full max-w-[700px]">
 				<SearchBar status={loaderData.status} autoFocus autoSubmit />
@@ -80,7 +80,7 @@ export default function UsersRoute({ loaderData }: Route.ComponentProps) {
 								<li key={user.id}>
 									<Link
 										to={user.username}
-										className="flex h-36 w-44 flex-col items-center justify-center rounded-lg bg-muted px-5 py-3"
+										className="bg-muted flex h-36 w-44 flex-col items-center justify-center rounded-lg px-5 py-3"
 									>
 										<img
 											alt={getUserDisplayName(user)}
@@ -88,11 +88,11 @@ export default function UsersRoute({ loaderData }: Route.ComponentProps) {
 											className="h-16 w-16 rounded-full"
 										/>
 										{user.name ? (
-											<span className="w-full overflow-hidden text-ellipsis whitespace-nowrap text-center text-lg">
+											<span className="w-full overflow-hidden text-center text-lg text-ellipsis whitespace-nowrap">
 												{user.name}
 											</span>
 										) : null}
-										<span className="w-full overflow-hidden text-ellipsis text-center text-muted-foreground">
+										<span className="text-muted-foreground w-full overflow-hidden text-center text-ellipsis">
 											{user.username}
 										</span>
 									</Link>

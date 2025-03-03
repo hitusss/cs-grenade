@@ -45,7 +45,7 @@ export function ErrorList({
 	return (
 		<ul id={id} className="flex flex-col gap-1">
 			{errorsToRender.map((e) => (
-				<li key={e} className="text-xs text-foreground-destructive">
+				<li key={e} className="text-foreground-destructive text-xs">
 					{e}
 				</li>
 			))}
@@ -76,7 +76,7 @@ export function Field({
 				aria-describedby={errorId}
 				{...inputProps}
 			/>
-			<div className="min-h-8 px-4 pb-3 pt-1">
+			<div className="min-h-8 px-4 pt-1 pb-3">
 				{errorId ? <ErrorList id={errorId} errors={errors} /> : null}
 			</div>
 		</div>
@@ -120,7 +120,7 @@ export function OTPField({
 					<InputOTPSlot index={5} />
 				</InputOTPGroup>
 			</InputOTP>
-			<div className="min-h-8 px-4 pb-3 pt-1">
+			<div className="min-h-8 px-4 pt-1 pb-3">
 				{errorId ? <ErrorList id={errorId} errors={errors} /> : null}
 			</div>
 		</div>
@@ -150,7 +150,7 @@ export function TextareaField({
 				aria-describedby={errorId}
 				{...textareaProps}
 			/>
-			<div className="min-h-8 px-4 pb-3 pt-1">
+			<div className="min-h-8 px-4 pt-1 pb-3">
 				{errorId ? <ErrorList id={errorId} errors={errors} /> : null}
 			</div>
 		</div>
@@ -210,10 +210,10 @@ export function CheckboxField({
 				<label
 					htmlFor={id}
 					{...labelProps}
-					className="self-center text-sm text-muted-foreground"
+					className="text-muted-foreground self-center text-sm"
 				/>
 			</div>
-			<div className="px-4 pb-3 pt-1">
+			<div className="px-4 pt-1 pb-3">
 				{errorId ? <ErrorList id={errorId} errors={errors} /> : null}
 			</div>
 		</div>
@@ -267,8 +267,8 @@ export function ImageField({
 				{imageSrc || existingImage ? (
 					<span
 						className={cn(
-							'absolute z-10 grid size-10 cursor-pointer place-content-center rounded-full bg-primary p-2',
-							fullRounded ? 'bottom-0 right-0' : '-bottom-5 -right-5',
+							'bg-primary absolute z-10 grid size-10 cursor-pointer place-content-center rounded-full p-2',
+							fullRounded ? 'right-0 bottom-0' : '-right-5 -bottom-5',
 						)}
 					>
 						<Icon name="pencil" />
@@ -280,7 +280,7 @@ export function ImageField({
 							size,
 							fullRounded,
 						}),
-						'relative ring-offset-background focus-within:outline-hidden focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2',
+						'ring-offset-background focus-within:ring-ring relative focus-within:ring-2 focus-within:ring-offset-2 focus-within:outline-hidden',
 						className,
 					)}
 				>
@@ -304,7 +304,7 @@ export function ImageField({
 								alt=""
 							/>
 						) : (
-							<Icon name="plus" className="size-6 text-border" />
+							<Icon name="plus" className="text-border size-6" />
 						)}
 						<input
 							id={id}
@@ -339,7 +339,7 @@ export function ImageField({
 				className={imageFieldVariants({
 					size,
 					fullRounded,
-					className: 'h-auto min-h-8 pb-3 pt-1',
+					className: 'h-auto min-h-8 pt-1 pb-3',
 				})}
 			>
 				{errorId ? <ErrorList id={errorId} errors={errors} /> : null}
@@ -508,7 +508,7 @@ function MultipleImageFieldDisplay({
 										type="button"
 										variant="destructive"
 										size="icon"
-										className="absolute right-0 top-0 size-7 rounded-full"
+										className="absolute top-0 right-0 size-7 rounded-full"
 										onClick={() => {
 											context.setFiles((prev) => {
 												prev?.items.remove(index)
@@ -530,7 +530,7 @@ function MultipleImageFieldDisplay({
 				))}
 			</ul>
 
-			<div className="h-auto min-h-8 pb-3 pt-1">
+			<div className="h-auto min-h-8 pt-1 pb-3">
 				{context.errorId ? (
 					<ErrorList id={context.errorId} errors={context.errors} />
 				) : null}

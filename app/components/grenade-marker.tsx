@@ -82,7 +82,7 @@ export function GrenadeMarker({
 					>
 						<span
 							className={cn(
-								'block size-5 rounded-full border-2 ring-offset-background transition-all duration-300 animate-in zoom-in group-focus-visible:outline-hidden group-focus-visible:ring-2 group-focus-visible:ring-ring group-focus-visible:ring-offset-2',
+								'ring-offset-background animate-in zoom-in group-focus-visible:ring-ring block size-5 rounded-full border-2 transition-all duration-300 group-focus-visible:ring-2 group-focus-visible:ring-offset-2 group-focus-visible:outline-hidden',
 								highlight ? 'bg-primary/75' : 'bg-destructive/75',
 								disabled && 'cursor-default',
 								className,
