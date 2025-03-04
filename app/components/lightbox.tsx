@@ -1,7 +1,7 @@
 import {
 	createContext,
 	useCallback,
-	useContext,
+	use,
 	useEffect,
 	useRef,
 	useState,
@@ -48,20 +48,20 @@ export function LightboxProvider({ children }: { children: React.ReactNode }) {
 	}, [])
 
 	return (
-		<LightboxContext.Provider
+        (<LightboxContext
 			value={{
 				activeLightbox,
 				openLightbox,
 				closeLightbox,
 			}}
 		>
-			{children}
-		</LightboxContext.Provider>
-	)
+            {children}
+        </LightboxContext>)
+    );
 }
 
 export function useLightbox() {
-	const context = useContext(LightboxContext)
+	const context = use(LightboxContext)
 	if (!context)
 		throw new Error('useLigthbox musth be used inside LightboxProvider')
 	return context

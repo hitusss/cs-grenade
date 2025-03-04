@@ -1,6 +1,6 @@
 import React, {
 	createContext,
-	useContext,
+	use,
 	useEffect,
 	useId,
 	useRef,
@@ -386,7 +386,7 @@ function MultipleImageFieldProvider({
 	const errorId = errors?.length ? `${id}-error` : undefined
 
 	return (
-		<MultipleImageFieldContext.Provider
+        (<MultipleImageFieldContext
 			value={{
 				files,
 				setFiles,
@@ -398,9 +398,9 @@ function MultipleImageFieldProvider({
 				errorId,
 			}}
 		>
-			{children}
-		</MultipleImageFieldContext.Provider>
-	)
+            {children}
+        </MultipleImageFieldContext>)
+    );
 }
 
 function MultipleImageFieldInput({
@@ -410,7 +410,7 @@ function MultipleImageFieldInput({
 	...props
 }: VariantProps<typeof buttonVariants> & { className?: string }) {
 	const inputRef = useRef<HTMLInputElement>(null)
-	const context = useContext(MultipleImageFieldContext)
+	const context = use(MultipleImageFieldContext)
 	if (!context)
 		throw new Error(
 			'MultipleImageFieldInput must be used inside of MultipleImageFieldProvider',
@@ -486,7 +486,7 @@ function MultipleImageFieldDisplay({
 	size = 'sm',
 	...props
 }: VariantProps<typeof imageFieldVariants>) {
-	const context = useContext(MultipleImageFieldContext)
+	const context = use(MultipleImageFieldContext)
 	if (!context)
 		throw new Error(
 			'MultipleImageFieldDisplay must be used inside of MultipleImageFieldProvider',

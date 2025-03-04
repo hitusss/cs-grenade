@@ -1,7 +1,7 @@
 import {
 	createContext,
 	useCallback,
-	useContext,
+	use,
 	useEffect,
 	useRef,
 	useState,
@@ -88,12 +88,12 @@ export function Map({
 	}, [imageId])
 
 	return (
-		<MapContext.Provider
+        (<MapContext
 			value={{
 				map,
 			}}
 		>
-			<TooltipProvider delayDuration={0}>
+            <TooltipProvider delayDuration={0}>
 				<div
 					ref={mapRef}
 					className="border-primary bg-primary relative isolate aspect-square w-full rounded-xl border-8 sm:h-[75vw] sm:max-h-[75vh] sm:w-[75vh] sm:max-w-[75vw] [&_a]:rounded-none [&_a]:shadow-none [&_button]:rounded-none [&_button]:shadow-none"
@@ -101,12 +101,12 @@ export function Map({
 					{children}
 				</div>
 			</TooltipProvider>
-		</MapContext.Provider>
-	)
+        </MapContext>)
+    );
 }
 
 export function useMap() {
-	const context = useContext(MapContext)
+	const context = use(MapContext)
 	if (!context)
 		throw new Error('useMap must be used within a MapContext.Provider')
 	return context
