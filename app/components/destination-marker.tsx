@@ -5,12 +5,7 @@ import { Overlay } from 'ol'
 import { cn } from '#app/utils/misc.tsx'
 
 import { useMap } from './map.tsx'
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipPortal,
-	TooltipTrigger,
-} from './ui/tooltip.tsx'
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip.tsx'
 
 type DestinationMarkerProps = {
 	to: string
@@ -83,11 +78,7 @@ export function DestinationMarker({
 						<span className="sr-only">destination: {name}</span>
 					</Link>
 				</TooltipTrigger>
-				<TooltipPortal>
-					<TooltipContent className="bg-white text-black">
-						{name}
-					</TooltipContent>
-				</TooltipPortal>
+				<TooltipContent className="bg-white text-black">{name}</TooltipContent>
 			</Tooltip>
 		</div>
 	)

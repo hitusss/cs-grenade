@@ -21,7 +21,7 @@ export function ContentCard({
 		<Card
 			variant={verified ? 'default' : 'muted'}
 			size="lg"
-			className="flex flex-col justify-between break-words"
+			className="flex flex-col justify-between py-0 break-words"
 		>
 			<CardHeader>
 				<p>Name</p>

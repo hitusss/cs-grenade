@@ -5,12 +5,7 @@ import { Overlay } from 'ol'
 import { cn } from '#app/utils/misc.tsx'
 
 import { useMap } from './map.tsx'
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipPortal,
-	TooltipTrigger,
-} from './ui/tooltip.tsx'
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip.tsx'
 
 type GrenadeMarkerProps = {
 	to: string
@@ -91,11 +86,7 @@ export function GrenadeMarker({
 						<span className="sr-only">grenade: {name}</span>
 					</Link>
 				</TooltipTrigger>
-				<TooltipPortal>
-					<TooltipContent className="bg-white text-black">
-						{name}
-					</TooltipContent>
-				</TooltipPortal>
+				<TooltipContent className="bg-white text-black">{name}</TooltipContent>
 			</Tooltip>
 		</div>
 	)

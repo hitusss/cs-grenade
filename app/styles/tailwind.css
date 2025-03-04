@@ -550,7 +550,7 @@
 
 @layer base {
 	* {
-		@apply border-border text-base text-pretty;
+		@apply border-border outline-ring/50 text-base text-pretty;
 	}
 	body {
 		@apply bg-background text-foreground;

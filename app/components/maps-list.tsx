@@ -28,7 +28,7 @@ export default function MapsList({
 						<Card
 							size="base"
 							className={cn(
-								'relative isolate overflow-hidden',
+								'relative isolate overflow-hidden py-0',
 								!map.isActive && 'grayscale-[0.75]',
 							)}
 						>

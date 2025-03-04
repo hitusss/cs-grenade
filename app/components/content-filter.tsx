@@ -120,7 +120,7 @@ export function ContentFilter({
 									onValueChange={(v) => handleFilterChange('map', v)}
 								>
 									<div className="flex">
-										<SelectTrigger>
+										<SelectTrigger className="flex-1">
 											<SelectValue placeholder="Map" />
 										</SelectTrigger>
 										<Button
@@ -175,7 +175,7 @@ export function ContentFilter({
 									onValueChange={(v) => handleFilterChange('team', v)}
 								>
 									<div className="flex">
-										<SelectTrigger>
+										<SelectTrigger className="flex-1">
 											<SelectValue placeholder="Team" />
 										</SelectTrigger>
 										<Button
@@ -210,7 +210,7 @@ export function ContentFilter({
 									onValueChange={(v) => handleFilterChange('type', v)}
 								>
 									<div className="flex">
-										<SelectTrigger>
+										<SelectTrigger className="flex-1">
 											<SelectValue placeholder="Grenade type" />
 										</SelectTrigger>
 										<Button
@@ -245,7 +245,7 @@ export function ContentFilter({
 									onValueChange={(v) => handleFilterChange('verified', v)}
 								>
 									<div className="flex">
-										<SelectTrigger>
+										<SelectTrigger className="flex-1">
 											<SelectValue placeholder="Verified" />
 										</SelectTrigger>
 										<Button

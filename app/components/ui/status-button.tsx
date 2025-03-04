@@ -3,7 +3,7 @@ import { useSpinDelay } from 'spin-delay'
 
 import { cn } from '#app/utils/misc.tsx'
 
-import { Button, type ButtonProps } from './button.tsx'
+import { Button } from './button.tsx'
 import { Icon } from './icon.tsx'
 import {
 	Tooltip,
@@ -12,9 +12,9 @@ import {
 	TooltipTrigger,
 } from './tooltip.tsx'
 
-export const StatusButton = React.forwardRef<
+const StatusButton = React.forwardRef<
 	HTMLButtonElement,
-	ButtonProps & {
+	React.ComponentProps<typeof Button> & {
 		status: 'pending' | 'success' | 'error' | 'idle'
 		message?: string | null
 		spinDelay?: Parameters<typeof useSpinDelay>[1]
@@ -74,3 +74,5 @@ export const StatusButton = React.forwardRef<
 	)
 })
 StatusButton.displayName = 'Button'
+
+export { StatusButton }

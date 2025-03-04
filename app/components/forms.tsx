@@ -13,7 +13,7 @@ import { REGEXP_ONLY_DIGITS_AND_CHARS, type OTPInputProps } from 'input-otp'
 import { cn } from '#app/utils/misc.tsx'
 
 import { Button, buttonVariants } from './ui/button.tsx'
-import { Checkbox, type CheckboxProps } from './ui/checkbox.tsx'
+import { Checkbox } from './ui/checkbox.tsx'
 import { Icon } from './ui/icon.tsx'
 import {
 	InputOTP,
@@ -164,10 +164,11 @@ export function CheckboxField({
 	className,
 }: {
 	labelProps: React.ComponentProps<'label'>
-	buttonProps: CheckboxProps & {
+	buttonProps: Omit<React.ComponentProps<typeof Checkbox>, 'type'> & {
 		name: string
 		form: string
 		value?: string
+		type?: string
 	}
 	errors?: ListOfErrors
 	className?: string
