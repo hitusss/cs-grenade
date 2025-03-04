@@ -12,14 +12,18 @@ import {
 	TooltipTrigger,
 } from './tooltip.tsx'
 
-const StatusButton = React.forwardRef<
-	HTMLButtonElement,
-	React.ComponentProps<typeof Button> & {
-		status: 'pending' | 'success' | 'error' | 'idle'
-		message?: string | null
-		spinDelay?: Parameters<typeof useSpinDelay>[1]
-	}
->(({ message, status, className, children, spinDelay, ...props }, ref) => {
+function StatusButton({
+	message,
+	status,
+	className,
+	children,
+	spinDelay,
+	...props
+}: React.ComponentProps<typeof Button> & {
+	status: 'pending' | 'success' | 'error' | 'idle'
+	message?: string | null
+	spinDelay?: Parameters<typeof useSpinDelay>[1]
+}) {
 	const delayedPending = useSpinDelay(status === 'pending', {
 		delay: 400,
 		minDuration: 300,
@@ -54,11 +58,7 @@ const StatusButton = React.forwardRef<
 	}[status]
 
 	return (
-		<Button
-			ref={ref}
-			className={cn('flex justify-center gap-4', className)}
-			{...props}
-		>
+		<Button className={cn('flex justify-center gap-4', className)} {...props}>
 			<div>{children}</div>
 			{message ? (
 				<TooltipProvider>
@@ -72,7 +72,6 @@ const StatusButton = React.forwardRef<
 			)}
 		</Button>
 	)
-})
-StatusButton.displayName = 'Button'
+}
 
 export { StatusButton }
