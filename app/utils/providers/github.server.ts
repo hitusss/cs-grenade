@@ -1,10 +1,10 @@
 import { redirect } from 'react-router'
+import { SetCookie } from '@mjackson/headers'
 import { createId as cuid } from '@paralleldrive/cuid2'
 import { GitHubStrategy } from 'remix-auth-github'
 import { z } from 'zod'
 
 import { cache, cachified } from '../cache.server.ts'
-import { connectionSessionStorage } from '../connections.server.ts'
 import { type Timings } from '../timing.server.ts'
 import { MOCK_CODE_GITHUB, MOCK_CODE_GITHUB_HEADER } from './constants.ts'
 import { type AuthProvider } from './provider.ts'
@@ -25,27 +25,39 @@ const shouldMock =
 	process.env.GITHUB_CLIENT_ID?.startsWith('MOCK_') ||
 	process.env.NODE_ENV === 'test'
 
+const GitHubUserResponseSchema = z.object({
+	id: z.number().or(z.string()),
+	login: z.string(),
+	name: z.string().optional(),
+	email: z.string(),
+	avatar_url: z.string().optional(),
+})
+
 export class GitHubProvider implements AuthProvider {
 	getAuthStrategy() {
 		return new GitHubStrategy(
 			{
-				clientID: process.env.GITHUB_CLIENT_ID,
+				clientId: process.env.GITHUB_CLIENT_ID,
 				clientSecret: process.env.GITHUB_CLIENT_SECRET,
-				callbackURL: '/auth/github/callback',
+				redirectURI: process.env.GITHUB_REDIRECT_URI,
 			},
-			async ({ profile }) => {
-				const email = profile.emails[0]?.value.trim().toLowerCase()
-				if (!email) {
-					throw new Error('Email not found')
-				}
-				const username = profile.displayName
-				const imageUrl = profile.photos[0].value
+			async ({ tokens }) => {
+				const userResponse = await fetch('https://api.github.com/user', {
+					headers: {
+						Accept: 'application/vnd.github+json',
+						Authorization: `Bearer ${tokens.accessToken()}`,
+						'X-GitHub-Api-Version': '2022-11-28',
+					},
+				})
+				const rawUser = await userResponse.json()
+				const user = GitHubUserResponseSchema.parse(rawUser)
+
 				return {
-					email,
-					id: profile.id,
-					username,
-					name: profile.name.givenName,
-					imageUrl,
+					id: String(user.id),
+					username: user.login,
+					name: user.name,
+					email: user.email,
+					imageUrl: user.avatar_url,
 				}
 			},
 		)
@@ -85,22 +97,22 @@ export class GitHubProvider implements AuthProvider {
 
 	async handleMockAction(request: Request) {
 		if (!shouldMock) return
-
-		const connectionSession = await connectionSessionStorage.getSession(
-			request.headers.get('cookie'),
-		)
 		const state = cuid()
-		connectionSession.set('oauth2:state', state)
-
-		// allows us to inject a code when running e2e tests,
-		// but falls back to a pre-defined 🐨 constant
 		const code =
 			request.headers.get(MOCK_CODE_GITHUB_HEADER) || MOCK_CODE_GITHUB
 		const searchParams = new URLSearchParams({ code, state })
+		let cookie = new SetCookie({
+			name: 'github',
+			value: searchParams.toString(),
+			path: '/',
+			sameSite: 'Lax',
+			httpOnly: true,
+			maxAge: 60 * 10,
+			secure: process.env.NODE_ENV === 'production' || undefined,
+		})
 		throw redirect(`/auth/github/callback?${searchParams}`, {
 			headers: {
-				'set-cookie':
-					await connectionSessionStorage.commitSession(connectionSession),
+				'Set-Cookie': cookie.toString(),
 			},
 		})
 	}

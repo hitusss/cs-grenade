@@ -83,7 +83,7 @@ export async function insertDiscordUser(code?: string | null) {
 async function getUser(request: Request) {
 	const accessToken = request.headers
 		.get('authorization')
-		?.slice('token '.length)
+		?.slice('Bearer '.length)
 		.trim()
 
 	if (!accessToken) {
@@ -105,7 +105,7 @@ const passthroughDiscord =
 	process.env.NODE_ENV !== 'test'
 
 export const handlers: Array<HttpHandler> = [
-	http.post('https://discord.com/api/v10/oauth2/token', async ({ request }) => {
+	http.post('https://discord.com/api/oauth2/token', async ({ request }) => {
 		if (passthroughDiscord) return passthrough()
 		const params = new URLSearchParams(await request.text())
 

@@ -18,10 +18,16 @@ const schema = z.object({
 	GITHUB_CLIENT_ID: z.string().default('MOCK_GITHUB_CLIENT_ID'),
 	GITHUB_CLIENT_SECRET: z.string().default('MOCK_GITHUB_CLIENT_SECRET'),
 	GITHUB_TOKEN: z.string().default('MOCK_GITHUB_TOKEN'),
+	GITHUB_REDIRECT_URI: z
+		.string()
+		.default('http://localhost:3000/auth/github/callback'),
 
 	DISCORD_CLIENT_ID: z.string().default('MOCK_DISCORD_CLIENT_ID'),
 	DISCORD_CLIENT_SECRET: z.string().default('MOCK_DISCORD_CLIENT_SECRET'),
 	DISCORD_TOKEN: z.string().default('MOCK_DISCORD_TOKEN'),
+	DISCORD_REDIRECT_URI: z
+		.string()
+		.default('http://localhost:3000/auth/discord/callback'),
 
 	ALLOW_INDEXING: z.enum(['true', 'false']).optional(),
 })

@@ -150,7 +150,7 @@ test('completes onboarding after GitHub OAuth given valid user details', async (
 	// let's verify we do not have user with that email in our system:
 	expect(
 		await prisma.user.findUnique({
-			where: { email: normalizeEmail(ghUser.primaryEmail) },
+			where: { email: normalizeEmail(ghUser.profile.email) },
 		}),
 	).toBeNull()
 
@@ -159,7 +159,7 @@ test('completes onboarding after GitHub OAuth given valid user details', async (
 
 	await expect(page).toHaveURL(/\/onboarding\/github/)
 	await expect(
-		page.getByText(new RegExp(`welcome aboard ${ghUser.primaryEmail}`, 'i')),
+		page.getByText(new RegExp(`welcome aboard ${ghUser.profile.email}`, 'i')),
 	).toBeVisible()
 
 	// fields are pre-populated for the user, so we only need to accept
@@ -188,7 +188,7 @@ test('completes onboarding after GitHub OAuth given valid user details', async (
 
 	// internally, a user has been created:
 	await prisma.user.findUniqueOrThrow({
-		where: { email: normalizeEmail(ghUser.primaryEmail) },
+		where: { email: normalizeEmail(ghUser.profile.email) },
 	})
 })
 
@@ -201,7 +201,7 @@ test('logs user in after GitHub OAuth if they are already registered', async ({
 	// let's verify we do not have user with that email in our system ...
 	expect(
 		await prisma.user.findUnique({
-			where: { email: normalizeEmail(ghUser.primaryEmail) },
+			where: { email: normalizeEmail(ghUser.profile.email) },
 		}),
 	).toBeNull()
 	// ... and create one:
@@ -209,7 +209,7 @@ test('logs user in after GitHub OAuth if they are already registered', async ({
 	const user = await prisma.user.create({
 		select: { id: true, name: true },
 		data: {
-			email: normalizeEmail(ghUser.primaryEmail),
+			email: normalizeEmail(ghUser.profile.email),
 			username: normalizeUsername(ghUser.profile.login),
 			name,
 		},
@@ -252,7 +252,7 @@ test('shows help texts on entering invalid details on onboarding page after GitH
 
 	await expect(page).toHaveURL(/\/onboarding\/github/)
 	await expect(
-		page.getByText(new RegExp(`welcome aboard ${ghUser.primaryEmail}`, 'i')),
+		page.getByText(new RegExp(`welcome aboard ${ghUser.profile.email}`, 'i')),
 	).toBeVisible()
 
 	const usernameInput = page.getByRole('textbox', { name: /username/i })

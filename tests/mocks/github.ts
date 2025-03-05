@@ -21,34 +21,6 @@ const githubUserFixturePath = path.join(
 await fsExtra.ensureDir(path.dirname(githubUserFixturePath))
 
 function createGitHubUser(code?: string | null) {
-	const createEmail = () => ({
-		email: faker.internet.email(),
-		verified: faker.datatype.boolean(),
-		primary: false, // <-- can only have one of these
-		visibility: faker.helpers.arrayElement(['public', null]),
-	})
-	const primaryEmail = {
-		...createEmail(),
-		verified: true,
-		primary: true,
-	}
-
-	const emails = [
-		{
-			email: faker.internet.email(),
-			verified: false,
-			primary: false,
-			visibility: 'public',
-		},
-		{
-			email: faker.internet.email(),
-			verified: true,
-			primary: false,
-			visibility: null,
-		},
-		primaryEmail,
-	]
-
 	code ??= faker.string.uuid()
 	return {
 		code,
@@ -58,10 +30,8 @@ function createGitHubUser(code?: string | null) {
 			id: faker.string.uuid(),
 			name: faker.person.fullName(),
 			avatar_url: 'https://github.com/ghost.png',
-			emails: emails.map((e) => e.email),
+			email: faker.internet.email(),
 		},
-		emails,
-		primaryEmail: primaryEmail.email,
 	}
 }
 
@@ -80,11 +50,11 @@ async function getGitHubUsers() {
 	}
 }
 
-export async function deleteGitHubUser(primaryEmail: string) {
+export async function deleteGitHubUser(email: string) {
 	const users = await getGitHubUsers()
-	const user = users.find((u) => u.primaryEmail === primaryEmail)
+	const user = users.find((u) => u.profile.email === email)
 	if (!user) return null
-	await setGitHubUsers(users.filter((u) => u.primaryEmail !== primaryEmail))
+	await setGitHubUsers(users.filter((u) => u.profile.email !== email))
 	return user
 }
 
@@ -112,7 +82,7 @@ export async function insertGitHubUser(code?: string | null) {
 async function getUser(request: Request) {
 	const accessToken = request.headers
 		.get('authorization')
-		?.slice('token '.length)
+		?.slice('Bearer '.length)
 
 	if (!accessToken) {
 		return new Response('Unauthorized', { status: 401 })
@@ -145,23 +115,15 @@ export const handlers: Array<HttpHandler> = [
 				user = await insertGitHubUser(code)
 			}
 
-			return new Response(
-				new URLSearchParams({
+			return json(
+				{
 					access_token: user.accessToken,
 					token_type: '__MOCK_TOKEN_TYPE__',
-				}).toString(),
+				},
 				{ headers: { 'content-type': 'application/x-www-form-urlencoded' } },
 			)
 		},
 	),
-	http.get('https://api.github.com/user/emails', async ({ request }) => {
-		if (passthroughGitHub) return passthrough()
-
-		const user = await getUser(request)
-		if (user instanceof Response) return user
-
-		return json(user.emails)
-	}),
 	http.get('https://api.github.com/user/:id', async ({ params }) => {
 		if (passthroughGitHub) return passthrough()
 

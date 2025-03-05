@@ -1,10 +1,10 @@
 import { invariant } from '@epic-web/invariant'
 import { faker } from '@faker-js/faker'
+import { SetCookie } from '@mjackson/headers'
 import { http } from 'msw'
 import { afterEach, expect, test } from 'vitest'
 
 import { getSessionExpirationDate, sessionKey } from '#app/utils/auth.server.ts'
-import { connectionSessionStorage } from '#app/utils/connections.server.ts'
 import { GITHUB_PROVIDER_NAME } from '#app/utils/connections.tsx'
 import { prisma } from '#app/utils/db.server.ts'
 import { authSessionStorage } from '#app/utils/session.server.ts'
@@ -38,7 +38,7 @@ test('when auth fails, send the user to login with a toast', async () => {
 	consoleError.mockImplementation(() => {})
 	server.use(
 		http.post('https://github.com/login/oauth/access_token', async () => {
-			return new Response('error', { status: 400 })
+			return new Response(null, { status: 400 })
 		}),
 	)
 	const request = await setupRequest()
@@ -111,7 +111,7 @@ test(`when a user is logged in and has already connected, it doesn't do anything
 
 test('when a user exists with the same email, create connection and make session', async () => {
 	const githubUser = await insertGitHubUser()
-	const email = githubUser.primaryEmail.toLowerCase()
+	const email = githubUser.profile.email.toLowerCase()
 	const { userId } = await setupUser({ ...createUser(), email })
 	const request = await setupRequest({ code: githubUser.code })
 	const response = await loader({ request, params: PARAMS, context: {} })
@@ -222,19 +222,25 @@ async function setupRequest({
 	const state = faker.string.uuid()
 	url.searchParams.set('state', state)
 	url.searchParams.set('code', code)
-	const connectionSession = await connectionSessionStorage.getSession()
-	connectionSession.set('oauth2:state', state)
 	const authSession = await authSessionStorage.getSession()
 	if (sessionId) authSession.set(sessionKey, sessionId)
 	const setSessionCookieHeader =
 		await authSessionStorage.commitSession(authSession)
-	const setConnectionSessionCookieHeader =
-		await connectionSessionStorage.commitSession(connectionSession)
+	const searchParams = new URLSearchParams({ code, state })
+	let authCookie = new SetCookie({
+		name: 'github',
+		value: searchParams.toString(),
+		path: '/',
+		sameSite: 'Lax',
+		httpOnly: true,
+		maxAge: 60 * 10,
+		secure: process.env.NODE_ENV === 'production' || undefined,
+	})
 	const request = new Request(url.toString(), {
 		method: 'GET',
 		headers: {
 			cookie: [
-				convertSetCookieToCookie(setConnectionSessionCookieHeader),
+				authCookie.toString(),
 				convertSetCookieToCookie(setSessionCookieHeader),
 			].join('; '),
 		},

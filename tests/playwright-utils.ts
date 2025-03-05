@@ -126,11 +126,11 @@ export const test = base.extend<{
 
 		const user = await prisma.user.findUniqueOrThrow({
 			select: { id: true, name: true },
-			where: { email: normalizeEmail(ghUser!.primaryEmail) },
+			where: { email: normalizeEmail(ghUser!.profile.email) },
 		})
 		await prisma.user.delete({ where: { id: user.id } })
 		await prisma.session.deleteMany({ where: { userId: user.id } })
-		await deleteGitHubUser(ghUser!.primaryEmail)
+		await deleteGitHubUser(ghUser!.profile.email)
 	},
 })
 export const { expect } = test

@@ -1,10 +1,10 @@
 import { redirect } from 'react-router'
+import { SetCookie } from '@mjackson/headers'
+import { DiscordStrategy } from '@nichtsam/remix-auth-discord'
 import { createId as cuid } from '@paralleldrive/cuid2'
-import { DiscordStrategy } from 'remix-auth-discord'
 import { z } from 'zod'
 
 import { cache, cachified } from '../cache.server.ts'
-import { connectionSessionStorage } from '../connections.server.ts'
 import { type Timings } from '../timing.server.ts'
 import { MOCK_CODE_DISCORD, MOCK_CODE_DISCORD_HEADER } from './constants.ts'
 import { type AuthProvider } from './provider.ts'
@@ -25,30 +25,42 @@ const shouldMock =
 	process.env.DISCORD_CLIENT_ID?.startsWith('MOCK_') ||
 	process.env.NODE_ENV === 'test'
 
+const DiscordUserResponseSchema = z.object({
+	id: z.number().or(z.string()),
+	username: z.string(),
+	global_name: z.string().optional(),
+	email: z.string(),
+	avatar: z.string().optional(),
+})
+
 export class DiscordProvider implements AuthProvider {
 	getAuthStrategy() {
 		return new DiscordStrategy(
 			{
-				clientID: process.env.DISCORD_CLIENT_ID,
+				clientId: process.env.DISCORD_CLIENT_ID,
 				clientSecret: process.env.DISCORD_CLIENT_SECRET,
-				callbackURL: '/auth/discord/callback',
-				scope: ['identify', 'email'],
+				redirectURI: process.env.DISCORD_REDIRECT_URI,
+				scopes: ['identify', 'email'],
 			},
-			async ({ profile }) => {
-				const email = profile.emails?.[0]?.value.trim().toLowerCase()
-				if (!email) {
-					throw new Error('Email not found')
-				}
-				const username = profile.__json.username
-				const imageUrl = profile.photos?.[0]
-					? `https://cdn.discordapp.com/avatars/${profile.id}/${profile.photos[0].value}`
-					: undefined
+			async ({ tokens }) => {
+				console.log(tokens)
+				const userResponse = await fetch(
+					'https://discord.com/api/v10/users/@me',
+					{
+						headers: {
+							Authorization: `Bearer ${tokens.accessToken()}`,
+						},
+					},
+				)
+				const rawUser = await userResponse.json()
+				const user = DiscordUserResponseSchema.parse(rawUser)
+
 				return {
-					email,
-					id: profile.id,
-					username,
-					name: profile.__json.global_name ?? undefined,
-					imageUrl,
+					id: String(user.id),
+					username: user.username,
+					name: user.global_name,
+					email: user.email,
+					imageUrl: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}`,
 				}
 			},
 		)
@@ -91,22 +103,22 @@ export class DiscordProvider implements AuthProvider {
 
 	async handleMockAction(request: Request) {
 		if (!shouldMock) return
-
-		const connectionSession = await connectionSessionStorage.getSession(
-			request.headers.get('cookie'),
-		)
 		const state = cuid()
-		connectionSession.set('oauth2:state', state)
-
-		// allows us to inject a code when running e2e tests,
-		// but falls back to a pre-defined 🐨 constant
 		const code =
 			request.headers.get(MOCK_CODE_DISCORD_HEADER) || MOCK_CODE_DISCORD
 		const searchParams = new URLSearchParams({ code, state })
+		let cookie = new SetCookie({
+			name: 'discord',
+			value: searchParams.toString(),
+			path: '/',
+			sameSite: 'Lax',
+			httpOnly: true,
+			maxAge: 60 * 10,
+			secure: process.env.NODE_ENV === 'production' || undefined,
+		})
 		throw redirect(`/auth/discord/callback?${searchParams}`, {
 			headers: {
-				'set-cookie':
-					await connectionSessionStorage.commitSession(connectionSession),
+				'Set-Cookie': cookie.toString(),
 			},
 		})
 	}

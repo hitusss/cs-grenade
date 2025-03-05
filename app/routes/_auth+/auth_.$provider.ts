@@ -6,7 +6,7 @@ import { ProviderNameSchema } from '#app/utils/connections.tsx'
 import { getReferrerRoute } from '#app/utils/misc.tsx'
 import { getRedirectCookieHeader } from '#app/utils/redirect-cookie.server.ts'
 
-import { type Route } from './+types/auth.$provider.ts'
+import { type Route } from './+types/auth_.$provider.ts'
 
 export async function loader() {
 	return redirect('/login')
