@@ -1,11 +1,9 @@
 import { invariantResponse } from '@epic-web/invariant'
 
+import { getUserPermissions } from '#app/models/index.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { notify } from '#app/utils/notifications.server.ts'
-import {
-	getUserPermissions,
-	unauthorized,
-} from '#app/utils/permissions.server.ts'
+import { unauthorized } from '#app/utils/permissions.server.ts'
 import { userHasPermission } from '#app/utils/permissions.ts'
 import { redirectWithToast } from '#app/utils/toast.server.ts'
 

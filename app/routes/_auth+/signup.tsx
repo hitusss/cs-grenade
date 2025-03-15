@@ -5,11 +5,11 @@ import * as E from '@react-email/components'
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
 import { z } from 'zod'
 
+import { getUserIdByEmail } from '#app/models/index.server.ts'
 import {
 	ProviderConnectionForm,
 	providerNames,
 } from '#app/utils/connections.tsx'
-import { prisma } from '#app/utils/db.server.ts'
 import { sendEmail } from '#app/utils/email.server.ts'
 import { checkHoneypot } from '#app/utils/honeypot.server.ts'
 import { useIsPending } from '#app/utils/misc.tsx'
@@ -37,10 +37,7 @@ export async function action({ request }: Route.ActionArgs) {
 
 	const submission = await parseWithZod(formData, {
 		schema: SignupSchema.superRefine(async (data, ctx) => {
-			const existingUser = await prisma.user.findUnique({
-				where: { email: data.email },
-				select: { id: true },
-			})
+			const existingUser = await getUserIdByEmail(data.email)
 			if (existingUser) {
 				ctx.addIssue({
 					path: ['email'],

@@ -1,12 +1,17 @@
 import { redirect } from 'react-router'
 
 import {
+	createConnection,
+	createUserSession,
+	getUserIdByEmail,
+	getUserIdFromConnection,
+} from '#app/models/index.server.ts'
+import {
 	authenticator,
 	getSessionExpirationDate,
 	getUserId,
 } from '#app/utils/auth.server.ts'
 import { providerLabels, ProviderNameSchema } from '#app/utils/connections.tsx'
-import { prisma } from '#app/utils/db.server.ts'
 import { ensurePrimary } from '#app/utils/litefs.server.ts'
 import { combineHeaders } from '#app/utils/misc.tsx'
 import {
@@ -69,14 +74,9 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
 	const { data: profile } = authResult
 
-	const existingConnection = await prisma.connection.findUnique({
-		select: { userId: true },
-		where: {
-			providerName_providerId: {
-				providerName,
-				providerId: String(profile.id),
-			},
-		},
+	const existingConnection = await getUserIdFromConnection({
+		providerName,
+		providerId: String(profile.id),
 	})
 
 	const userId = await getUserId(request)
@@ -105,12 +105,10 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
 	// If we're already logged in, then link the account
 	if (userId) {
-		await prisma.connection.create({
-			data: {
-				providerName,
-				providerId: String(profile.id),
-				userId,
-			},
+		await createConnection({
+			providerName,
+			providerId: String(profile.id),
+			userId,
 		})
 		return redirectWithToast(
 			'/settings/profile/connections',
@@ -130,17 +128,12 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
 	// if the email matches a user in the db, then link the account and
 	// make a new session
-	const user = await prisma.user.findUnique({
-		select: { id: true },
-		where: { email: profile.email.toLowerCase() },
-	})
+	const user = await getUserIdByEmail(profile.email.toLowerCase())
 	if (user) {
-		await prisma.connection.create({
-			data: {
-				providerName,
-				providerId: profile.id,
-				userId: user.id,
-			},
+		await createConnection({
+			providerName,
+			providerId: profile.id,
+			userId: user.id,
 		})
 		return makeSession(
 			{ request, userId: user.id },
@@ -188,12 +181,9 @@ async function makeSession(
 	responseInit?: ResponseInit,
 ) {
 	redirectTo ??= '/'
-	const session = await prisma.session.create({
-		select: { id: true, expirationDate: true, userId: true },
-		data: {
-			expirationDate: getSessionExpirationDate(),
-			userId,
-		},
+	const session = await createUserSession({
+		expirationDate: getSessionExpirationDate(),
+		userId,
 	})
 	return handleNewSession(
 		{ request, session, redirectTo, remember: true },

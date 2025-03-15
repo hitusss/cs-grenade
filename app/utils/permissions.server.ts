@@ -1,9 +1,13 @@
 import { data } from 'react-router'
 
 import { type PermissionString } from '#types/permissions.ts'
+import {
+	checkUserPermission,
+	checkUserRole,
+	checkUserRolePriority,
+} from '#app/models/index.server.ts'
 
 import { requireUserId } from './auth.server.ts'
-import { prisma } from './db.server.ts'
 import { parsePermissionString } from './permissions.ts'
 
 export function unauthorized({
@@ -20,48 +24,15 @@ export function unauthorized({
 	)
 }
 
-export async function getUserPermissions(userId: string) {
-	const user = await prisma.user.findUniqueOrThrow({
-		where: { id: userId },
-		select: {
-			roles: {
-				select: {
-					name: true,
-					priority: true,
-					permissions: {
-						select: { entity: true, action: true, access: true },
-					},
-				},
-			},
-		},
-	})
-
-	return user
-}
-
 export async function requireUserWithPermission(
 	request: Request,
 	permission: PermissionString,
 ) {
 	const userId = await requireUserId(request)
 	const permissionData = parsePermissionString(permission)
-	const user = await prisma.user.findFirst({
-		select: { id: true },
-		where: {
-			id: userId,
-			roles: {
-				some: {
-					permissions: {
-						some: {
-							...permissionData,
-							access: permissionData.access
-								? { in: permissionData.access }
-								: undefined,
-						},
-					},
-				},
-			},
-		},
+	const user = await checkUserPermission({
+		userId,
+		permission: permissionData,
 	})
 	if (!user) {
 		throw unauthorized({
@@ -74,14 +45,9 @@ export async function requireUserWithPermission(
 
 export async function requireUserWithRole(request: Request, name: string) {
 	const userId = await requireUserId(request)
-	const user = await prisma.user.findFirst({
-		select: { id: true },
-		where: {
-			id: userId,
-			roles: {
-				some: { name },
-			},
-		},
+	const user = await checkUserRole({
+		userId,
+		role: name,
 	})
 	if (!user) {
 		throw unauthorized({
@@ -97,18 +63,9 @@ export async function requireUserWithRolePriority(
 	priority: number,
 ) {
 	const userId = await requireUserId(request)
-	const user = await prisma.user.findFirst({
-		select: { id: true },
-		where: {
-			id: userId,
-			roles: {
-				some: {
-					priority: {
-						gte: priority,
-					},
-				},
-			},
-		},
+	const user = await checkUserRolePriority({
+		userId,
+		rolePriority: priority,
 	})
 	if (!user) {
 		throw unauthorized({

@@ -11,6 +11,7 @@ export default {
 		'<THIRD_PARTY_MODULES>',
 		'',
 		'^#types/(.*)$',
+		'^#app/models/(.*)$',
 		'^#app/utils/(.*)$',
 		'^#app/hooks/(.*)$',
 		'^#app/components/ui/(.*)$',

@@ -5,8 +5,13 @@ import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import * as QRCode from 'qrcode'
 import { z } from 'zod'
 
+import {
+	deleteMayVerifications,
+	getUserEmail,
+	getVerification,
+	updateVerifiactionType,
+} from '#app/models/index.server.ts'
 import { requireUserId } from '#app/utils/auth.server.ts'
-import { prisma } from '#app/utils/db.server.ts'
 import { getDomainUrl, useIsPending } from '#app/utils/misc.tsx'
 import { redirectWithToast } from '#app/utils/toast.server.ts'
 import { getTOTPAuthUri } from '#app/utils/totp.server.ts'
@@ -39,25 +44,17 @@ export const twoFAVerifyVerificationType = '2fa-verify'
 
 export async function loader({ request }: Route.LoaderArgs) {
 	const userId = await requireUserId(request)
-	const verification = await prisma.verification.findUnique({
-		where: {
-			target_type: { type: twoFAVerifyVerificationType, target: userId },
-		},
-		select: {
-			id: true,
-			algorithm: true,
-			secret: true,
-			period: true,
-			digits: true,
-		},
+	const verification = await getVerification({
+		type: twoFAVerifyVerificationType,
+		target: userId,
 	})
 	if (!verification) {
 		return redirect('/settings/profile/two-factor')
 	}
-	const user = await prisma.user.findUniqueOrThrow({
-		where: { id: userId },
-		select: { email: true },
-	})
+	const user = await getUserEmail(userId)
+	if (!user) {
+		throw new Error('User not found')
+	}
 	const issuer = new URL(getDomainUrl(request)).host
 	const otpUri = getTOTPAuthUri({
 		...verification,
@@ -104,17 +101,17 @@ export async function action({ request }: Route.ActionArgs) {
 
 	switch (submission.value.intent) {
 		case 'cancel': {
-			await prisma.verification.deleteMany({
-				where: { type: twoFAVerifyVerificationType, target: userId },
+			await deleteMayVerifications({
+				type: twoFAVerifyVerificationType,
+				target: userId,
 			})
 			return redirect('/settings/profile/two-factor')
 		}
 		case 'verify': {
-			await prisma.verification.update({
-				where: {
-					target_type: { type: twoFAVerifyVerificationType, target: userId },
-				},
-				data: { type: twoFAVerificationType },
+			await updateVerifiactionType({
+				target: userId,
+				type: twoFAVerifyVerificationType,
+				newType: twoFAVerificationType,
 			})
 			return redirectWithToast('/settings/profile/two-factor', {
 				type: 'success',

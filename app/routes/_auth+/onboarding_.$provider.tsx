@@ -17,13 +17,13 @@ import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { safeRedirect } from 'remix-utils/safe-redirect'
 import { z } from 'zod'
 
+import { getUserIdByUsername } from '#app/models/index.server.ts'
 import {
 	requireAnonymous,
 	sessionKey,
 	signupWithConnection,
 } from '#app/utils/auth.server.ts'
 import { ProviderNameSchema } from '#app/utils/connections.tsx'
-import { prisma } from '#app/utils/db.server.ts'
 import { useIsPending } from '#app/utils/misc.tsx'
 import { authSessionStorage } from '#app/utils/session.server.ts'
 import { redirectWithToast } from '#app/utils/toast.server.ts'
@@ -115,10 +115,7 @@ export async function action({ request, params }: Route.ActionArgs) {
 
 	const submission = await parseWithZod(formData, {
 		schema: SignupFormSchema.superRefine(async (data, ctx) => {
-			const existingUser = await prisma.user.findUnique({
-				where: { username: data.username },
-				select: { id: true },
-			})
+			const existingUser = await getUserIdByUsername(data.username)
 			if (existingUser) {
 				ctx.addIssue({
 					path: ['username'],

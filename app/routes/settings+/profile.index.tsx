@@ -5,6 +5,14 @@ import { invariantResponse } from '@epic-web/invariant'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { z } from 'zod'
 
+import {
+	deleteUserSessionExceptOne,
+	deteteUser,
+	getUserIdByUsername,
+	getUserWithActiveSessionCount,
+	getVerificationId,
+	updateUsernameAndName,
+} from '#app/models/index.server.ts'
 import { requireUserId, sessionKey } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { useDoubleCheck } from '#app/utils/misc.tsx'
@@ -31,31 +39,13 @@ const ProfileFormSchema = z.object({
 
 export async function loader({ request }: Route.LoaderArgs) {
 	const userId = await requireUserId(request)
-	const user = await prisma.user.findUniqueOrThrow({
-		where: { id: userId },
-		select: {
-			id: true,
-			name: true,
-			username: true,
-			email: true,
-			image: {
-				select: { id: true },
-			},
-			_count: {
-				select: {
-					sessions: {
-						where: {
-							expirationDate: { gt: new Date() },
-						},
-					},
-				},
-			},
-		},
-	})
+	const user = await getUserWithActiveSessionCount(userId)
 
-	const twoFactorVerification = await prisma.verification.findUnique({
-		select: { id: true },
-		where: { target_type: { type: twoFAVerificationType, target: userId } },
+	invariantResponse(user, 'User not found', { status: 404 })
+
+	const twoFactorVerification = await getVerificationId({
+		type: twoFAVerificationType,
+		target: userId,
 	})
 
 	const password = await prisma.password.findUnique({
@@ -168,10 +158,7 @@ async function profileUpdateAction({ userId, formData }: ProfileActionArgs) {
 	const submission = await parseWithZod(formData, {
 		async: true,
 		schema: ProfileFormSchema.superRefine(async ({ username }, ctx) => {
-			const existingUsername = await prisma.user.findUnique({
-				where: { username },
-				select: { id: true },
-			})
+			const existingUsername = await getUserIdByUsername(username)
 			if (existingUsername && existingUsername.id !== userId) {
 				ctx.addIssue({
 					path: ['username'],
@@ -188,15 +175,12 @@ async function profileUpdateAction({ userId, formData }: ProfileActionArgs) {
 		)
 	}
 
-	const profileData = submission.value
+	const { username, name } = submission.value
 
-	await prisma.user.update({
-		select: { username: true },
-		where: { id: userId },
-		data: {
-			name: profileData.name,
-			username: profileData.username,
-		},
+	await updateUsernameAndName({
+		userId,
+		username,
+		name,
 	})
 
 	return data({
@@ -267,11 +251,9 @@ async function signOutOfSessionsAction({ request, userId }: ProfileActionArgs) {
 		sessionId,
 		'You must be authenticated to sign out of other sessions',
 	)
-	await prisma.session.deleteMany({
-		where: {
-			userId,
-			id: { not: sessionId },
-		},
+	await deleteUserSessionExceptOne({
+		userId,
+		sessionId,
 	})
 	return data({ status: 'success' } as const)
 }
@@ -313,7 +295,7 @@ function SignOutOfSessions({ loaderData }: { loaderData: Info['loaderData'] }) {
 }
 
 async function deleteDataAction({ userId }: ProfileActionArgs) {
-	await prisma.user.delete({ where: { id: userId } })
+	await deteteUser(userId)
 	return redirectWithToast('/', {
 		type: 'success',
 		title: 'Data Deleted',

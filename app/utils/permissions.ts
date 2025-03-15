@@ -16,7 +16,7 @@ export function parsePermissionString(permissionString: PermissionString) {
 	return {
 		action,
 		entity,
-		access: access ? (access.split(',') as Array<Access>) : undefined,
+		access,
 	}
 }
 

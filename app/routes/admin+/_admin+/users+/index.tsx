@@ -54,6 +54,12 @@ import {
 	SortSchema,
 } from '#app/components/data-table.tsx'
 import { Pagination } from '#app/components/pagination.tsx'
+import {
+	addUserRole,
+	getFilteredUserCount,
+	getFilteredUsersWithPagginations,
+	removeUserRole,
+} from '#app/models/index.server.ts'
 
 import { type Route } from './+types/index.ts'
 
@@ -232,72 +238,13 @@ export async function loader({ request }: Route.LoaderArgs) {
 		orderBy[sort.id] = sort.desc ? 'desc' : 'asc'
 	})
 
-	const total = await prisma.user.count({
-		where: {
-			OR: query
-				? [
-						{
-							email: {
-								contains: query,
-							},
-						},
-						{
-							username: {
-								contains: query,
-							},
-						},
-						{
-							name: {
-								contains: query,
-							},
-						},
-					]
-				: undefined,
-			roles: role ? { some: { name: role } } : undefined,
-		},
-	})
-	const users = await prisma.user.findMany({
-		where: {
-			OR: query
-				? [
-						{
-							email: {
-								contains: query,
-							},
-						},
-						{
-							username: {
-								contains: query,
-							},
-						},
-						{
-							name: {
-								contains: query,
-							},
-						},
-					]
-				: undefined,
-			roles: role ? { some: { name: role } } : undefined,
-		},
-		select: {
-			id: true,
-			email: true,
-			username: true,
-			name: true,
-			image: {
-				select: {
-					id: true,
-				},
-			},
-			roles: {
-				select: {
-					name: true,
-				},
-			},
-		},
+	const total = await getFilteredUserCount({ query, role })
+	const users = await getFilteredUsersWithPagginations({
+		query,
+		role,
 		orderBy,
-		skip: page * perPage - perPage,
-		take: perPage,
+		page,
+		perPage,
 	})
 
 	const roles = await prisma.role.findMany({
@@ -345,23 +292,17 @@ export async function action({ request }: Route.ActionArgs) {
 			invariantResponse(roleWithPriority, "Role doesn't exist")
 			await requireUserWithRolePriority(request, roleWithPriority.priority)
 
-			await prisma.user.update({
-				where: { id: userId },
-				data: {
-					roles: {
-						connect: booleanValue
-							? {
-									name: role,
-								}
-							: undefined,
-						disconnect: booleanValue
-							? undefined
-							: {
-									name: role,
-								},
-					},
-				},
-			})
+			if (booleanValue) {
+				await addUserRole({
+					userId,
+					role,
+				})
+			} else {
+				await removeUserRole({
+					userId,
+					role,
+				})
+			}
 
 			return data({ result: submission.reply() })
 		}

@@ -2,7 +2,7 @@ import { data } from 'react-router'
 import { invariant } from '@epic-web/invariant'
 import * as E from '@react-email/components'
 
-import { prisma } from '#app/utils/db.server.ts'
+import { getUserEmail, updateUserEmail } from '#app/models/index.server.ts'
 import { sendEmail } from '#app/utils/email.server.ts'
 import { redirectWithToast } from '#app/utils/toast.server.ts'
 import { verifySessionStorage } from '#app/utils/verification.server.ts'
@@ -39,16 +39,14 @@ export async function handleVerification({
 			{ status: 400 },
 		)
 	}
-	const preUpdateUser = await prisma.user.findFirstOrThrow({
-		select: { email: true },
-		where: { id: submission.value.target },
+	const preUpdateUser = await getUserEmail(submission.value.target)
+	if (!preUpdateUser) {
+		throw new Error('User not found')
+	}
+	const user = await updateUserEmail({
+		userId: submission.value.target,
+		email: newEmail,
 	})
-	const user = await prisma.user.update({
-		where: { id: submission.value.target },
-		select: { id: true, email: true, username: true },
-		data: { email: newEmail },
-	})
-
 	void sendEmail({
 		to: preUpdateUser.email,
 		subject: 'Epic Stack email changed',

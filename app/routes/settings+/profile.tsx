@@ -3,8 +3,8 @@ import { invariantResponse } from '@epic-web/invariant'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { z } from 'zod'
 
+import { getUser } from '#app/models/index.server.ts'
 import { requireUserId } from '#app/utils/auth.server.ts'
-import { prisma } from '#app/utils/db.server.ts'
 import { cn } from '#app/utils/misc.tsx'
 import { useUser } from '#app/utils/user.ts'
 import {
@@ -28,10 +28,7 @@ export const handle: BreadcrumbHandle & SEOHandle = {
 
 export async function loader({ request }: Route.LoaderArgs) {
 	const userId = await requireUserId(request)
-	const user = await prisma.user.findUnique({
-		where: { id: userId },
-		select: { username: true },
-	})
+	const user = await getUser(userId)
 	invariantResponse(user, 'User not found', { status: 404 })
 	return data({})
 }

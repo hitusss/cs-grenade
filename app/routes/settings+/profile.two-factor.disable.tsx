@@ -1,8 +1,8 @@
 import { data, useFetcher } from 'react-router'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 
+import { deleteVerification } from '#app/models/index.server.ts'
 import { requireUserId } from '#app/utils/auth.server.ts'
-import { prisma } from '#app/utils/db.server.ts'
 import { useDoubleCheck } from '#app/utils/misc.tsx'
 import { redirectWithToast } from '#app/utils/toast.server.ts'
 import { Icon } from '#app/components/ui/icon.tsx'
@@ -26,9 +26,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 export async function action({ request }: Route.ActionArgs) {
 	await requireRecentVerification(request)
 	const userId = await requireUserId(request)
-	await prisma.verification.delete({
-		where: { target_type: { target: userId, type: twoFAVerificationType } },
-	})
+	await deleteVerification({ target: userId, type: twoFAVerificationType })
 	return redirectWithToast('/settings/profile/two-factor', {
 		title: '2FA Disabled',
 		description: 'Two factor authentication has been disabled.',

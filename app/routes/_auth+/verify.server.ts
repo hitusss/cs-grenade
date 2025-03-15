@@ -3,8 +3,12 @@ import { type Submission } from '@conform-to/react'
 import { parseWithZod } from '@conform-to/zod'
 import { z } from 'zod'
 
+import {
+	createOrUpdateVerification,
+	deleteVerification,
+	getActiveVerification,
+} from '#app/models/index.server.ts'
 import { requireUserId } from '#app/utils/auth.server.ts'
-import { prisma } from '#app/utils/db.server.ts'
 import { getDomainUrl } from '#app/utils/misc.tsx'
 import { redirectWithToast } from '#app/utils/toast.server.ts'
 import { generateTOTP, verifyTOTP } from '#app/utils/totp.server.ts'
@@ -101,11 +105,7 @@ export async function prepareVerification({
 		...verificationConfig,
 		expiresAt: new Date(Date.now() + verificationConfig.period * 1000),
 	}
-	await prisma.verification.upsert({
-		where: { target_type: { target, type } },
-		create: verificationData,
-		update: verificationData,
-	})
+	await createOrUpdateVerification(verificationData)
 
 	// add the otp to the url we'll email the user.
 	verifyUrl.searchParams.set(codeQueryParam, otp)
@@ -122,13 +122,7 @@ export async function isCodeValid({
 	type: VerificationTypes | typeof twoFAVerifyVerificationType
 	target: string
 }) {
-	const verification = await prisma.verification.findUnique({
-		where: {
-			target_type: { target, type },
-			OR: [{ expiresAt: { gt: new Date() } }, { expiresAt: null }],
-		},
-		select: { algorithm: true, secret: true, period: true, charSet: true },
-	})
+	const verification = await getActiveVerification({ type, target })
 	if (!verification) return false
 	const result = await verifyTOTP({
 		otp: code,
@@ -171,28 +165,26 @@ export async function validateRequest(
 
 	const { value: submissionValue } = submission
 
-	async function deleteVerification() {
-		await prisma.verification.delete({
-			where: {
-				target_type: {
-					type: submissionValue[typeQueryParam],
-					target: submissionValue[targetQueryParam],
-				},
-			},
-		})
-	}
-
 	switch (submissionValue[typeQueryParam]) {
 		case 'reset-password': {
-			await deleteVerification()
+			await deleteVerification({
+				type: submissionValue[typeQueryParam],
+				target: submissionValue[targetQueryParam],
+			})
 			return handleResetPasswordVerification({ request, body, submission })
 		}
 		case 'onboarding': {
-			await deleteVerification()
+			await deleteVerification({
+				type: submissionValue[typeQueryParam],
+				target: submissionValue[targetQueryParam],
+			})
 			return handleOnboardingVerification({ request, body, submission })
 		}
 		case 'change-email': {
-			await deleteVerification()
+			await deleteVerification({
+				type: submissionValue[typeQueryParam],
+				target: submissionValue[targetQueryParam],
+			})
 			return handleChangeEmailVerification({ request, body, submission })
 		}
 		case '2fa': {

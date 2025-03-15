@@ -2,8 +2,11 @@ import { redirect } from 'react-router'
 import { invariant } from '@epic-web/invariant'
 import { safeRedirect } from 'remix-utils/safe-redirect'
 
+import {
+	getSessionExpirationDate,
+	getVerificationId,
+} from '#app/models/index.server.ts'
 import { getUserId, sessionKey } from '#app/utils/auth.server.ts'
-import { prisma } from '#app/utils/db.server.ts'
 import { combineResponseInits } from '#app/utils/misc.tsx'
 import { authSessionStorage } from '#app/utils/session.server.ts'
 import { redirectWithToast } from '#app/utils/toast.server.ts'
@@ -30,11 +33,9 @@ export async function handleNewSession(
 	},
 	responseInit?: ResponseInit,
 ) {
-	const verification = await prisma.verification.findUnique({
-		select: { id: true },
-		where: {
-			target_type: { target: session.userId, type: twoFAVerificationType },
-		},
+	const verification = await getVerificationId({
+		target: session.userId,
+		type: twoFAVerificationType,
 	})
 	const userHasTwoFactor = Boolean(verification)
 
@@ -104,10 +105,7 @@ export async function handleVerification({
 
 	const unverifiedSessionId = verifySession.get(unverifiedSessionIdKey)
 	if (unverifiedSessionId) {
-		const session = await prisma.session.findUnique({
-			select: { expirationDate: true },
-			where: { id: unverifiedSessionId },
-		})
+		const session = await getSessionExpirationDate(unverifiedSessionId)
 		if (!session) {
 			throw await redirectWithToast('/login', {
 				type: 'error',
@@ -149,9 +147,9 @@ export async function shouldRequestTwoFA(request: Request) {
 	const userId = await getUserId(request)
 	if (!userId) return false
 	// if it's over two hours since they last verified, we should request 2FA again
-	const userHasTwoFA = await prisma.verification.findUnique({
-		select: { id: true },
-		where: { target_type: { target: userId, type: twoFAVerificationType } },
+	const userHasTwoFA = await getVerificationId({
+		target: userId,
+		type: twoFAVerificationType,
 	})
 	if (!userHasTwoFA) return false
 	const verifiedTime = authSession.get(verifiedTimeKey) ?? new Date(0)

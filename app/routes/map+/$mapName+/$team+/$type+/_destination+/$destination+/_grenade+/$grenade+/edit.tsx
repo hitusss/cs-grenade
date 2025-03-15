@@ -4,6 +4,7 @@ import { invariantResponse } from '@epic-web/invariant'
 import { parseFormData } from '@mjackson/form-data-parser'
 import { z } from 'zod'
 
+import { getUserPermissions } from '#app/models/index.server.ts'
 import { requireUserId } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { checkHoneypot } from '#app/utils/honeypot.server.ts'
@@ -12,10 +13,7 @@ import {
 	useDoubleCheck,
 	useIsPending,
 } from '#app/utils/misc.tsx'
-import {
-	getUserPermissions,
-	unauthorized,
-} from '#app/utils/permissions.server.ts'
+import { unauthorized } from '#app/utils/permissions.server.ts'
 import { userHasPermission } from '#app/utils/permissions.ts'
 import { useUser } from '#app/utils/user.ts'
 import {

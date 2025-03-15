@@ -8,18 +8,14 @@ import { prisma } from '#app/utils/db.server.ts'
 import { ContentCard } from '#app/components/content-card.tsx'
 import { ContentFilter } from '#app/components/content-filter.tsx'
 import { Pagination } from '#app/components/pagination.tsx'
+import { getUserIdByUsername } from '#app/models/index.server.ts'
 
 import { type Route } from './+types/destinations.ts'
 
 export async function loader({ request, params }: Route.LoaderArgs) {
 	const { username } = params
 	invariantResponse(username, 'Username is required')
-	const user = await prisma.user.findUnique({
-		where: {
-			username,
-		},
-		select: { id: true },
-	})
+	const user = await getUserIdByUsername(username)
 	invariantResponse(user, 'Not found', { status: 404 })
 
 	const userId = await getUserId(request)

@@ -20,6 +20,7 @@ import { Lightbox, LightboxProvider } from './components/lightbox.tsx'
 import { EpicProgress } from './components/progress-bar.tsx'
 import { href as iconsHref } from './components/ui/icon.tsx'
 import { Toaster } from './components/ui/sonner.tsx'
+import { getUserWithPermissions } from './models/index.server.ts'
 import {
 	useOptionalTheme,
 	useTheme,
@@ -108,28 +109,11 @@ export async function loader({ request }: Route.LoaderArgs) {
 	)
 
 	const user = userId
-		? await time(
-				() =>
-					prisma.user.findUnique({
-						select: {
-							id: true,
-							name: true,
-							username: true,
-							image: { select: { id: true } },
-							roles: {
-								select: {
-									name: true,
-									priority: true,
-									permissions: {
-										select: { entity: true, action: true, access: true },
-									},
-								},
-							},
-						},
-						where: { id: userId },
-					}),
-				{ timings, type: 'find user', desc: 'find user in root' },
-			)
+		? await time(() => getUserWithPermissions(userId), {
+				timings,
+				type: 'find user',
+				desc: 'find user in root',
+			})
 		: null
 	if (userId && !user) {
 		console.info('something weird happened')

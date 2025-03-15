@@ -5,7 +5,10 @@ import * as E from '@react-email/components'
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
 import { z } from 'zod'
 
-import { prisma } from '#app/utils/db.server.ts'
+import {
+	getUserIdByUsernameOrEmail,
+	getUsernameAndEmailByUsernameOrEmail,
+} from '#app/models/index.server.ts'
 import { sendEmail } from '#app/utils/email.server.ts'
 import { checkHoneypot } from '#app/utils/honeypot.server.ts'
 import { EmailSchema, UsernameSchema } from '#app/utils/validators/user.ts'
@@ -30,15 +33,7 @@ export async function action({ request }: Route.ActionArgs) {
 	await checkHoneypot(formData)
 	const submission = await parseWithZod(formData, {
 		schema: ForgotPasswordSchema.superRefine(async (data, ctx) => {
-			const user = await prisma.user.findFirst({
-				where: {
-					OR: [
-						{ email: data.usernameOrEmail },
-						{ username: data.usernameOrEmail },
-					],
-				},
-				select: { id: true },
-			})
+			const user = await getUserIdByUsernameOrEmail(data.usernameOrEmail)
 			if (!user) {
 				ctx.addIssue({
 					path: ['usernameOrEmail'],
@@ -58,11 +53,10 @@ export async function action({ request }: Route.ActionArgs) {
 	}
 	const { usernameOrEmail } = submission.value
 
-	const user = await prisma.user.findFirstOrThrow({
-		where: { OR: [{ email: usernameOrEmail }, { username: usernameOrEmail }] },
-		select: { email: true, username: true },
-	})
-
+	const user = await getUsernameAndEmailByUsernameOrEmail(usernameOrEmail)
+	if (!user) {
+		throw new Error('User not found')
+	}
 	const { verifyUrl, redirectTo, otp } = await prepareVerification({
 		period: 10 * 60,
 		request,

@@ -17,6 +17,7 @@ import { Button } from '#app/components/ui/button.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { ErrorList, Field } from '#app/components/forms.tsx'
+import { updateUserPassowrd } from '#app/models/index.server.ts'
 
 import { type Route } from './+types/profile.password.ts'
 import { type BreadcrumbHandle } from './profile.tsx'
@@ -91,17 +92,11 @@ export async function action({ request }: Route.ActionArgs) {
 	}
 
 	const { newPassword } = submission.value
+	const passwordHash = await getPasswordHash(newPassword)
 
-	await prisma.user.update({
-		select: { username: true },
-		where: { id: userId },
-		data: {
-			password: {
-				update: {
-					hash: await getPasswordHash(newPassword),
-				},
-			},
-		},
+	await updateUserPassowrd({
+		userId,
+		passwordHash,
 	})
 
 	return redirectWithToast(

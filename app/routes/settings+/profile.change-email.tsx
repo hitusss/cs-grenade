@@ -4,8 +4,8 @@ import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { z } from 'zod'
 
+import { getUserEmail, getUserIdByEmail } from '#app/models/index.server.ts'
 import { requireUserId } from '#app/utils/auth.server.ts'
-import { prisma } from '#app/utils/db.server.ts'
 import { sendEmail } from '#app/utils/email.server.ts'
 import { useIsPending } from '#app/utils/misc.tsx'
 import { EmailSchema } from '#app/utils/validators/user.ts'
@@ -36,10 +36,7 @@ const ChangeEmailSchema = z.object({
 export async function loader({ request }: Route.LoaderArgs) {
 	await requireRecentVerification(request)
 	const userId = await requireUserId(request)
-	const user = await prisma.user.findUnique({
-		where: { id: userId },
-		select: { email: true },
-	})
+	const user = await getUserEmail(userId)
 	if (!user) {
 		const params = new URLSearchParams({ redirectTo: request.url })
 		throw redirect(`/login?${params}`)
@@ -52,9 +49,7 @@ export async function action({ request }: Route.ActionArgs) {
 	const formData = await request.formData()
 	const submission = await parseWithZod(formData, {
 		schema: ChangeEmailSchema.superRefine(async (data, ctx) => {
-			const existingUser = await prisma.user.findUnique({
-				where: { email: data.email },
-			})
+			const existingUser = await getUserIdByEmail(data.email)
 			if (existingUser) {
 				ctx.addIssue({
 					path: ['email'],

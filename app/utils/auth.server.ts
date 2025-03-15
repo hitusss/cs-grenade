@@ -4,8 +4,18 @@ import bcrypt from 'bcryptjs'
 import { Authenticator } from 'remix-auth'
 import { safeRedirect } from 'remix-utils/safe-redirect'
 
+import {
+	createUser,
+	createUserSession,
+	createUserWithConnection,
+	deleteSession,
+	getUserIdFromActiveSession,
+	getUserWithPassword,
+	getUserWithPasswordByUsername,
+	updateUserPassowrdByUsername,
+} from '#app/models/index.server.ts'
+
 import { providers } from './connections.server.ts'
-import { prisma } from './db.server.ts'
 import { combineHeaders, downloadFile } from './misc.tsx'
 import { type ProviderUser } from './providers/provider.ts'
 import { authSessionStorage } from './session.server.ts'
@@ -28,10 +38,7 @@ export async function getUserId(request: Request) {
 	)
 	const sessionId = authSession.get(sessionKey)
 	if (!sessionId) return null
-	const session = await prisma.session.findUnique({
-		select: { user: { select: { id: true } } },
-		where: { id: sessionId, expirationDate: { gt: new Date() } },
-	})
+	const session = await getUserIdFromActiveSession(sessionId)
 	if (!session?.user) {
 		throw redirect('/', {
 			headers: {
@@ -78,12 +85,9 @@ export async function login({
 }) {
 	const user = await verifyUserPassword({ username }, password)
 	if (!user) return null
-	const session = await prisma.session.create({
-		select: { id: true, expirationDate: true, userId: true },
-		data: {
-			expirationDate: getSessionExpirationDate(),
-			userId: user.id,
-		},
+	const session = await createUserSession({
+		expirationDate: getSessionExpirationDate(),
+		userId: user.id,
 	})
 	return session
 }
@@ -96,15 +100,9 @@ export async function resetUserPassword({
 	password: string
 }) {
 	const hashedPassword = await getPasswordHash(password)
-	return prisma.user.update({
-		where: { username },
-		data: {
-			password: {
-				update: {
-					hash: hashedPassword,
-				},
-			},
-		},
+	return updateUserPassowrdByUsername({
+		username,
+		passwordHash: hashedPassword,
 	})
 }
 
@@ -121,24 +119,12 @@ export async function signup({
 }) {
 	const hashedPassword = await getPasswordHash(password)
 
-	const session = await prisma.session.create({
-		data: {
-			expirationDate: getSessionExpirationDate(),
-			user: {
-				create: {
-					email: email.toLowerCase(),
-					username: username.toLowerCase(),
-					name,
-					roles: { connect: { name: 'user' } },
-					password: {
-						create: {
-							hash: hashedPassword,
-						},
-					},
-				},
-			},
-		},
-		select: { id: true, expirationDate: true },
+	const session = await createUser({
+		email: email.toLowerCase(),
+		username: username.toLowerCase(),
+		name,
+		passwordHash: hashedPassword,
+		sessionExpirationDate: getSessionExpirationDate(),
 	})
 
 	return session
@@ -159,23 +145,14 @@ export async function signupWithConnection({
 	providerName: Connection['providerName']
 	imageUrl?: string
 }) {
-	const session = await prisma.session.create({
-		data: {
-			expirationDate: getSessionExpirationDate(),
-			user: {
-				create: {
-					email: email.toLowerCase(),
-					username: username.toLowerCase(),
-					name,
-					roles: { connect: { name: 'user' } },
-					connections: { create: { providerId, providerName } },
-					image: imageUrl
-						? { create: await downloadFile(imageUrl) }
-						: undefined,
-				},
-			},
-		},
-		select: { id: true, expirationDate: true },
+	const session = await createUserWithConnection({
+		sessionExpirationDate: getSessionExpirationDate(),
+		email: email.toLowerCase(),
+		username: username.toLowerCase(),
+		name,
+		providerId,
+		providerName,
+		image: imageUrl ? await downloadFile(imageUrl) : undefined,
 	})
 
 	return session
@@ -200,7 +177,7 @@ export async function logout(
 	if (sessionId) {
 		// the .catch is important because that's what triggers the query.
 		// learn more about PrismaPromise: https://www.prisma.io/docs/orm/reference/prisma-client-reference#prismapromise-behavior
-		void prisma.session.deleteMany({ where: { id: sessionId } }).catch(() => {})
+		void deleteSession(sessionId).catch(() => {})
 	}
 	throw redirect(safeRedirect(redirectTo), {
 		...responseInit,
@@ -220,11 +197,13 @@ export async function verifyUserPassword(
 	where: Pick<User, 'username'> | Pick<User, 'id'>,
 	password: Password['hash'],
 ) {
-	const userWithPassword = await prisma.user.findUnique({
-		where,
-		select: { id: true, password: { select: { hash: true } } },
-	})
-
+	let userWithPassword
+	if ('id' in where) {
+		userWithPassword = await getUserWithPassword(where.id)
+	}
+	if ('username' in where) {
+		userWithPassword = await getUserWithPasswordByUsername(where.username)
+	}
 	if (!userWithPassword || !userWithPassword.password) {
 		return null
 	}

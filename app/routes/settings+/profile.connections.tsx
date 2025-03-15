@@ -3,6 +3,11 @@ import { data, useFetcher } from 'react-router'
 import { invariantResponse } from '@epic-web/invariant'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 
+import {
+	deleteConnection,
+	getUserConnections,
+	getUserPasswordAndConnectionCount,
+} from '#app/models/index.server.ts'
 import { requireUserId } from '#app/utils/auth.server.ts'
 import { resolveConnectionData } from '#app/utils/connections.server.ts'
 import {
@@ -12,7 +17,6 @@ import {
 	ProviderNameSchema,
 	type ProviderName,
 } from '#app/utils/connections.tsx'
-import { prisma } from '#app/utils/db.server.ts'
 import { makeTimings } from '#app/utils/timing.server.ts'
 import { createToastHeaders } from '#app/utils/toast.server.ts'
 import { Icon } from '#app/components/ui/icon.tsx'
@@ -33,13 +37,7 @@ export const handle: BreadcrumbHandle & SEOHandle = {
 }
 
 async function userCanDeleteConnections(userId: string) {
-	const user = await prisma.user.findUnique({
-		select: {
-			password: { select: { userId: true } },
-			_count: { select: { connections: true } },
-		},
-		where: { id: userId },
-	})
+	const user = await getUserPasswordAndConnectionCount(userId)
 	// user can delete their connections if they have a password
 	if (user?.password) return true
 	// users have to have more than one remaining connection to delete one
@@ -49,10 +47,7 @@ async function userCanDeleteConnections(userId: string) {
 export async function loader({ request }: Route.LoaderArgs) {
 	const userId = await requireUserId(request)
 	const timings = makeTimings('profile connections loader')
-	const rawConnections = await prisma.connection.findMany({
-		select: { id: true, providerName: true, providerId: true, createdAt: true },
-		where: { userId },
-	})
+	const rawConnections = await getUserConnections(userId)
 	const connections: Array<{
 		providerName: ProviderName
 		id: string
@@ -106,12 +101,7 @@ export async function action({ request }: Route.ActionArgs) {
 	)
 	const connectionId = formData.get('connectionId')
 	invariantResponse(typeof connectionId === 'string', 'Invalid connectionId')
-	await prisma.connection.delete({
-		where: {
-			id: connectionId,
-			userId: userId,
-		},
-	})
+	await deleteConnection({ userId, connectionId })
 	const toastHeaders = await createToastHeaders({
 		title: 'Deleted',
 		description: 'Your connection has been deleted.',

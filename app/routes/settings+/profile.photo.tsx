@@ -7,7 +7,6 @@ import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { z } from 'zod'
 
 import { requireUserId } from '#app/utils/auth.server.ts'
-import { prisma } from '#app/utils/db.server.ts'
 import {
 	uploadHandler,
 	useDoubleCheck,
@@ -18,6 +17,7 @@ import { Button } from '#app/components/ui/button.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { ErrorList, ImageField } from '#app/components/forms.tsx'
+import { deleteUserImage, getUser, updateUserImage } from '#app/models/index.server.ts'
 
 import { type Route } from './+types/profile.photo.ts'
 import { type BreadcrumbHandle } from './profile.tsx'
@@ -51,15 +51,7 @@ const PhotoFormSchema = z.discriminatedUnion('intent', [
 
 export async function loader({ request }: Route.LoaderArgs) {
 	const userId = await requireUserId(request)
-	const user = await prisma.user.findUnique({
-		where: { id: userId },
-		select: {
-			id: true,
-			name: true,
-			username: true,
-			image: { select: { id: true } },
-		},
-	})
+	const user = await getUser(userId)
 	invariantResponse(user, 'User not found', { status: 404 })
 	return data({ user })
 }
@@ -95,18 +87,15 @@ export async function action({ request }: Route.ActionArgs) {
 
 	const { image, intent } = submission.value
 
+	await deleteUserImage(userId)
+
 	if (intent === 'delete') {
-		await prisma.userImage.deleteMany({ where: { userId } })
 		return redirect('/settings/profile')
 	}
 
-	await prisma.$transaction(async ($prisma) => {
-		await $prisma.userImage.deleteMany({ where: { userId } })
-		await $prisma.user.update({
-			where: { id: userId },
-			data: { image: { create: image } },
-		})
-	})
+	if (image) {
+		await updateUserImage({ userId, image })
+	}
 
 	return redirect('/settings/profile')
 }

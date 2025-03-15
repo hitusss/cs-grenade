@@ -8,9 +8,9 @@ import {
 	useParams,
 	type LoaderFunctionArgs,
 } from 'react-router'
-import { invariantResponse } from '@epic-web/invariant'
+import { invariant, invariantResponse } from '@epic-web/invariant'
 
-import { prisma } from '#app/utils/db.server.ts'
+import { getUserByUsername } from '#app/models/index.server.ts'
 import {
 	getUserDisplayName,
 	getUserImgSrc,
@@ -37,18 +37,8 @@ export const meta: Route.MetaFunction = ({ data, params }) => {
 }
 
 export async function loader({ params }: LoaderFunctionArgs) {
-	const user = await prisma.user.findFirst({
-		select: {
-			id: true,
-			name: true,
-			username: true,
-			createdAt: true,
-			image: { select: { id: true } },
-		},
-		where: {
-			username: params.username,
-		},
-	})
+	invariant(params.username, 'Username is required')
+	const user = await getUserByUsername(params.username)
 
 	invariantResponse(user, 'User not found', { status: 404 })
 

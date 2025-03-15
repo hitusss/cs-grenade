@@ -1,7 +1,7 @@
 import { data, redirect } from 'react-router'
 import { invariant } from '@epic-web/invariant'
 
-import { prisma } from '#app/utils/db.server.ts'
+import { getUsernameAndEmailByUsernameOrEmail } from '#app/models/index.server.ts'
 import { verifySessionStorage } from '#app/utils/verification.server.ts'
 
 import { resetPasswordUsernameSessionKey } from './reset-password.tsx'
@@ -13,10 +13,7 @@ export async function handleVerification({ submission }: VerifyFunctionArgs) {
 		'Submission should be successful by now',
 	)
 	const target = submission.value.target
-	const user = await prisma.user.findFirst({
-		where: { OR: [{ email: target }, { username: target }] },
-		select: { email: true, username: true },
-	})
+	const user = await getUsernameAndEmailByUsernameOrEmail(target)
 	// we don't want to say the user is not found if the email is not found
 	// because that would allow an attacker to check if an email is registered
 	if (!user) {
