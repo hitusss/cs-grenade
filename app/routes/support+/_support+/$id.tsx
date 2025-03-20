@@ -6,8 +6,16 @@ import { parseFormData } from '@mjackson/form-data-parser'
 import { useEventSource } from 'remix-utils/sse/react'
 import { z } from 'zod'
 
+import {
+	createTicketImage,
+	createTicketMessage,
+	getSimpleTicket,
+	getTicket,
+	updateTicketAdminMassagesAsSeen,
+	updateTicketOpenStatus,
+	updateTicketUpdatedAt,
+} from '#app/models/index.server.ts'
 import { requireUserId } from '#app/utils/auth.server.ts'
-import { prisma } from '#app/utils/db.server.ts'
 import { emitter } from '#app/utils/event.server.ts'
 import { checkHoneypot } from '#app/utils/honeypot.server.ts'
 import {
@@ -46,44 +54,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
 	const userId = await requireUserId(request)
 
-	const ticket = await prisma.ticket.findUnique({
-		where: {
-			id,
-		},
-		select: {
-			id: true,
-			title: true,
-			open: true,
-			messages: {
-				select: {
-					id: true,
-					message: true,
-					images: {
-						orderBy: {
-							order: 'asc',
-						},
-						select: { id: true },
-					},
-					isAdmin: true,
-					seen: true,
-					user: {
-						select: {
-							id: true,
-							username: true,
-							name: true,
-							image: {
-								select: {
-									id: true,
-								},
-							},
-						},
-					},
-					createdAt: true,
-				},
-			},
-			userId: true,
-		},
-	})
+	const ticket = await getTicket(id)
 
 	invariantResponse(ticket, 'Not found', { status: 404 })
 
@@ -93,17 +64,9 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 		})
 	}
 
-	const updated = await prisma.ticketMessage.updateMany({
-		where: {
-			ticketId: ticket.id,
-			userId: {
-				not: userId,
-			},
-			seen: false,
-		},
-		data: {
-			seen: true,
-		},
+	const updated = await updateTicketAdminMassagesAsSeen({
+		ticketId: ticket.id,
+		userId,
 	})
 	if (updated.count > 0) {
 		emitter.emit(`support/${userId}`)
@@ -119,13 +82,7 @@ export async function action({ request, params }: Route.ActionArgs) {
 
 	const userId = await requireUserId(request)
 
-	const ticket = await prisma.ticket.findUnique({
-		where: {
-			id,
-		},
-		select: { id: true, title: true, userId: true },
-	})
-
+	const ticket = await getSimpleTicket(id)
 	invariantResponse(ticket, 'Not found', { status: 404 })
 
 	if (userId !== ticket.userId) {
@@ -173,43 +130,31 @@ export async function action({ request, params }: Route.ActionArgs) {
 	switch (submission.value.intent) {
 		case 'new-message': {
 			const { message, images } = submission.value
-			const msg = await prisma.ticketMessage.create({
-				data: {
-					message,
-					ticketId: ticket.id,
-					userId,
-				},
-				select: {
-					id: true,
-				},
+			const msg = await createTicketMessage({
+				message,
+				ticketId: ticket.id,
+				userId,
 			})
 
 			if (images) {
 				await Promise.all(
 					images.map(
 						async (img) =>
-							await prisma.ticketImage.create({
-								data: {
-									...img,
-									ticketMessageId: msg.id,
-								},
+							await createTicketImage({
+								...img,
+								ticketMessageId: msg.id,
 							}),
 					),
 				)
 			}
 
-			await prisma.ticket.update({
-				where: { id: ticket.id },
-				data: {
-					updatedAt: new Date(),
-				},
-			})
+			await updateTicketUpdatedAt(id)
 			break
 		}
 		case 'close': {
-			await prisma.ticket.update({
-				where: { id },
-				data: { open: false },
+			await updateTicketOpenStatus({
+				ticketId: id,
+				open: false,
 			})
 			break
 		}

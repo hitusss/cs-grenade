@@ -7,7 +7,15 @@ import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { useEventSource } from 'remix-utils/sse/react'
 import { z } from 'zod'
 
-import { prisma } from '#app/utils/db.server.ts'
+import {
+	createTicketImage,
+	createTicketMessage,
+	getSimpleTicket,
+	getTicket,
+	updateTicketOpenStatus,
+	updateTicketUpdatedAt,
+	updateTicketUserMassagesAsSeen,
+} from '#app/models/index.server.ts'
 import { emitter } from '#app/utils/event.server.ts'
 import { checkHoneypot } from '#app/utils/honeypot.server.ts'
 import {
@@ -52,54 +60,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
 	invariantResponse(id, 'Id is required')
 
-	const ticket = await prisma.ticket.findUnique({
-		where: {
-			id,
-		},
-		select: {
-			id: true,
-			title: true,
-			open: true,
-			messages: {
-				select: {
-					id: true,
-					message: true,
-					images: {
-						orderBy: {
-							order: 'asc',
-						},
-						select: { id: true },
-					},
-					isAdmin: true,
-					seen: true,
-					user: {
-						select: {
-							id: true,
-							username: true,
-							name: true,
-							image: {
-								select: {
-									id: true,
-								},
-							},
-						},
-					},
-					createdAt: true,
-				},
-			},
-			user: {
-				select: {
-					username: true,
-					name: true,
-					image: {
-						select: {
-							id: true,
-						},
-					},
-				},
-			},
-		},
-	})
+	const ticket = await getTicket(id)
 
 	invariantResponse(ticket, 'Not found', { status: 404 })
 
@@ -113,10 +74,7 @@ export async function action({ request, params }: Route.ActionArgs) {
 
 	invariantResponse(id, 'Ticket id is required', { status: 400 })
 
-	const ticket = await prisma.ticket.findUnique({
-		where: { id },
-		select: { title: true, userId: true },
-	})
+	const ticket = await getSimpleTicket(id)
 
 	invariantResponse(ticket, 'Not found', { status: 404 })
 	invariantResponse(ticket.userId, 'Ticket author does not exist', {
@@ -163,49 +121,28 @@ export async function action({ request, params }: Route.ActionArgs) {
 		case 'new-message': {
 			await requireUserWithPermission(request, 'update:support:any')
 			const { message, images } = submission.value
-			const msg = await prisma.ticketMessage.create({
-				data: {
-					message,
-					ticketId: id,
-					userId,
-					isAdmin: true,
-				},
-				select: {
-					id: true,
-				},
+			const msg = await createTicketMessage({
+				message,
+				ticketId: id,
+				userId,
+				isAdmin: true,
 			})
 
 			if (images) {
 				await Promise.all(
 					images.map(
 						async (img) =>
-							await prisma.ticketImage.create({
-								data: {
-									...img,
-									ticketMessageId: msg.id,
-								},
+							await createTicketImage({
+								...img,
+								ticketMessageId: msg.id,
 							}),
 					),
 				)
 			}
 
-			await prisma.ticket.update({
-				where: { id },
-				data: {
-					updatedAt: new Date(),
-				},
-			})
+			await updateTicketUpdatedAt(id)
 
-			await prisma.ticketMessage.updateMany({
-				where: {
-					ticketId: id,
-					isAdmin: false,
-					seen: false,
-				},
-				data: {
-					seen: true,
-				},
-			})
+			await updateTicketUserMassagesAsSeen(id)
 
 			await notify({
 				userId: ticket.userId,
@@ -217,9 +154,9 @@ export async function action({ request, params }: Route.ActionArgs) {
 		}
 		case 'close': {
 			await requireUserWithPermission(request, 'update:support:any')
-			await prisma.ticket.update({
-				where: { id },
-				data: { open: false },
+			await updateTicketOpenStatus({
+				ticketId: id,
+				open: false,
 			})
 			await notify({
 				userId: ticket.userId,

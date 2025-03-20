@@ -10,8 +10,12 @@ import { parseFormData } from '@mjackson/form-data-parser'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
 
+import {
+	createTicket,
+	createTicketImage,
+	createTicketMessage,
+} from '#app/models/index.server.ts'
 import { requireUserId } from '#app/utils/auth.server.ts'
-import { prisma } from '#app/utils/db.server.ts'
 import { checkHoneypot } from '#app/utils/honeypot.server.ts'
 import { uploadHandler, useIsPending } from '#app/utils/misc.tsx'
 import { redirectWithToast } from '#app/utils/toast.server.ts'
@@ -68,36 +72,21 @@ export async function action({ request }: Route.ActionArgs) {
 
 	const { title, message, images } = submission.value
 
-	const ticket = await prisma.ticket.create({
-		data: {
-			title,
-			userId,
-		},
-		select: {
-			id: true,
-		},
-	})
+	const ticket = await createTicket({ title, userId })
 
-	const msg = await prisma.ticketMessage.create({
-		data: {
-			message: message,
-			ticketId: ticket.id,
-			userId,
-		},
-		select: {
-			id: true,
-		},
+	const msg = await createTicketMessage({
+		message: message,
+		ticketId: ticket.id,
+		userId,
 	})
 
 	if (images) {
 		await Promise.all(
 			images.map(
 				async (img) =>
-					await prisma.ticketImage.create({
-						data: {
-							...img,
-							ticketMessageId: msg.id,
-						},
+					await createTicketImage({
+						...img,
+						ticketMessageId: msg.id,
 					}),
 			),
 		)

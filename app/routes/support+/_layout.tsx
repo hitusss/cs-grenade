@@ -2,8 +2,8 @@ import { useEffect } from 'react'
 import { data, Link, Outlet, useLocation, useRevalidator } from 'react-router'
 import { useEventSource } from 'remix-utils/sse/react'
 
+import { getUserTickets } from '#app/models/index.server.ts'
 import { requireUserId } from '#app/utils/auth.server.ts'
-import { prisma } from '#app/utils/db.server.ts'
 import { useUser } from '#app/utils/user.ts'
 import { Button } from '#app/components/ui/button.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
@@ -28,30 +28,7 @@ import { type Route } from './+types/_layout.ts'
 export async function loader({ request }: Route.LoaderArgs) {
 	const userId = await requireUserId(request)
 
-	const tickets = await prisma.ticket.findMany({
-		where: {
-			userId,
-		},
-		select: {
-			_count: {
-				select: {
-					messages: {
-						where: {
-							isAdmin: true,
-							seen: false,
-						},
-					},
-				},
-			},
-			id: true,
-			title: true,
-			open: true,
-			updatedAt: true,
-		},
-		orderBy: {
-			updatedAt: 'desc',
-		},
-	})
+	const tickets = await getUserTickets(userId)
 
 	return data({ tickets })
 }

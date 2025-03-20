@@ -9,7 +9,7 @@ import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { type ColumnDef } from '@tanstack/react-table'
 import { z } from 'zod'
 
-import { prisma } from '#app/utils/db.server.ts'
+import { getAdminTickets, getTicketCount } from '#app/models/index.server.ts'
 import { useDebounce } from '#app/utils/misc.tsx'
 import { requireUserWithPermission } from '#app/utils/permissions.server.ts'
 import { getUserImgSrc } from '#app/utils/user.ts'
@@ -180,37 +180,13 @@ export async function loader({ request }: Route.LoaderArgs) {
 		}
 	})
 
-	const total = await prisma.ticket.count()
-	const tickets = await prisma.$queryRawUnsafe(
-		`
-			SELECT
-				Ticket.id,
-				Ticket.title,
-				Ticket.open,
-				Ticket.updatedAt,
-				Ticket.createdAt,
-				User.name,
-				User.username,
-				UserImage.id AS userImageId,
-				(
-					SELECT COUNT(*)
-					FROM TicketMessage
-					WHERE TicketMessage.ticketId = Ticket.id
-					AND TicketMessage.isAdmin = false
-					AND TicketMessage.seen = false
-				) AS messages
-			FROM Ticket
-			LEFT JOIN User ON Ticket.userId = User.id
-			LEFT JOIN UserImage ON User.id = UserImage.userId
-			${orderBy.length > 0 ? `ORDER BY ${orderBy.join(', ')}` : ''}
-			WHERE Ticket.title LIKE $1
-			LIMIT $2
-			OFFSET $3;
-		`,
-		`%${query}%`,
+	const total = await getTicketCount()
+	const tickets = await getAdminTickets({
+		orderBy,
+		query,
+		page,
 		perPage,
-		page * perPage - perPage,
-	)
+	})
 	const ticketsResult = TicketResultSchema.safeParse(tickets)
 	if (!ticketsResult.success) {
 		throw new Error(ticketsResult.error.message)
