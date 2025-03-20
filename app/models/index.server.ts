@@ -1,4 +1,5 @@
 export * from './connection.server.ts'
+export * from './notifications.server.ts'
 export * from './password.server.ts'
 export * from './permissions.server.ts'
 export * from './session.server.ts'

@@ -1,8 +1,11 @@
 import { data } from 'react-router'
 import { invariantResponse } from '@epic-web/invariant'
 
+import {
+	deleteNotification,
+	updateNotificationAsSeen,
+} from '#app/models/index.server.ts'
 import { requireUserId } from '#app/utils/auth.server.ts'
-import { prisma } from '#app/utils/db.server.ts'
 
 import { type Route } from './+types/notifications.$id.ts'
 
@@ -16,24 +19,11 @@ export async function action({ request, params }: Route.ActionArgs) {
 
 	switch (intent) {
 		case 'seen': {
-			await prisma.notification.update({
-				where: {
-					id: params.id,
-					userId,
-				},
-				data: {
-					seen: true,
-				},
-			})
+			await updateNotificationAsSeen({ userId, notificationId: params.id })
 			break
 		}
 		case 'delete': {
-			await prisma.notification.delete({
-				where: {
-					id: params.id,
-					userId,
-				},
-			})
+			await deleteNotification({ userId, notificationId: params.id })
 			break
 		}
 		default:

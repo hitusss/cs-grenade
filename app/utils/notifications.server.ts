@@ -1,4 +1,5 @@
-import { prisma } from './db.server.ts'
+import { createNotification } from '#app/models/index.server.ts'
+
 import { emitter } from './event.server.ts'
 
 export async function notify({
@@ -12,13 +13,11 @@ export async function notify({
 	description?: string
 	redirectTo?: string
 }) {
-	await prisma.notification.create({
-		data: {
-			userId,
-			title,
-			description,
-			redirectTo,
-		},
+	await createNotification({
+		userId,
+		title,
+		description,
+		redirectTo,
 	})
 
 	emitter.emit(`notifications/${userId}`)

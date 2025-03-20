@@ -2,8 +2,8 @@ import { useEffect, useRef } from 'react'
 import { data, Link, useFetcher, useSubmit } from 'react-router'
 import { useEventSource } from 'remix-utils/sse/react'
 
+import { getNotifications } from '#app/models/index.server.ts'
 import { getUserId } from '#app/utils/auth.server.ts'
-import { prisma } from '#app/utils/db.server.ts'
 import { cn } from '#app/utils/misc.tsx'
 import { useUser } from '#app/utils/user.ts'
 import { Button } from '#app/components/ui/button.tsx'
@@ -21,22 +21,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 	if (!userId) {
 		return data({ notifications: [] })
 	}
-	const notifications = await prisma.notification.findMany({
-		where: {
-			userId,
-		},
-		select: {
-			id: true,
-			title: true,
-			description: true,
-			redirectTo: true,
-			seen: true,
-			createdAt: true,
-		},
-		orderBy: {
-			createdAt: 'desc',
-		},
-	})
+	const notifications = await getNotifications(userId)
 	return data({ notifications })
 }
 
