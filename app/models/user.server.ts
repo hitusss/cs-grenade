@@ -7,6 +7,7 @@ import {
 	type UserImage,
 } from '@prisma/client'
 
+import { type OptionalNullable } from '#types/utils.ts'
 import { prisma } from '#app/utils/db.server.ts'
 
 export async function createUser({
@@ -299,11 +300,11 @@ export async function updateUsernameAndName({
 	userId,
 	name,
 	username,
-}: {
+}: OptionalNullable<{
 	userId: User['id']
 	username: User['username']
-	name?: User['name']
-}) {
+	name: User['name']
+}>) {
 	return prisma.user.update({
 		where: { id: userId },
 		data: {
