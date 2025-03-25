@@ -5,9 +5,13 @@ import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { serverOnly$ } from 'vite-env-only/macros'
 import { z } from 'zod'
 
-import { grenadeLabels, grenadeTypes } from '#types/grenades-types.ts'
-import { teamLabels, teams } from '#types/teams.ts'
 import { prisma } from '#app/utils/db.server.ts'
+import {
+	grenadeLabels,
+	grenadeTypes,
+	isGrenadeType,
+} from '#types/grenades-types.ts'
+import { isTeamType, teamLabels, teams } from '#types/teams.ts'
 import { getSocialMetas } from '#app/utils/seo.ts'
 import { DestinationMarker } from '#app/components/destination-marker.tsx'
 import { GrenadeMarker } from '#app/components/grenade-marker.tsx'
@@ -138,8 +142,8 @@ export async function loader({ params }: Route.LoaderArgs) {
 	const { mapName, team, type } = params
 
 	invariantResponse(mapName, 'Map name is required')
-	invariantResponse(team, 'Team is required')
-	invariantResponse(type, 'Grenade type is required')
+	invariantResponse(isTeamType(team), 'Team is required')
+	invariantResponse(isGrenadeType(type), 'Grenade type is required')
 
 	const map = await prisma.map.findUnique({
 		where: {

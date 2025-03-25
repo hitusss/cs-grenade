@@ -5,3 +5,7 @@ export const teamLabels: Record<TeamType, string> = {
 	t: 'Terrorist',
 	ct: 'Counter Terrorist',
 } as const
+
+export function isTeamType(team: string): team is TeamType {
+	return teams.some((t) => t === team)
+}

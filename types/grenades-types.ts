@@ -7,3 +7,7 @@ export const grenadeLabels: Record<GrenadeType, string> = {
 	flashbang: 'Flashbang',
 	he: 'HE Grenade',
 }
+
+export function isGrenadeType(grenade: string): grenade is GrenadeType {
+	return grenadeTypes.some((g) => g === grenade)
+}
