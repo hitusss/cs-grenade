@@ -4,7 +4,7 @@ import { parseFormData } from '@mjackson/form-data-parser'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { z } from 'zod'
 
-import { prisma } from '#app/utils/db.server.ts'
+import { createMap } from '#app/models/index.server.ts'
 import { checkHoneypot } from '#app/utils/honeypot.server.ts'
 import { toSlug, uploadHandler } from '#app/utils/misc.tsx'
 import { requireUserWithPermission } from '#app/utils/permissions.server.ts'
@@ -66,21 +66,13 @@ export async function action({ request }: Route.ActionArgs) {
 
 	const { label, image, logo, radar } = submission.value
 
-	await prisma.map.create({
-		data: {
-			name: toSlug(label),
-			label,
-			image: {
-				create: image,
-			},
-			logo: {
-				create: logo,
-			},
-			radar: {
-				create: radar,
-			},
-			userId,
-		},
+	await createMap({
+		name: toSlug(label),
+		label,
+		image,
+		logo,
+		radar,
+		userId,
 	})
 
 	return await redirectWithToast(`/map/${toSlug(label)}`, {

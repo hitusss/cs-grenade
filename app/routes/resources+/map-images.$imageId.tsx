@@ -1,15 +1,12 @@
 import { invariantResponse } from '@epic-web/invariant'
 
-import { prisma } from '#app/utils/db.server.ts'
+import { getMapImage } from '#app/models/index.server.ts'
 
 import { type Route } from './+types/map-images.$imageId.ts'
 
 export async function loader({ params }: Route.LoaderArgs) {
 	invariantResponse(params.imageId, 'Image ID is required', { status: 400 })
-	const image = await prisma.mapImage.findUnique({
-		where: { id: params.imageId },
-		select: { contentType: true, blob: true },
-	})
+	const image = await getMapImage(params.imageId)
 
 	invariantResponse(image, 'Not found', { status: 404 })
 

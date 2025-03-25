@@ -3,7 +3,16 @@ import { parseWithZod } from '@conform-to/zod'
 import { invariantResponse } from '@epic-web/invariant'
 import { parseFormData } from '@mjackson/form-data-parser'
 
-import { prisma } from '#app/utils/db.server.ts'
+import {
+	createMapImage,
+	createMapLogo,
+	createMapRadar,
+	deleteMapImageByMapName,
+	deleteMapLogoByMapName,
+	deleteMapRadarByMapName,
+	getMap,
+	updateMapNameAndLabel,
+} from '#app/models/index.server.ts'
 import { checkHoneypot } from '#app/utils/honeypot.server.ts'
 import { toSlug, uploadHandler } from '#app/utils/misc.tsx'
 import { requireUserWithPermission } from '#app/utils/permissions.server.ts'
@@ -19,27 +28,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 	const mapName = params.mapName
 	invariantResponse(mapName, 'Map is required', { status: 400 })
 
-	const map = await prisma.map.findUnique({
-		where: { name: mapName },
-		select: {
-			label: true,
-			image: {
-				select: {
-					id: true,
-				},
-			},
-			logo: {
-				select: {
-					id: true,
-				},
-			},
-			radar: {
-				select: {
-					id: true,
-				},
-			},
-		},
-	})
+	const map = await getMap(mapName)
 
 	invariantResponse(map, 'Not found', { status: 404 })
 
@@ -95,51 +84,38 @@ export async function action({ request, params }: Route.ActionArgs) {
 	}
 
 	const { label, image, logo, radar } = submission.value
+	const newName = toSlug(label)
 
-	await prisma.map.update({
-		where: { name: mapName },
-		data: {
-			name: toSlug(label),
-			label,
-		},
+	await updateMapNameAndLabel({
+		name: mapName,
+		newName,
+		newLabel: label,
 	})
 
 	if (image) {
-		await prisma.mapImage.delete({
-			where: { mapName },
-		})
-		await prisma.mapImage.create({
-			data: {
-				mapName,
-				contentType: image.contentType,
-				blob: image.blob,
-			},
+		await deleteMapImageByMapName(mapName)
+		await createMapImage({
+			mapName: newName,
+			contentType: image.contentType,
+			blob: image.blob,
 		})
 	}
 
 	if (logo) {
-		await prisma.mapLogo.delete({
-			where: { mapName },
-		})
-		await prisma.mapLogo.create({
-			data: {
-				mapName,
-				contentType: logo.contentType,
-				blob: logo.blob,
-			},
+		await deleteMapLogoByMapName(mapName)
+		await createMapLogo({
+			mapName: newName,
+			contentType: logo.contentType,
+			blob: logo.blob,
 		})
 	}
 
 	if (radar) {
-		await prisma.mapRadar.delete({
-			where: { mapName },
-		})
-		await prisma.mapRadar.create({
-			data: {
-				mapName,
-				contentType: radar.contentType,
-				blob: radar.blob,
-			},
+		await deleteMapRadarByMapName(mapName)
+		await createMapRadar({
+			mapName: newName,
+			contentType: radar.contentType,
+			blob: radar.blob,
 		})
 	}
 

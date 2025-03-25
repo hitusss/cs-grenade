@@ -1,7 +1,10 @@
 import fsExtra from 'fs-extra'
 import satori from 'satori'
 
-import { prisma } from '#app/utils/db.server.ts'
+import {
+	getMapLogoIdByMapName,
+	getMapLogosIds,
+} from '#app/models/index.server.ts'
 import { toSlug } from '#app/utils/misc.tsx'
 
 import { type Route } from './+types/social-image.ts'
@@ -43,24 +46,8 @@ export async function loader({ request }: Route.LoaderArgs) {
 	const description = searchParams.get('description')
 	const spMap = searchParams.get('map')
 
-	const map = spMap
-		? await prisma.mapLogo.findFirst({
-				where: {
-					mapName: spMap,
-				},
-				select: {
-					id: true,
-				},
-			})
-		: null
-	const maps = map
-		? new Array(4).fill(map)
-		: await prisma.mapLogo.findMany({
-				select: {
-					id: true,
-				},
-				take: 4,
-			})
+	const map = spMap ? await getMapLogoIdByMapName(spMap) : null
+	const maps = map ? new Array(4).fill(map) : await getMapLogosIds(4)
 	if (maps.length > mapLogoPositions.length) {
 		throw new Error('Too many maps logos to display')
 	}

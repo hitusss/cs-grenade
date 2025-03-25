@@ -7,7 +7,11 @@ import { z } from 'zod'
 
 import { grenadeTypes } from '#types/grenades-types.ts'
 import { teams } from '#types/teams.ts'
-import { prisma } from '#app/utils/db.server.ts'
+import {
+	getMapCount,
+	getMapsWithPagination,
+	updateMapActiveState,
+} from '#app/models/index.server.ts'
 import { requireUserWithPermission } from '#app/utils/permissions.server.ts'
 import { userHasPermission } from '#app/utils/permissions.ts'
 import {
@@ -220,32 +224,11 @@ export async function loader({ request }: Route.LoaderArgs) {
 		orderBy[sort.id] = sort.desc ? 'desc' : 'asc'
 	})
 
-	const total = await prisma.map.count({})
-	const maps = await prisma.map.findMany({
-		select: {
-			name: true,
-			label: true,
-			isActive: true,
-			logo: {
-				select: {
-					id: true,
-				},
-			},
-			user: {
-				select: {
-					name: true,
-					username: true,
-					image: {
-						select: {
-							id: true,
-						},
-					},
-				},
-			},
-		},
+	const total = await getMapCount()
+	const maps = await getMapsWithPagination({
 		orderBy,
-		skip: page * perPage - perPage,
-		take: perPage,
+		page: page * perPage - perPage,
+		perPage,
 	})
 
 	return data({ maps, total })
@@ -271,9 +254,9 @@ export async function action({ request }: Route.ActionArgs) {
 		case 'toggleActive': {
 			await requireUserWithPermission(request, 'update:map')
 			const isActive = submission.value.isActive === 'true'
-			await prisma.map.update({
-				where: { name: submission.value.mapName },
-				data: { isActive: !isActive },
+			await updateMapActiveState({
+				name: submission.value.mapName,
+				isActive: !isActive,
 			})
 			return data({ result: submission.reply() })
 		}

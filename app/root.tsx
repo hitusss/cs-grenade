@@ -20,7 +20,7 @@ import { Lightbox, LightboxProvider } from './components/lightbox.tsx'
 import { EpicProgress } from './components/progress-bar.tsx'
 import { href as iconsHref } from './components/ui/icon.tsx'
 import { Toaster } from './components/ui/sonner.tsx'
-import { getUserWithPermissions } from './models/index.server.ts'
+import { getMaps, getUserWithPermissions } from './models/index.server.ts'
 import {
 	useOptionalTheme,
 	useTheme,
@@ -28,7 +28,6 @@ import {
 import tailwindStyleSheetUrl from './styles/tailwind.css?url'
 import { getUserId, logout } from './utils/auth.server.ts'
 import { ClientHintCheck, getHints } from './utils/client-hints.tsx'
-import { prisma } from './utils/db.server.ts'
 import { getEnv } from './utils/env.server.ts'
 import { honeypot } from './utils/honeypot.server.ts'
 import { combineHeaders, getDomainUrl } from './utils/misc.tsx'
@@ -83,30 +82,11 @@ export async function loader({ request }: Route.LoaderArgs) {
 		desc: 'getUserId in root',
 	})
 
-	const maps = await time(
-		() =>
-			prisma.map.findMany({
-				select: {
-					name: true,
-					label: true,
-					isActive: true,
-					image: {
-						select: {
-							id: true,
-						},
-					},
-					logo: {
-						select: {
-							id: true,
-						},
-					},
-				},
-				orderBy: {
-					name: 'asc',
-				},
-			}),
-		{ timings, type: 'select maps', desc: 'select maps in root' },
-	)
+	const maps = await time(() => getMaps(), {
+		timings,
+		type: 'select maps',
+		desc: 'select maps in root',
+	})
 
 	const user = userId
 		? await time(() => getUserWithPermissions(userId), {

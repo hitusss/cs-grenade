@@ -5,13 +5,13 @@ import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { serverOnly$ } from 'vite-env-only/macros'
 import { z } from 'zod'
 
-import { prisma } from '#app/utils/db.server.ts'
 import {
 	grenadeLabels,
 	grenadeTypes,
 	isGrenadeType,
 } from '#types/grenades-types.ts'
 import { isTeamType, teamLabels, teams } from '#types/teams.ts'
+import { getMapsNames, getMapWithContent } from '#app/models/index.server.ts'
 import { getSocialMetas } from '#app/utils/seo.ts'
 import { DestinationMarker } from '#app/components/destination-marker.tsx'
 import { GrenadeMarker } from '#app/components/grenade-marker.tsx'
@@ -126,11 +126,7 @@ export const meta: Route.MetaFunction = ({ data, matches }) => {
 
 export const handle = serverOnly$({
 	getSitemapEntries: async () => {
-		const maps = await prisma.map.findMany({
-			select: {
-				name: true,
-			},
-		})
+		const maps = await getMapsNames()
 		return maps.map((map) => ({
 			route: `/map/${map.name}/${teams[0]}/${grenadeTypes[0]}`,
 			priority: 0.7,
@@ -145,41 +141,7 @@ export async function loader({ params }: Route.LoaderArgs) {
 	invariantResponse(isTeamType(team), 'Team is required')
 	invariantResponse(isGrenadeType(type), 'Grenade type is required')
 
-	const map = await prisma.map.findUnique({
-		where: {
-			name: mapName,
-		},
-		select: {
-			label: true,
-			radar: { select: { id: true } },
-			destinations: {
-				where: {
-					team,
-					type,
-					verified: true,
-				},
-				select: {
-					id: true,
-					name: true,
-					x: true,
-					y: true,
-					grenades: {
-						where: {
-							team,
-							type,
-							verified: true,
-						},
-						select: {
-							id: true,
-							name: true,
-							x: true,
-							y: true,
-						},
-					},
-				},
-			},
-		},
-	})
+	const map = await getMapWithContent({ mapName, team, type })
 
 	invariantResponse(map, 'Not Found', { status: 404 })
 
