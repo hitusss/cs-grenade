@@ -1,11 +1,15 @@
 import { data, Link, redirect, useLocation } from 'react-router'
+import { invariant } from '@epic-web/invariant'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { type Prisma } from '@prisma/client'
 import { type ColumnDef } from '@tanstack/react-table'
 
-import { grenadeLabels } from '#types/grenades-types.ts'
-import { teamLabels } from '#types/teams.ts'
-import { prisma } from '#app/utils/db.server.ts'
+import { grenadeLabels, isGrenadeType } from '#types/grenades-types.ts'
+import { isTeamType, teamLabels } from '#types/teams.ts'
+import {
+	getFilteredDestinationWithChangesCount,
+	getFiltereDestinationsWithChangesWithPagination,
+} from '#app/models/index.server.ts'
 import { requireUserWithPermission } from '#app/utils/permissions.server.ts'
 import {
 	getUserDisplayName,
@@ -230,62 +234,22 @@ export async function loader({ request }: Route.LoaderArgs) {
 		}
 	})
 
-	const total = await prisma.destination.count({
-		where: {
-			destinationChanges: {
-				id: {
-					not: undefined,
-				},
-			},
-			name: { contains: query },
-			mapName: map,
-			team,
-			type,
-		},
+	invariant(team === undefined || isTeamType(team), 'Invalid team')
+	invariant(type === undefined || isGrenadeType(type), 'Invalid grenade type')
+
+	const total = await getFilteredDestinationWithChangesCount({
+		query,
+		mapName: map,
+		team,
+		type,
 	})
-	const destinations = await prisma.destination.findMany({
-		where: {
-			destinationChanges: {
-				id: {
-					not: undefined,
-				},
-			},
-			name: { contains: query },
-			mapName: map,
-			team,
-			type,
-		},
-		select: {
-			id: true,
-			name: true,
-			map: {
-				select: {
-					name: true,
-					label: true,
-					logo: {
-						select: {
-							id: true,
-						},
-					},
-				},
-			},
-			team: true,
-			type: true,
-			user: {
-				select: {
-					name: true,
-					username: true,
-					image: {
-						select: {
-							id: true,
-						},
-					},
-				},
-			},
-		},
-		orderBy,
-		take: perPage,
-		skip: page * perPage - perPage,
+	const destinations = await getFiltereDestinationsWithChangesWithPagination({
+		query,
+		mapName: map,
+		team,
+		type,
+		page,
+		perPage,
 	})
 
 	return data({ destinations, total })

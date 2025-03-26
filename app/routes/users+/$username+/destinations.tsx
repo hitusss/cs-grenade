@@ -1,14 +1,21 @@
 import { data, Link } from 'react-router'
-import { invariantResponse } from '@epic-web/invariant'
+import { invariant, invariantResponse } from '@epic-web/invariant'
 
-import { grenadeLabels, type GrenadeType } from '#types/grenades-types.ts'
-import { teamLabels, type TeamType } from '#types/teams.ts'
+import {
+	grenadeLabels,
+	isGrenadeType,
+	type GrenadeType,
+} from '#types/grenades-types.ts'
+import { isTeamType, teamLabels, type TeamType } from '#types/teams.ts'
+import {
+	getFilteredUserDestinationCount,
+	getFiltereUserDestinationsWithPagination,
+	getUserIdByUsername,
+} from '#app/models/index.server.ts'
 import { getUserId } from '#app/utils/auth.server.ts'
-import { prisma } from '#app/utils/db.server.ts'
 import { ContentCard } from '#app/components/content-card.tsx'
 import { ContentFilter } from '#app/components/content-filter.tsx'
 import { Pagination } from '#app/components/pagination.tsx'
-import { getUserIdByUsername } from '#app/models/index.server.ts'
 
 import { type Route } from './+types/destinations.ts'
 
@@ -33,49 +40,26 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 	const verified =
 		spVerified === 'true' ? true : spVerified === 'false' ? false : undefined
 
-	const total = await prisma.destination.count({
-		where: {
-			userId: user.id,
-			name: {
-				contains: query,
-			},
-			verified: user.id === userId ? verified : true,
-			map: map ? { name: map } : undefined,
-			team,
-			type,
-		},
+	invariant(team === undefined || isTeamType(team), 'Invalid team')
+	invariant(type === undefined || isGrenadeType(type), 'Invalid grenade type')
+
+	const total = await getFilteredUserDestinationCount({
+		userId: user.id,
+		query,
+		verified: user.id === userId ? verified : true,
+		mapName: map,
+		team,
+		type,
 	})
-	const destinations = await prisma.destination.findMany({
-		where: {
-			userId: user.id,
-			name: {
-				contains: query,
-			},
-			verified: user.id === userId ? verified : true,
-			map: map ? { name: map } : undefined,
-			team,
-			type,
-		},
-		select: {
-			id: true,
-			name: true,
-			verified: true,
-			map: {
-				select: {
-					name: true,
-					label: true,
-					logo: {
-						select: {
-							id: true,
-						},
-					},
-				},
-			},
-			type: true,
-			team: true,
-		},
-		skip: page * perPage - perPage,
-		take: perPage,
+	const destinations = await getFiltereUserDestinationsWithPagination({
+		userId: user.id,
+		query,
+		verified: user.id === userId ? verified : true,
+		mapName: map,
+		team,
+		type,
+		page,
+		perPage,
 	})
 
 	return data({ destinations, total, isOwn: user.id === userId })

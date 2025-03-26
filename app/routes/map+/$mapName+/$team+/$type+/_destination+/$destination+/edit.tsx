@@ -3,9 +3,12 @@ import { parseWithZod } from '@conform-to/zod'
 import { invariantResponse } from '@epic-web/invariant'
 import { z } from 'zod'
 
-import { getUserPermissions } from '#app/models/index.server.ts'
+import {
+	getDestinationUserId,
+	getDestinationWithChangesId,
+	getUserPermissions,
+} from '#app/models/index.server.ts'
 import { requireUserId } from '#app/utils/auth.server.ts'
-import { prisma } from '#app/utils/db.server.ts'
 import { checkHoneypot } from '#app/utils/honeypot.server.ts'
 import { useDoubleCheck, useIsPending } from '#app/utils/misc.tsx'
 import { unauthorized } from '#app/utils/permissions.server.ts'
@@ -59,18 +62,9 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
 	invariantResponse(destinationId, 'Destination ID is required')
 
-	const destination = await prisma.destination.findUnique({
-		where: { id: destinationId, verified: true },
-		select: {
-			id: true,
-			name: true,
-			x: true,
-			y: true,
-			userId: true,
-			destinationChanges: {
-				select: { id: true },
-			},
-		},
+	const destination = await getDestinationWithChangesId({
+		destinationId,
+		verified: true,
 	})
 
 	invariantResponse(destination, 'Not found', { status: 404 })
@@ -94,12 +88,7 @@ export async function action({ request, params }: Route.ActionArgs) {
 
 	invariantResponse(destinationId, 'Destination ID is required')
 
-	const destination = await prisma.destination.findUnique({
-		where: { id: destinationId },
-		select: {
-			userId: true,
-		},
-	})
+	const destination = await getDestinationUserId(destinationId)
 
 	invariantResponse(destination, 'Not found', { status: 404 })
 

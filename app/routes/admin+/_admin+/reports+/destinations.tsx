@@ -1,12 +1,17 @@
 import { data, Form, Link, redirect } from 'react-router'
 import { parseWithZod } from '@conform-to/zod'
+import { invariant } from '@epic-web/invariant'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { type Prisma } from '@prisma/client'
 import { getExpandedRowModel, type ColumnDef } from '@tanstack/react-table'
 import { z } from 'zod'
 
-import { grenadeLabels } from '#types/grenades-types.ts'
-import { teamLabels } from '#types/teams.ts'
+import { grenadeLabels, isGrenadeType } from '#types/grenades-types.ts'
+import { isTeamType, teamLabels } from '#types/teams.ts'
+import {
+	getFilteredDestinationWithReportsCount,
+	getFiltereDestinationsWithReportsWithPagination,
+} from '#app/models/index.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { cn } from '#app/utils/misc.tsx'
 import { requireUserWithPermission } from '#app/utils/permissions.server.ts'
@@ -304,90 +309,25 @@ export async function loader({ request }: Route.LoaderArgs) {
 		}
 	})
 
-	const total = await prisma.destination.count({
-		where: {
-			reports: {
-				some: {
-					id: {
-						not: undefined,
-					},
-				},
-			},
-			name: {
-				contains: query,
-			},
-			map: map ? { name: map } : undefined,
-			team,
-			type,
-			verified,
-		},
+	invariant(team === undefined || isTeamType(team), 'Invalid team')
+	invariant(type === undefined || isGrenadeType(type), 'Invalid grenade type')
+
+	const total = await getFilteredDestinationWithReportsCount({
+		query,
+		mapName: map,
+		team,
+		type,
+		verified,
 	})
-	const destinations = await prisma.destination.findMany({
-		where: {
-			reports: {
-				some: {
-					id: {
-						not: undefined,
-					},
-				},
-			},
-			name: {
-				contains: query,
-			},
-			map: map ? { name: map } : undefined,
-			team,
-			type,
-			verified,
-		},
-		select: {
-			id: true,
-			name: true,
-			map: {
-				select: {
-					name: true,
-					label: true,
-					logo: {
-						select: {
-							id: true,
-						},
-					},
-				},
-			},
-			team: true,
-			type: true,
-			verified: true,
-			user: {
-				select: {
-					name: true,
-					username: true,
-					image: {
-						select: {
-							id: true,
-						},
-					},
-				},
-			},
-			reports: {
-				select: {
-					id: true,
-					message: true,
-					user: {
-						select: {
-							name: true,
-							username: true,
-							image: {
-								select: {
-									id: true,
-								},
-							},
-						},
-					},
-				},
-			},
-		},
+	const destinations = await getFiltereDestinationsWithReportsWithPagination({
+		query,
+		mapName: map,
+		team,
+		type,
+		verified,
 		orderBy,
-		skip: page * perPage - perPage,
-		take: perPage,
+		page,
+		perPage,
 	})
 
 	return data({ destinations, total })

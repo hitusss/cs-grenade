@@ -1,8 +1,12 @@
 import { data, Form, Link } from 'react-router'
 import { invariantResponse } from '@epic-web/invariant'
 
+import {
+	deleteDestination,
+	getDestination,
+	getDestinationUserId,
+} from '#app/models/index.server.ts'
 import { getUserId, requireUserId } from '#app/utils/auth.server.ts'
-import { prisma } from '#app/utils/db.server.ts'
 import { useDoubleCheck, useIsPending } from '#app/utils/misc.tsx'
 import { unauthorized } from '#app/utils/permissions.server.ts'
 import { userHasPermission } from '#app/utils/permissions.ts'
@@ -28,18 +32,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
 	const userId = await getUserId(request)
 
-	const destination = await prisma.destination.findUnique({
-		where: {
-			id: destinationId,
-		},
-		select: {
-			id: true,
-			verified: true,
-			userId: true,
-			x: true,
-			y: true,
-		},
-	})
+	const destination = await getDestination(destinationId)
 
 	invariantResponse(destination, 'Not found', { status: 404 })
 
@@ -56,14 +49,7 @@ export async function action({ request, params }: Route.ActionArgs) {
 	const { destination: destinationId } = params
 	const userId = await requireUserId(request)
 
-	const destination = await prisma.destination.findUnique({
-		where: {
-			id: destinationId,
-		},
-		select: {
-			userId: true,
-		},
-	})
+	const destination = await getDestinationUserId(destinationId)
 
 	invariantResponse(destination, 'Not found', { status: 404 })
 	if (destination.userId !== userId) {
@@ -72,12 +58,7 @@ export async function action({ request, params }: Route.ActionArgs) {
 		})
 	}
 
-	await prisma.destination.delete({
-		where: {
-			id: destinationId,
-			verified: false,
-		},
-	})
+	await deleteDestination({ destinationId, verified: false })
 
 	return await redirectWithToast(`..`, {
 		title: `Destination request cancelled`,

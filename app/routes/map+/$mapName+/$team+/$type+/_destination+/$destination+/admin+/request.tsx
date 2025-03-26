@@ -1,7 +1,12 @@
 import { data, Form, useSearchParams } from 'react-router'
 import { invariantResponse } from '@epic-web/invariant'
 
-import { prisma } from '#app/utils/db.server.ts'
+import {
+	deleteDestination,
+	getDestination,
+	getSimpleDestination,
+	updateDestinationVerifiedStatus,
+} from '#app/models/index.server.ts'
 import { useIsPending } from '#app/utils/misc.tsx'
 import { notify } from '#app/utils/notifications.server.ts'
 import { requireUserWithPermission } from '#app/utils/permissions.server.ts'
@@ -31,16 +36,9 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
 	invariantResponse(destinationId, 'Destination is required')
 
-	const destination = await prisma.destination.findUnique({
-		where: {
-			id: destinationId,
-			verified: false,
-		},
-		select: {
-			name: true,
-			x: true,
-			y: true,
-		},
+	const destination = await getSimpleDestination({
+		destinationId,
+		verified: false,
 	})
 
 	invariantResponse(destination, 'Not fount', { status: 404 })
@@ -58,19 +56,7 @@ export async function action({ request, params }: Route.ActionArgs) {
 
 	invariantResponse(destinationId, 'Destination is required')
 
-	const destination = await prisma.destination.findUnique({
-		where: {
-			id: destinationId,
-		},
-		select: {
-			name: true,
-			mapName: true,
-			team: true,
-			type: true,
-			verified: true,
-			userId: true,
-		},
-	})
+	const destination = await getDestination(destinationId)
 
 	invariantResponse(destination, 'Not fount', { status: 404 })
 
@@ -91,13 +77,9 @@ export async function action({ request, params }: Route.ActionArgs) {
 
 	switch (intent) {
 		case 'accept': {
-			await prisma.destination.update({
-				where: {
-					id: destinationId,
-				},
-				data: {
-					verified: true,
-				},
+			await updateDestinationVerifiedStatus({
+				destinationId,
+				verified: true,
 			})
 			if (destination.userId) {
 				await notify({
@@ -110,11 +92,7 @@ export async function action({ request, params }: Route.ActionArgs) {
 			break
 		}
 		case 'reject': {
-			await prisma.destination.delete({
-				where: {
-					id: destinationId,
-				},
-			})
+			await deleteDestination({ destinationId })
 			if (destination.userId) {
 				await notify({
 					userId: destination.userId,

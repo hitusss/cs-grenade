@@ -1,7 +1,13 @@
 import { invariantResponse } from '@epic-web/invariant'
 
-import { getUserPermissions } from '#app/models/index.server.ts'
-import { prisma } from '#app/utils/db.server.ts'
+import {
+	createDestinationChanges,
+	deletedDestinationChangesByDestinationId,
+	deleteDestination as deleteDestinationDb,
+	getDestinationWithChangesId,
+	getUserPermissions,
+	updateDestinationNameAndPosition,
+} from '#app/models/index.server.ts'
 import { notify } from '#app/utils/notifications.server.ts'
 import { unauthorized } from '#app/utils/permissions.server.ts'
 import { userHasPermission } from '#app/utils/permissions.ts'
@@ -34,34 +40,18 @@ export async function updateDestination({
 		})
 	}
 
-	const prevDestination = await prisma.destination.findUnique({
-		where: { id },
-		select: {
-			name: true,
-			x: true,
-			y: true,
-			destinationChanges: {
-				select: {
-					id: true,
-				},
-			},
-			mapName: true,
-			team: true,
-			type: true,
-			userId: true,
-		},
+	const prevDestination = await getDestinationWithChangesId({
+		destinationId: id,
 	})
 
 	invariantResponse(prevDestination, 'Not found', { status: 404 })
 
 	if (hasUpdateDestinationPermission) {
-		await prisma.destination.update({
-			where: { id },
-			data: {
-				name,
-				x,
-				y,
-			},
+		await updateDestinationNameAndPosition({
+			destinationId: id,
+			name,
+			x,
+			y,
 		})
 		if (!isOwn && prevDestination.userId) {
 			await notify({
@@ -89,14 +79,12 @@ export async function updateDestination({
 				type: 'error',
 			})
 		}
-		await prisma.destinationChanges.create({
-			data: {
-				destinationId: id,
-				name,
-				x,
-				y,
-				userId,
-			},
+		await createDestinationChanges({
+			destinationId: id,
+			name,
+			x,
+			y,
+			userId,
 		})
 	}
 
@@ -128,10 +116,7 @@ export async function deleteDestination({
 		})
 	}
 
-	const deletedDestination = await prisma.destination.delete({
-		where: { id },
-		select: { name: true, userId: true },
-	})
+	const deletedDestination = await deleteDestinationDb({ destinationId: id })
 
 	if (!isOwn && deletedDestination.userId) {
 		await notify({
@@ -161,11 +146,7 @@ export async function cancelEditDestinationRequest({
 		})
 	}
 
-	await prisma.destinationChanges.delete({
-		where: {
-			destinationId: id,
-		},
-	})
+	await deletedDestinationChangesByDestinationId(id)
 
 	return await redirectWithToast(`..`, {
 		title: `Destination changes cancelled`,

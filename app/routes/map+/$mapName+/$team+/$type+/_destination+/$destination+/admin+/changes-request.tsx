@@ -1,7 +1,13 @@
 import { data, Form, useSearchParams } from 'react-router'
 import { invariantResponse } from '@epic-web/invariant'
 
-import { prisma } from '#app/utils/db.server.ts'
+import {
+	deletedDestinationChangesByDestinationId,
+	getDestination,
+	getDestinationChangesByDestinationId,
+	getSimpleDestination,
+	updateDestinationNameAndPosition,
+} from '#app/models/index.server.ts'
 import { cn, useIsPending } from '#app/utils/misc.tsx'
 import { notify } from '#app/utils/notifications.server.ts'
 import { requireUserWithPermission } from '#app/utils/permissions.server.ts'
@@ -43,30 +49,12 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
 	invariantResponse(destinationId, 'Destination is required')
 
-	const destination = await prisma.destination.findUnique({
-		where: {
-			id: destinationId,
-		},
-		select: {
-			name: true,
-			x: true,
-			y: true,
-			destinationChanges: {},
-		},
-	})
+	const destination = await getSimpleDestination({ destinationId })
 
 	invariantResponse(destination, 'Not fount', { status: 404 })
 
-	const destinationChanges = await prisma.destinationChanges.findUnique({
-		where: {
-			destinationId,
-		},
-		select: {
-			name: true,
-			x: true,
-			y: true,
-		},
-	})
+	const destinationChanges =
+		await getDestinationChangesByDestinationId(destinationId)
 
 	invariantResponse(destinationChanges, 'Not fount', {
 		status: 404,
@@ -85,18 +73,7 @@ export async function action({ request, params }: Route.ActionArgs) {
 
 	invariantResponse(destinationId, 'Destination is required')
 
-	const destination = await prisma.destination.findUnique({
-		where: {
-			id: destinationId,
-		},
-		select: {
-			name: true,
-			mapName: true,
-			team: true,
-			type: true,
-			userId: true,
-		},
-	})
+	const destination = await getDestination(destinationId)
 
 	invariantResponse(destination, 'Not fount', { status: 404 })
 
@@ -109,16 +86,8 @@ export async function action({ request, params }: Route.ActionArgs) {
 
 	switch (intent) {
 		case 'accept': {
-			const destinationChanges = await prisma.destinationChanges.findUnique({
-				where: {
-					destinationId,
-				},
-				select: {
-					name: true,
-					x: true,
-					y: true,
-				},
-			})
+			const destinationChanges =
+				await getDestinationChangesByDestinationId(destinationId)
 			if (!destinationChanges) {
 				return redirectWithToast(redirectTo, {
 					type: 'error',
@@ -126,13 +95,11 @@ export async function action({ request, params }: Route.ActionArgs) {
 					description: ``,
 				})
 			}
-			await prisma.destination.update({
-				where: {
-					id: destinationId,
-				},
-				data: destinationChanges,
+			await updateDestinationNameAndPosition({
+				destinationId,
+				...destinationChanges,
 			})
-			await prisma.destinationChanges.delete({ where: { destinationId } })
+			await deletedDestinationChangesByDestinationId(destinationId)
 			if (destination.userId) {
 				await notify({
 					userId: destination.userId,
@@ -144,11 +111,7 @@ export async function action({ request, params }: Route.ActionArgs) {
 			break
 		}
 		case 'reject': {
-			await prisma.destinationChanges.delete({
-				where: {
-					destinationId,
-				},
-			})
+			await deletedDestinationChangesByDestinationId(destinationId)
 			if (destination.userId) {
 				await notify({
 					userId: destination.userId,

@@ -2,9 +2,13 @@ import { data, Link } from 'react-router'
 import { parseWithZod } from '@conform-to/zod'
 import { invariantResponse } from '@epic-web/invariant'
 
-import { getUserPermissions } from '#app/models/index.server.ts'
+import { isGrenadeType } from '#types/grenades-types.ts'
+import { isTeamType } from '#types/teams.ts'
+import {
+	createDestination,
+	getUserPermissions,
+} from '#app/models/index.server.ts'
 import { requireUserId } from '#app/utils/auth.server.ts'
-import { prisma } from '#app/utils/db.server.ts'
 import { checkHoneypot } from '#app/utils/honeypot.server.ts'
 import { useIsPending } from '#app/utils/misc.tsx'
 import { userHasPermission } from '#app/utils/permissions.ts'
@@ -41,8 +45,10 @@ export async function action({ request, params }: Route.ActionArgs) {
 	const { mapName, team, type } = params
 
 	invariantResponse(mapName, 'Map is required', { status: 400 })
-	invariantResponse(team, 'Team is required', { status: 400 })
-	invariantResponse(type, 'Grenade type is required', { status: 400 })
+	invariantResponse(isTeamType(team), 'Team is required', { status: 400 })
+	invariantResponse(isGrenadeType(type), 'Grenade type is required', {
+		status: 400,
+	})
 
 	const formData = await request.formData()
 	await checkHoneypot(formData)
@@ -62,17 +68,15 @@ export async function action({ request, params }: Route.ActionArgs) {
 
 	const { x, y, name } = submission.value
 
-	await prisma.destination.create({
-		data: {
-			verified: hasCreateDestinationPermission,
-			x,
-			y,
-			name,
-			mapName,
-			team,
-			type,
-			userId,
-		},
+	await createDestination({
+		verified: hasCreateDestinationPermission,
+		x,
+		y,
+		name,
+		mapName,
+		team,
+		type,
+		userId,
 	})
 
 	return await redirectWithToast(`..`, {
