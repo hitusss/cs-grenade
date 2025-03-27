@@ -1,4 +1,4 @@
-import { type User, type UserImage } from '@prisma/client'
+import { type UserImage } from '@prisma/client'
 
 import { prisma } from '#app/utils/db.server.ts'
 
@@ -13,7 +13,7 @@ export async function updateUserImage({
 	userId,
 	image,
 }: {
-	userId: User['id']
+	userId: UserImage['userId']
 	image: Pick<UserImage, 'contentType' | 'blob'>
 }) {
 	return prisma.user.update({
@@ -22,6 +22,6 @@ export async function updateUserImage({
 	})
 }
 
-export async function deleteUserImage(userId: User['id']) {
+export async function deleteUserImage(userId: UserImage['userId']) {
 	return prisma.userImage.deleteMany({ where: { userId } })
 }

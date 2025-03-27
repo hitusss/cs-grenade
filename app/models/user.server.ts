@@ -58,10 +58,7 @@ export async function createUserWithConnection({
 	name: User['name']
 	providerId: Connection['providerId']
 	providerName: Connection['providerName']
-	image?: {
-		contentType: UserImage['contentType']
-		blob: UserImage['blob']
-	}
+	image?: Pick<UserImage, 'contentType' | 'blob'>
 	sessionExpirationDate: Session['expirationDate']
 }) {
 	return prisma.session.create({
@@ -109,6 +106,20 @@ export async function getUserByUsername(username: User['username']) {
 			createdAt: true,
 			image: { select: { id: true } },
 		},
+	})
+}
+
+export async function getUserWithPassword(userId: User['id']) {
+	return prisma.user.findUnique({
+		where: { id: userId },
+		select: { id: true, password: { select: { hash: true } } },
+	})
+}
+
+export async function getUserWithPasswordByUsername(username: User['id']) {
+	return prisma.user.findUnique({
+		where: { username },
+		select: { id: true, password: { select: { hash: true } } },
 	})
 }
 

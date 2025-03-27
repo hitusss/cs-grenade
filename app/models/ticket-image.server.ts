@@ -1,4 +1,4 @@
-import { type TicketImage, type TicketMessage } from '@prisma/client'
+import { type TicketImage } from '@prisma/client'
 
 import { prisma } from '#app/utils/db.server.ts'
 
@@ -11,7 +11,7 @@ export async function createTicketImage({
 	contentType: TicketImage['contentType']
 	blob: TicketImage['blob']
 	order: TicketImage['order']
-	ticketMessageId: TicketMessage['id']
+	ticketMessageId: TicketImage['ticketMessageId']
 }) {
 	return prisma.ticketImage.create({
 		data: {

@@ -4,7 +4,6 @@ import {
 	type MapLogo,
 	type MapRadar,
 	type Prisma,
-	type User,
 } from '@prisma/client'
 
 import { type GrenadeType } from '#types/grenades-types.ts'
@@ -24,7 +23,7 @@ export async function createMap({
 	image: Pick<MapImage, 'contentType' | 'blob'>
 	logo: Pick<MapLogo, 'contentType' | 'blob'>
 	radar: Pick<MapRadar, 'contentType' | 'blob'>
-	userId: User['id']
+	userId: Map['userId']
 }) {
 	return prisma.map.create({
 		data: {

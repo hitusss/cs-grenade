@@ -1,4 +1,4 @@
-import { type Session, type User } from '@prisma/client'
+import { type Session } from '@prisma/client'
 
 import { prisma } from '#app/utils/db.server.ts'
 
@@ -6,7 +6,7 @@ export async function createUserSession({
 	userId,
 	expirationDate,
 }: {
-	userId: User['id']
+	userId: Session['userId']
 	expirationDate: Session['expirationDate']
 }) {
 	return prisma.session.create({
@@ -40,7 +40,7 @@ export async function deleteUserSessionExceptOne({
 	userId,
 	sessionId,
 }: {
-	userId: User['id']
+	userId: Session['userId']
 	sessionId: Session['id']
 }) {
 	return prisma.session.deleteMany({

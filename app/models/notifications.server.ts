@@ -1,4 +1,4 @@
-import { type Notification, type User } from '@prisma/client'
+import { type Notification } from '@prisma/client'
 
 import { type OptionalNullable } from '#types/utils.ts'
 import { prisma } from '#app/utils/db.server.ts'
@@ -9,7 +9,7 @@ export async function createNotification({
 	description,
 	redirectTo,
 }: OptionalNullable<{
-	userId: User['id']
+	userId: Notification['userId']
 	title: Notification['title']
 	description: Notification['description']
 	redirectTo: Notification['redirectTo']
@@ -24,7 +24,7 @@ export async function createNotification({
 	})
 }
 
-export async function getNotifications(userId: User['id']) {
+export async function getNotifications(userId: Notification['userId']) {
 	return prisma.notification.findMany({
 		where: {
 			userId,
@@ -47,7 +47,7 @@ export async function updateNotificationAsSeen({
 	userId,
 	notificationId,
 }: {
-	userId: User['id']
+	userId: Notification['userId']
 	notificationId: Notification['id']
 }) {
 	return prisma.notification.update({
@@ -65,7 +65,7 @@ export async function deleteNotification({
 	userId,
 	notificationId,
 }: {
-	userId: User['id']
+	userId: Notification['userId']
 	notificationId: Notification['id']
 }) {
 	return prisma.notification.delete({

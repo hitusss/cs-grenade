@@ -1,4 +1,4 @@
-import { type Map, type MapRadar } from '@prisma/client'
+import { type MapRadar } from '@prisma/client'
 
 import { prisma } from '#app/utils/db.server.ts'
 
@@ -7,7 +7,7 @@ export async function createMapRadar({
 	contentType,
 	blob,
 }: {
-	mapName: Map['name']
+	mapName: MapRadar['mapName']
 	contentType: MapRadar['contentType']
 	blob: MapRadar['blob']
 }) {
@@ -27,7 +27,7 @@ export async function getMapRadar(imageId: MapRadar['id']) {
 	})
 }
 
-export async function deleteMapRadarByMapName(mapName: Map['name']) {
+export async function deleteMapRadarByMapName(mapName: MapRadar['mapName']) {
 	return prisma.mapRadar.delete({
 		where: { mapName },
 	})

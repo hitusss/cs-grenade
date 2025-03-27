@@ -1,4 +1,4 @@
-import { type Ticket, type TicketMessage, type User } from '@prisma/client'
+import { type TicketMessage } from '@prisma/client'
 
 import { prisma } from '#app/utils/db.server.ts'
 
@@ -9,8 +9,8 @@ export function createTicketMessage({
 	isAdmin = false,
 }: {
 	message: TicketMessage['message']
-	ticketId: Ticket['id']
-	userId: User['id']
+	ticketId: TicketMessage['ticketId']
+	userId: TicketMessage['userId']
 	isAdmin?: TicketMessage['isAdmin']
 }) {
 	return prisma.ticketMessage.create({
@@ -30,8 +30,8 @@ export async function updateTicketAdminMassagesAsSeen({
 	ticketId,
 	userId,
 }: {
-	ticketId: Ticket['id']
-	userId: User['id']
+	ticketId: TicketMessage['ticketId']
+	userId: TicketMessage['userId']
 }) {
 	return prisma.ticketMessage.updateMany({
 		where: {
@@ -47,7 +47,9 @@ export async function updateTicketAdminMassagesAsSeen({
 	})
 }
 
-export async function updateTicketUserMassagesAsSeen(ticketId: Ticket['id']) {
+export async function updateTicketUserMassagesAsSeen(
+	ticketId: TicketMessage['ticketId'],
+) {
 	return prisma.ticketMessage.updateMany({
 		where: {
 			ticketId,

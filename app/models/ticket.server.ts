@@ -1,4 +1,4 @@
-import { type Ticket, type User } from '@prisma/client'
+import { type Ticket } from '@prisma/client'
 
 import { prisma } from '#app/utils/db.server.ts'
 
@@ -7,7 +7,7 @@ export async function createTicket({
 	userId,
 }: {
 	title: Ticket['title']
-	userId: User['id']
+	userId: Ticket['userId']
 }) {
 	return prisma.ticket.create({
 		data: {
@@ -86,7 +86,7 @@ export async function getSimpleTicket(ticketId: Ticket['id']) {
 	})
 }
 
-export async function getUserTickets(userId: User['id']) {
+export async function getUserTickets(userId: Ticket['userId']) {
 	return prisma.ticket.findMany({
 		where: {
 			userId,

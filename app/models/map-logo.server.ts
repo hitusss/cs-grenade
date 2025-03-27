@@ -1,4 +1,4 @@
-import { type Map, type MapLogo } from '@prisma/client'
+import { type MapLogo } from '@prisma/client'
 
 import { prisma } from '#app/utils/db.server.ts'
 
@@ -7,7 +7,7 @@ export async function createMapLogo({
 	contentType,
 	blob,
 }: {
-	mapName: Map['name']
+	mapName: MapLogo['mapName']
 	contentType: MapLogo['contentType']
 	blob: MapLogo['blob']
 }) {
@@ -27,7 +27,7 @@ export async function getMapLogo(imageId: MapLogo['id']) {
 	})
 }
 
-export async function getMapLogoIdByMapName(mapName: Map['name']) {
+export async function getMapLogoIdByMapName(mapName: MapLogo['mapName']) {
 	return prisma.mapLogo.findFirst({
 		where: {
 			mapName,
@@ -47,7 +47,7 @@ export async function getMapLogosIds(take: number) {
 	})
 }
 
-export async function deleteMapLogoByMapName(mapName: Map['name']) {
+export async function deleteMapLogoByMapName(mapName: MapLogo['mapName']) {
 	return prisma.mapLogo.delete({
 		where: { mapName },
 	})

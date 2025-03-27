@@ -1,4 +1,4 @@
-import { type Connection, type User } from '@prisma/client'
+import { type Connection } from '@prisma/client'
 
 import { prisma } from '#app/utils/db.server.ts'
 
@@ -7,7 +7,7 @@ export async function createConnection({
 	providerName,
 	providerId,
 }: {
-	userId: User['id']
+	userId: Connection['userId']
 	providerName: Connection['providerName']
 	providerId: Connection['providerId']
 }) {
@@ -20,7 +20,7 @@ export async function createConnection({
 	})
 }
 
-export async function getUserConnections(userId: User['id']) {
+export async function getUserConnections(userId: Connection['userId']) {
 	return prisma.connection.findMany({
 		where: { userId },
 		select: { id: true, providerName: true, providerId: true, createdAt: true },
@@ -49,7 +49,7 @@ export async function deleteConnection({
 	userId,
 	connectionId,
 }: {
-	userId: User['id']
+	userId: Connection['userId']
 	connectionId: Connection['id']
 }) {
 	return prisma.connection.delete({

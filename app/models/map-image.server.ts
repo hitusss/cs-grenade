@@ -1,4 +1,4 @@
-import { type Map, type MapImage } from '@prisma/client'
+import { type MapImage } from '@prisma/client'
 
 import { prisma } from '#app/utils/db.server.ts'
 
@@ -7,7 +7,7 @@ export async function createMapImage({
 	contentType,
 	blob,
 }: {
-	mapName: Map['name']
+	mapName: MapImage['mapName']
 	contentType: MapImage['contentType']
 	blob: MapImage['blob']
 }) {
@@ -27,7 +27,7 @@ export async function getMapImage(imageId: MapImage['id']) {
 	})
 }
 
-export async function deleteMapImageByMapName(mapName: Map['name']) {
+export async function deleteMapImageByMapName(mapName: MapImage['mapName']) {
 	return prisma.mapImage.delete({
 		where: { mapName },
 	})
