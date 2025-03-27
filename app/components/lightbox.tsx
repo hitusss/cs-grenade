@@ -1,7 +1,7 @@
 import {
 	createContext,
-	useCallback,
 	use,
+	useCallback,
 	useEffect,
 	useRef,
 	useState,
@@ -48,16 +48,16 @@ export function LightboxProvider({ children }: { children: React.ReactNode }) {
 	}, [])
 
 	return (
-        (<LightboxContext
+		<LightboxContext
 			value={{
 				activeLightbox,
 				openLightbox,
 				closeLightbox,
 			}}
 		>
-            {children}
-        </LightboxContext>)
-    );
+			{children}
+		</LightboxContext>
+	)
 }
 
 export function useLightbox() {

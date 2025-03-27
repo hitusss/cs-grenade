@@ -14,6 +14,12 @@ import { type Prisma } from '@prisma/client'
 import { type ColumnDef } from '@tanstack/react-table'
 import { z } from 'zod'
 
+import {
+	addUserRole,
+	getFilteredUserCount,
+	getFilteredUsersWithPagginations,
+	removeUserRole,
+} from '#app/models/index.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { useDebounce } from '#app/utils/misc.tsx'
 import {
@@ -54,12 +60,6 @@ import {
 	SortSchema,
 } from '#app/components/data-table.tsx'
 import { Pagination } from '#app/components/pagination.tsx'
-import {
-	addUserRole,
-	getFilteredUserCount,
-	getFilteredUsersWithPagginations,
-	removeUserRole,
-} from '#app/models/index.server.ts'
 
 import { type Route } from './+types/index.ts'
 

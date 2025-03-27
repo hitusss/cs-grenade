@@ -3,12 +3,12 @@ import { invariantResponse } from '@epic-web/invariant'
 
 import { grenadeLabels, type GrenadeType } from '#types/grenades-types.ts'
 import { teamLabels, type TeamType } from '#types/teams.ts'
+import { getUserIdByUsername } from '#app/models/index.server.ts'
 import { getUserId } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { ContentCard } from '#app/components/content-card.tsx'
 import { ContentFilter } from '#app/components/content-filter.tsx'
 import { Pagination } from '#app/components/pagination.tsx'
-import { getUserIdByUsername } from '#app/models/index.server.ts'
 
 import { type Route } from './+types/grenades.ts'
 

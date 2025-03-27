@@ -386,7 +386,7 @@ function MultipleImageFieldProvider({
 	const errorId = errors?.length ? `${id}-error` : undefined
 
 	return (
-        (<MultipleImageFieldContext
+		<MultipleImageFieldContext
 			value={{
 				files,
 				setFiles,
@@ -398,9 +398,9 @@ function MultipleImageFieldProvider({
 				errorId,
 			}}
 		>
-            {children}
-        </MultipleImageFieldContext>)
-    );
+			{children}
+		</MultipleImageFieldContext>
+	)
 }
 
 function MultipleImageFieldInput({

@@ -6,6 +6,11 @@ import { parseFormData } from '@mjackson/form-data-parser'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { z } from 'zod'
 
+import {
+	deleteUserImage,
+	getUser,
+	updateUserImage,
+} from '#app/models/index.server.ts'
 import { requireUserId } from '#app/utils/auth.server.ts'
 import {
 	uploadHandler,
@@ -17,7 +22,6 @@ import { Button } from '#app/components/ui/button.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { ErrorList, ImageField } from '#app/components/forms.tsx'
-import { deleteUserImage, getUser, updateUserImage } from '#app/models/index.server.ts'
 
 import { type Route } from './+types/profile.photo.ts'
 import { type BreadcrumbHandle } from './profile.tsx'

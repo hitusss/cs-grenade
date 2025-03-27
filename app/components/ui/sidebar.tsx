@@ -126,8 +126,8 @@ function SidebarProvider({
 	)
 
 	return (
-        (<SidebarContext value={contextValue}>
-            <TooltipProvider delayDuration={0}>
+		<SidebarContext value={contextValue}>
+			<TooltipProvider delayDuration={0}>
 				<div
 					data-slot="sidebar-wrapper"
 					style={
@@ -146,8 +146,8 @@ function SidebarProvider({
 					{children}
 				</div>
 			</TooltipProvider>
-        </SidebarContext>)
-    );
+		</SidebarContext>
+	)
 }
 
 function Sidebar({

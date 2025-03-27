@@ -4,6 +4,7 @@ import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { z } from 'zod'
 
+import { updateUserPassowrd } from '#app/models/index.server.ts'
 import {
 	getPasswordHash,
 	requireUserId,
@@ -17,7 +18,6 @@ import { Button } from '#app/components/ui/button.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { ErrorList, Field } from '#app/components/forms.tsx'
-import { updateUserPassowrd } from '#app/models/index.server.ts'
 
 import { type Route } from './+types/profile.password.ts'
 import { type BreadcrumbHandle } from './profile.tsx'
