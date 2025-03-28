@@ -4,7 +4,10 @@ import { getFormProps, getTextareaProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
 
-import { prisma } from '#app/utils/db.server.ts'
+import {
+	createReport,
+	getUserRecentReportCount,
+} from '#app/models/index.server.ts'
 import { checkHoneypot } from '#app/utils/honeypot.server.ts'
 import { getReferrerRoute } from '#app/utils/misc.tsx'
 import { requireUserWithPermission } from '#app/utils/permissions.server.ts'
@@ -61,15 +64,11 @@ export async function action({ request }: Route.ActionArgs) {
 	}
 
 	let lastDay = Date.now() - 24 * 60 * 60 * 1000
-	const hasRecentlyReport = await prisma.report.count({
-		where: {
-			userId,
-			destinationId: submission.value.destinationId,
-			grenadeId: submission.value.grenadeId,
-			createdAt: {
-				gte: new Date(lastDay).toISOString(),
-			},
-		},
+	const hasRecentlyReport = await getUserRecentReportCount({
+		userId,
+		destinationId: submission.value.destinationId,
+		grenadeId: submission.value.grenadeId,
+		date: lastDay,
 	})
 	if (hasRecentlyReport > 0) {
 		return data({
@@ -81,11 +80,9 @@ export async function action({ request }: Route.ActionArgs) {
 		})
 	}
 
-	await prisma.report.create({
-		data: {
-			...submission.value,
-			userId,
-		},
+	await createReport({
+		userId,
+		...submission.value,
 	})
 
 	return redirectWithToast(

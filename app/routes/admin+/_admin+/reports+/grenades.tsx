@@ -7,6 +7,10 @@ import { z } from 'zod'
 
 import { grenadeLabels } from '#types/grenades-types.ts'
 import { teamLabels } from '#types/teams.ts'
+import {
+	deleteAllGrenadeReports,
+	deleteReport,
+} from '#app/models/index.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { cn } from '#app/utils/misc.tsx'
 import { requireUserWithPermission } from '#app/utils/permissions.server.ts'
@@ -432,20 +436,12 @@ export async function action({ request }: Route.ActionArgs) {
 	switch (submission.value.intent) {
 		case 'delete-report': {
 			await requireUserWithPermission(request, 'delete:report:any')
-			await prisma.report.delete({
-				where: {
-					id: submission.value.reportId,
-				},
-			})
+			await deleteReport(submission.value.reportId)
 			return data({ result: submission.reply() })
 		}
 		case 'delete-all-reports': {
 			await requireUserWithPermission(request, 'delete:report:any')
-			await prisma.report.deleteMany({
-				where: {
-					grenadeId: submission.value.grenadeId,
-				},
-			})
+			await deleteAllGrenadeReports(submission.value.grenadeId)
 			return data({ result: submission.reply() })
 		}
 		default: {
