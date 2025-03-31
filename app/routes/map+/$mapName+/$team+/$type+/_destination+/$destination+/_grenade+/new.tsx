@@ -1,10 +1,15 @@
 import { data, Link } from 'react-router'
 import { parseWithZod } from '@conform-to/zod'
-import { invariantResponse } from '@epic-web/invariant'
+import { invariant, invariantResponse } from '@epic-web/invariant'
 
-import { getUserPermissions } from '#app/models/index.server.ts'
+import { isGrenadeType } from '#types/grenades-types.ts'
+import { isTeamType } from '#types/teams.ts'
+import {
+	createGrenade,
+	createGrenadeImage,
+	getUserPermissions,
+} from '#app/models/index.server.ts'
 import { requireUserId } from '#app/utils/auth.server.ts'
-import { prisma } from '#app/utils/db.server.ts'
 import { checkHoneypot } from '#app/utils/honeypot.server.ts'
 import { useIsPending } from '#app/utils/misc.tsx'
 import { userHasPermission } from '#app/utils/permissions.ts'
@@ -95,31 +100,30 @@ export async function action({ request, params }: Route.ActionArgs) {
 		)
 	}
 
+	invariant(team === undefined || isTeamType(team), 'Invalid team type')
+	invariant(type === undefined || isGrenadeType(type), 'Invalid grenade type')
+
 	const { x, y, name, description, images } = submission.value
 
-	const grenade = await prisma.grenade.create({
-		data: {
-			verified: hasCreateGrenadePermission,
-			x,
-			y,
-			name,
-			description,
-			mapName,
-			destinationId: destination,
-			team,
-			type,
-			userId,
-		},
+	const grenade = await createGrenade({
+		verified: hasCreateGrenadePermission,
+		x,
+		y,
+		name,
+		description,
+		mapName,
+		destinationId: destination,
+		team,
+		type,
+		userId,
 	})
 
 	await Promise.all(
 		images.map(async (img) => {
 			if (img.type === 'edit') return
-			await prisma.grenadeImage.create({
-				data: {
-					...img.data,
-					grenadeId: grenade.id,
-				},
+			await createGrenadeImage({
+				...img.data,
+				grenadeId: grenade.id,
 			})
 		}),
 	)

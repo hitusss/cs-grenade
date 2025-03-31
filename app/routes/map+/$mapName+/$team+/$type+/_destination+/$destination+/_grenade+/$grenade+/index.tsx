@@ -1,6 +1,11 @@
 import { data, Form, Link, useNavigate } from 'react-router'
 import { invariantResponse } from '@epic-web/invariant'
 
+import {
+	deleteGrenade,
+	getGrenade,
+	getGrenadeUserId,
+} from '#app/models/index.server.ts'
 import { getUserId, requireUserId } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { useDoubleCheck, useIsPending } from '#app/utils/misc.tsx'
@@ -41,36 +46,9 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
 	const userId = await getUserId(request)
 
-	const grenade = await prisma.grenade.findUnique({
-		where: {
-			id: grenadeId,
-		},
-		select: {
-			id: true,
-			verified: true,
-			name: true,
-			description: true,
-			images: {
-				orderBy: {
-					order: 'asc',
-				},
-				select: {
-					id: true,
-					description: true,
-				},
-			},
-			favorites: userId
-				? {
-						where: {
-							userId,
-						},
-						select: {
-							id: true,
-						},
-					}
-				: undefined,
-			userId: true,
-		},
+	const grenade = await getGrenade({
+		grenadeId,
+		userId,
 	})
 
 	invariantResponse(grenade, 'Not found', { status: 404 })
@@ -90,14 +68,7 @@ export async function action({ request, params }: Route.ActionArgs) {
 
 	const userId = await requireUserId(request)
 
-	const grenade = await prisma.grenade.findUnique({
-		where: {
-			id: grenadeId,
-		},
-		select: {
-			userId: true,
-		},
-	})
+	const grenade = await getGrenadeUserId(grenadeId)
 
 	invariantResponse(grenade, 'Not found', { status: 404 })
 
@@ -112,11 +83,9 @@ export async function action({ request, params }: Route.ActionArgs) {
 				})
 			}
 
-			await prisma.grenade.delete({
-				where: {
-					id: grenadeId,
-					verified: false,
-				},
+			await deleteGrenade({
+				grenadeId,
+				verified: false,
 			})
 
 			return await redirectWithToast(`..`, {

@@ -1,7 +1,18 @@
 import { invariantResponse } from '@epic-web/invariant'
 
-import { getUserPermissions } from '#app/models/index.server.ts'
-import { prisma } from '#app/utils/db.server.ts'
+import {
+	createGrenadeImage,
+	createGrenadeImageChanges,
+	createGrendeChanges,
+	deleteGrenade as deleteGrenadeDB,
+	deleteGrenadeImage,
+	deleteGrendeChangesByGrenadeId,
+	getGrenadeWithChangesId,
+	getSimpleGrenade,
+	getUserPermissions,
+	updateGrenadeImage,
+	updateGrenadeNameDesctiptionAndPosition,
+} from '#app/models/index.server.ts'
 import { notify } from '#app/utils/notifications.server.ts'
 import { unauthorized } from '#app/utils/permissions.server.ts'
 import { userHasPermission } from '#app/utils/permissions.ts'
@@ -94,38 +105,15 @@ async function editGrenade({
 	images,
 	isOwn,
 }: GrenadeType & { isOwn: boolean }) {
-	const prevGrenade = await prisma.grenade.findUnique({
-		where: {
-			id,
-		},
-		select: {
-			name: true,
-			mapName: true,
-			team: true,
-			type: true,
-			destinationId: true,
-			userId: true,
-		},
-	})
+	const prevGrenade = await getSimpleGrenade(id)
 	invariantResponse(prevGrenade, 'Not found', { status: 404 })
 
-	const grenade = await prisma.grenade.update({
-		where: {
-			id,
-		},
-		data: {
-			name,
-			description,
-			x,
-			y,
-		},
-		select: {
-			images: {
-				select: {
-					id: true,
-				},
-			},
-		},
+	const grenade = await updateGrenadeNameDesctiptionAndPosition({
+		grenadeId: id,
+		name,
+		description,
+		x,
+		y,
 	})
 
 	await Promise.all(
@@ -137,22 +125,16 @@ async function editGrenade({
 					) === -1,
 			)
 			.map(async (img) => {
-				await prisma.grenadeImage.delete({
-					where: {
-						id: img.id,
-					},
-				})
+				await deleteGrenadeImage(img.id)
 			}),
 	)
 
 	await Promise.all(
 		images.map(async ({ type, data }) => {
 			if (type === 'new') {
-				await prisma.grenadeImage.create({
-					data: {
-						...data,
-						grenadeId: id,
-					},
+				await createGrenadeImage({
+					...data,
+					grenadeId: id,
 				})
 			} else {
 				const keys = Object.keys(data) as Array<keyof typeof data>
@@ -160,30 +142,21 @@ async function editGrenade({
 					if (!data[k]) delete data[k]
 				})
 				if (data.blob && data.contentType) {
-					const oldImg = await prisma.grenadeImage.delete({
-						where: {
-							id: data.id,
-						},
-						select: {
-							order: true,
-							description: true,
-						},
-					})
-					await prisma.grenadeImage.create({
-						data: {
-							blob: data.blob,
-							contentType: data.contentType,
-							order: data.order || oldImg.order,
-							description: data.description || oldImg.description,
-							grenadeId: id,
-						},
+					const oldImg = await deleteGrenadeImage(data.id)
+					await createGrenadeImage({
+						blob: data.blob,
+						contentType: data.contentType,
+						order: data.order || oldImg.order,
+						description: data.description || oldImg.description,
+						grenadeId: id,
 					})
 				} else {
-					await prisma.grenadeImage.update({
-						where: {
-							id: data.id,
-						},
-						data,
+					await updateGrenadeImage({
+						imageId: data.id,
+						contentType: data.contentType,
+						blob: data.blob,
+						order: data.order,
+						description: data.description,
 					})
 				}
 			}
@@ -215,29 +188,7 @@ async function requestGrenadeChanges({
 	y,
 	images,
 }: { userId: string } & GrenadeType) {
-	const prevGrenade = await prisma.grenade.findUnique({
-		where: {
-			id,
-		},
-		select: {
-			name: true,
-			description: true,
-			x: true,
-			y: true,
-			images: {
-				select: {
-					id: true,
-					order: true,
-					description: true,
-				},
-			},
-			grenadeChanges: {
-				select: {
-					id: true,
-				},
-			},
-		},
-	})
+	const prevGrenade = await getGrenadeWithChangesId({ grenadeId: id })
 
 	invariantResponse(prevGrenade, 'Not found', { status: 404 })
 	invariantResponse(
@@ -286,45 +237,34 @@ async function requestGrenadeChanges({
 		})
 	}
 
-	const grenadeChanges = await prisma.grenadeChanges.create({
-		data: {
-			grenadeId: id,
-			userId,
-			name,
-			description,
-			x,
-			y,
-		},
-		select: {
-			id: true,
-		},
+	const grenadeChanges = await createGrendeChanges({
+		grenadeId: id,
+		userId,
+		name,
+		description,
+		x,
+		y,
 	})
 
 	await Promise.all([
 		...newImages.map(async (img) => {
-			return await prisma.grenadeImageChanges.create({
-				data: {
-					...img,
-					grenadeId: grenadeChanges.id,
-				},
+			return await createGrenadeImageChanges({
+				...img,
+				grenadeId: grenadeChanges.id,
 			})
 		}),
 		...editedImages.map(async (img) => {
-			return await prisma.grenadeImageChanges.create({
-				data: {
-					...img,
-					grenadeId: grenadeChanges.id,
-					grenadeImageId: img.id,
-				},
+			return await createGrenadeImageChanges({
+				...img,
+				grenadeId: grenadeChanges.id,
+				grenadeImageId: img.id,
 			})
 		}),
 		...deletedImages.map(async (imgId) => {
-			return await prisma.grenadeImageChanges.create({
-				data: {
-					delete: true,
-					grenadeId: grenadeChanges.id,
-					grenadeImageId: imgId,
-				},
+			return await createGrenadeImageChanges({
+				isDeleted: true,
+				grenadeId: grenadeChanges.id,
+				grenadeImageId: imgId,
 			})
 		}),
 	])
@@ -357,14 +297,8 @@ export async function deleteGrenade({
 		})
 	}
 
-	const deletedGrenade = await prisma.grenade.delete({
-		where: {
-			id,
-		},
-		select: {
-			name: true,
-			userId: true,
-		},
+	const deletedGrenade = await deleteGrenadeDB({
+		grenadeId: id,
 	})
 
 	if (!isOwn && deletedGrenade.userId) {
@@ -395,11 +329,7 @@ export async function cancelEditGrenadeRequest({
 		})
 	}
 
-	await prisma.grenadeChanges.delete({
-		where: {
-			grenadeId: id,
-		},
-	})
+	await deleteGrendeChangesByGrenadeId(id)
 
 	return await redirectWithToast(`..`, {
 		title: `Grenade changes cancelled`,

@@ -1,11 +1,15 @@
 import { data, Link, redirect } from 'react-router'
+import { invariant } from '@epic-web/invariant'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { type Prisma } from '@prisma/client'
 import { type ColumnDef } from '@tanstack/react-table'
 
-import { grenadeLabels } from '#types/grenades-types.ts'
-import { teamLabels } from '#types/teams.ts'
-import { prisma } from '#app/utils/db.server.ts'
+import { grenadeLabels, isGrenadeType } from '#types/grenades-types.ts'
+import { isTeamType, teamLabels } from '#types/teams.ts'
+import {
+	getFilteredGrenadeCount,
+	getFilteredGrenadesWithPagination,
+} from '#app/models/index.server.ts'
 import { requireUserWithPermission } from '#app/utils/permissions.server.ts'
 import {
 	getUserDisplayName,
@@ -254,65 +258,25 @@ export async function loader({ request }: Route.LoaderArgs) {
 		}
 	})
 
-	const total = await prisma.grenade.count({
-		where: {
-			name: {
-				contains: query,
-			},
-			map: map ? { name: map } : undefined,
-			team,
-			type,
-			verified,
-		},
+	invariant(team === undefined || isTeamType(team), 'Invalid team type')
+	invariant(type === undefined || isGrenadeType(type), 'Invalid grenade type')
+
+	const total = await getFilteredGrenadeCount({
+		query,
+		mapName: map,
+		team,
+		type,
+		verified,
 	})
-	const grenades = await prisma.grenade.findMany({
-		where: {
-			name: {
-				contains: query,
-			},
-			map: map ? { name: map } : undefined,
-			team,
-			type,
-			verified,
-		},
-		select: {
-			id: true,
-			name: true,
-			destination: {
-				select: {
-					id: true,
-					name: true,
-				},
-			},
-			map: {
-				select: {
-					name: true,
-					label: true,
-					logo: {
-						select: {
-							id: true,
-						},
-					},
-				},
-			},
-			team: true,
-			type: true,
-			verified: true,
-			user: {
-				select: {
-					name: true,
-					username: true,
-					image: {
-						select: {
-							id: true,
-						},
-					},
-				},
-			},
-		},
+	const grenades = await getFilteredGrenadesWithPagination({
+		query,
+		mapName: map,
+		team,
+		type,
+		verified,
 		orderBy,
-		skip: page * perPage - perPage,
-		take: perPage,
+		page,
+		perPage,
 	})
 
 	return data({ grenades, total })

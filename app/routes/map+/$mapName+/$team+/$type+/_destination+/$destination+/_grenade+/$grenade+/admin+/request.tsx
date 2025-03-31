@@ -1,7 +1,12 @@
 import { data, Form, useSearchParams } from 'react-router'
 import { invariantResponse } from '@epic-web/invariant'
 
-import { prisma } from '#app/utils/db.server.ts'
+import {
+	deleteGrenade,
+	getGrenade,
+	getSimpleGrenade,
+	updateGrenadeVerifiedStatus,
+} from '#app/models/index.server.ts'
 import { useIsPending } from '#app/utils/misc.tsx'
 import { notify } from '#app/utils/notifications.server.ts'
 import { requireUserWithPermission } from '#app/utils/permissions.server.ts'
@@ -39,26 +44,9 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
 	invariantResponse(grenadeId, 'Grenade is required')
 
-	const grenade = await prisma.grenade.findUnique({
-		where: {
-			id: grenadeId,
-			verified: false,
-		},
-		select: {
-			name: true,
-			description: true,
-			images: {
-				orderBy: {
-					order: 'asc',
-				},
-				select: {
-					id: true,
-					description: true,
-				},
-			},
-			x: true,
-			y: true,
-		},
+	const grenade = await getGrenade({
+		grenadeId,
+		verified: false,
 	})
 
 	invariantResponse(grenade, 'Not fount', { status: 404 })
@@ -73,20 +61,7 @@ export async function action({ request, params }: Route.ActionArgs) {
 
 	invariantResponse(grenadeId, 'Grenade is required')
 
-	const grenade = await prisma.grenade.findUnique({
-		where: {
-			id: grenadeId,
-		},
-		select: {
-			name: true,
-			destinationId: true,
-			mapName: true,
-			team: true,
-			type: true,
-			verified: true,
-			userId: true,
-		},
-	})
+	const grenade = await getSimpleGrenade(grenadeId)
 
 	invariantResponse(grenade, 'Not fount', { status: 404 })
 
@@ -107,13 +82,9 @@ export async function action({ request, params }: Route.ActionArgs) {
 
 	switch (intent) {
 		case 'accept': {
-			await prisma.grenade.update({
-				where: {
-					id: grenadeId,
-				},
-				data: {
-					verified: true,
-				},
+			await updateGrenadeVerifiedStatus({
+				grenadeId,
+				verified: true,
 			})
 			if (grenade.userId) {
 				await notify({
@@ -126,11 +97,7 @@ export async function action({ request, params }: Route.ActionArgs) {
 			break
 		}
 		case 'reject': {
-			await prisma.grenade.delete({
-				where: {
-					id: grenadeId,
-				},
-			})
+			await deleteGrenade({ grenadeId })
 			if (grenade.userId) {
 				await notify({
 					userId: grenade.userId,

@@ -4,9 +4,12 @@ import { invariantResponse } from '@epic-web/invariant'
 import { parseFormData } from '@mjackson/form-data-parser'
 import { z } from 'zod'
 
-import { getUserPermissions } from '#app/models/index.server.ts'
+import {
+	getGrenadeUserId,
+	getGrenadeWithChangesId,
+	getUserPermissions,
+} from '#app/models/index.server.ts'
 import { requireUserId } from '#app/utils/auth.server.ts'
-import { prisma } from '#app/utils/db.server.ts'
 import { checkHoneypot } from '#app/utils/honeypot.server.ts'
 import {
 	uploadHandler,
@@ -65,31 +68,9 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
 	invariantResponse(grenadeId, 'Grenade ID is required')
 
-	const grenade = await prisma.grenade.findUnique({
-		where: { id: grenadeId, verified: true },
-		select: {
-			id: true,
-			name: true,
-			description: true,
-			x: true,
-			y: true,
-			images: {
-				orderBy: {
-					order: 'asc',
-				},
-				select: {
-					id: true,
-					description: true,
-					order: true,
-				},
-			},
-			grenadeChanges: {
-				select: {
-					id: true,
-				},
-			},
-			userId: true,
-		},
+	const grenade = await getGrenadeWithChangesId({
+		grenadeId,
+		verified: true,
 	})
 
 	invariantResponse(grenade, 'Not found', { status: 404 })
@@ -113,12 +94,7 @@ export async function action({ request, params }: Route.ActionArgs) {
 
 	invariantResponse(grenadeId, 'Grenade ID is required')
 
-	const grenade = await prisma.grenade.findUnique({
-		where: { id: grenadeId },
-		select: {
-			userId: true,
-		},
-	})
+	const grenade = await getGrenadeUserId(grenadeId)
 
 	invariantResponse(grenade, 'Not found', { status: 404 })
 

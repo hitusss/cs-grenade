@@ -1,15 +1,12 @@
 import { invariantResponse } from '@epic-web/invariant'
 
-import { prisma } from '#app/utils/db.server.ts'
+import { getGrenadeImageChanges } from '#app/models/index.server.ts'
 
 import { type Route } from './+types/grenade-changes-images.$imageId.ts'
 
 export async function loader({ params }: Route.LoaderArgs) {
 	invariantResponse(params.imageId, 'Image ID is required', { status: 400 })
-	const image = await prisma.grenadeImageChanges.findUnique({
-		where: { id: params.imageId },
-		select: { contentType: true, blob: true },
-	})
+	const image = await getGrenadeImageChanges(params.imageId)
 
 	invariantResponse(image, 'Not found', { status: 404 })
 	invariantResponse(image.contentType, 'Not found', { status: 404 })

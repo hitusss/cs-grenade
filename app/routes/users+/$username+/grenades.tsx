@@ -1,11 +1,18 @@
 import { data, Link } from 'react-router'
-import { invariantResponse } from '@epic-web/invariant'
+import { invariant, invariantResponse } from '@epic-web/invariant'
 
-import { grenadeLabels, type GrenadeType } from '#types/grenades-types.ts'
-import { teamLabels, type TeamType } from '#types/teams.ts'
-import { getUserIdByUsername } from '#app/models/index.server.ts'
+import {
+	grenadeLabels,
+	isGrenadeType,
+	type GrenadeType,
+} from '#types/grenades-types.ts'
+import { isTeamType, teamLabels, type TeamType } from '#types/teams.ts'
+import {
+	getFilteredUserGrenadeCount,
+	getFilteredUserGrenadesWithPagination,
+	getUserIdByUsername,
+} from '#app/models/index.server.ts'
 import { getUserId } from '#app/utils/auth.server.ts'
-import { prisma } from '#app/utils/db.server.ts'
 import { ContentCard } from '#app/components/content-card.tsx'
 import { ContentFilter } from '#app/components/content-filter.tsx'
 import { Pagination } from '#app/components/pagination.tsx'
@@ -33,55 +40,26 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 	const verified =
 		spVerified === 'true' ? true : spVerified === 'false' ? false : undefined
 
-	const total = await prisma.grenade.count({
-		where: {
-			userId: user.id,
-			name: {
-				contains: query,
-			},
-			verified: user.id === userId ? verified : true,
-			map: map ? { name: map } : undefined,
-			team,
-			type,
-		},
+	invariant(team === undefined || isTeamType(team), 'Invalid team type')
+	invariant(type === undefined || isGrenadeType(type), 'Invalid grenade type')
+
+	const total = await getFilteredUserGrenadeCount({
+		userId: user.id,
+		query,
+		verified: user.id === userId ? verified : true,
+		mapName: map,
+		team,
+		type,
 	})
-	const grenades = await prisma.grenade.findMany({
-		where: {
-			userId: user.id,
-			name: {
-				contains: query,
-			},
-			verified: user.id === userId ? verified : true,
-			map: map ? { name: map } : undefined,
-			team,
-			type,
-		},
-		select: {
-			id: true,
-			name: true,
-			verified: true,
-			destination: {
-				select: {
-					id: true,
-					name: true,
-				},
-			},
-			map: {
-				select: {
-					name: true,
-					label: true,
-					logo: {
-						select: {
-							id: true,
-						},
-					},
-				},
-			},
-			type: true,
-			team: true,
-		},
-		skip: page * perPage - perPage,
-		take: perPage,
+	const grenades = await getFilteredUserGrenadesWithPagination({
+		userId: user.id,
+		query,
+		verified: user.id === userId ? verified : true,
+		mapName: map,
+		team,
+		type,
+		page,
+		perPage,
 	})
 
 	return data({ grenades, total, isOwn: user.id === userId })
