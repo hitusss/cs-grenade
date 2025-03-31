@@ -7,7 +7,7 @@ export type PickNotNullable<T> = {
 }
 
 export type OptionalNullable<T> = {
-	[K in keyof PickNullable<T>]?: Exclude<T[K], null>
+	[K in keyof PickNullable<T>]?: T[K] | null
 } & {
 	[K in keyof PickNotNullable<T>]: T[K]
 }
