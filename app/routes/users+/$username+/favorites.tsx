@@ -1,9 +1,16 @@
 import { data, Link } from 'react-router'
-import { invariantResponse } from '@epic-web/invariant'
+import { invariant, invariantResponse } from '@epic-web/invariant'
 
-import { grenadeLabels, type GrenadeType } from '#types/grenades-types.ts'
-import { teamLabels, type TeamType } from '#types/teams.ts'
-import { prisma } from '#app/utils/db.server.ts'
+import {
+	grenadeLabels,
+	isGrenadeType,
+	type GrenadeType,
+} from '#types/grenades-types.ts'
+import { isTeamType, teamLabels, type TeamType } from '#types/teams.ts'
+import {
+	getFilteredUserFavoriteCount,
+	getFilteredUserFavoritesWithPagination,
+} from '#app/models/index.server.ts'
 import { ContentCard } from '#app/components/content-card.tsx'
 import { ContentFilter } from '#app/components/content-filter.tsx'
 import { Pagination } from '#app/components/pagination.tsx'
@@ -25,64 +32,24 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 	const team = searchParams.get('team') ?? undefined
 	const type = searchParams.get('type') ?? undefined
 
-	const total = await prisma.favorite.count({
-		where: {
-			user: {
-				username,
-			},
-			grenade: {
-				name: {
-					contains: query,
-				},
-				map: map ? { name: map } : undefined,
-				team,
-				type,
-			},
-		},
+	invariant(team === undefined || isTeamType(team), 'Invalid team type')
+	invariant(type === undefined || isGrenadeType(type), 'Invalid grenade type')
+
+	const total = await getFilteredUserFavoriteCount({
+		username,
+		query,
+		mapName: map,
+		team,
+		type,
 	})
-	const favorites = await prisma.favorite.findMany({
-		where: {
-			user: {
-				username,
-			},
-			grenade: {
-				name: {
-					contains: query,
-				},
-				map: map ? { name: map } : undefined,
-				team,
-				type,
-			},
-		},
-		select: {
-			grenade: {
-				select: {
-					id: true,
-					name: true,
-					destination: {
-						select: {
-							id: true,
-							name: true,
-						},
-					},
-					map: {
-						select: {
-							name: true,
-							label: true,
-							logo: {
-								select: {
-									id: true,
-								},
-							},
-						},
-					},
-					type: true,
-					team: true,
-				},
-			},
-		},
-		skip: page * perPage - perPage,
-		take: perPage,
+	const favorites = await getFilteredUserFavoritesWithPagination({
+		username,
+		query,
+		mapName: map,
+		team,
+		type,
+		page,
+		perPage,
 	})
 
 	return data({ favorites, total })

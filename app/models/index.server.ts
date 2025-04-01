@@ -1,6 +1,7 @@
 export * from './connection.server.ts'
 export * from './destination-changes.server.ts'
 export * from './destination.server.ts'
+export * from './favorite.server.ts'
 export * from './grenade-changes.server.ts'
 export * from './grenade-image-changes.server.ts'
 export * from './grenade-image.server.ts'

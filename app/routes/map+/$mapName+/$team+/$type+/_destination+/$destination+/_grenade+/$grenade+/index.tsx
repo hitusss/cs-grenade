@@ -2,12 +2,13 @@ import { data, Form, Link, useNavigate } from 'react-router'
 import { invariantResponse } from '@epic-web/invariant'
 
 import {
+	createFavorite,
+	deleteFavorite,
 	deleteGrenade,
 	getGrenade,
 	getGrenadeUserId,
 } from '#app/models/index.server.ts'
 import { getUserId, requireUserId } from '#app/utils/auth.server.ts'
-import { prisma } from '#app/utils/db.server.ts'
 import { useDoubleCheck, useIsPending } from '#app/utils/misc.tsx'
 import { unauthorized } from '#app/utils/permissions.server.ts'
 import { userHasPermission } from '#app/utils/permissions.ts'
@@ -95,11 +96,9 @@ export async function action({ request, params }: Route.ActionArgs) {
 			})
 		}
 		case 'add-favorite': {
-			await prisma.favorite.create({
-				data: {
-					grenadeId,
-					userId,
-				},
+			await createFavorite({
+				grenadeId,
+				userId,
 			})
 			return redirectWithToast('.', {
 				title: `Grenade added to favorite`,
@@ -108,11 +107,9 @@ export async function action({ request, params }: Route.ActionArgs) {
 			})
 		}
 		case 'remove-favorite': {
-			await prisma.favorite.deleteMany({
-				where: {
-					grenadeId,
-					userId,
-				},
+			await deleteFavorite({
+				grenadeId,
+				userId,
 			})
 			return redirectWithToast('.', {
 				title: `Grenade removed from favorite`,
