@@ -7,8 +7,8 @@ import { render, screen } from '@testing-library/react'
 import setCookieParser from 'set-cookie-parser'
 import { test } from 'vitest'
 
+import { createUser as createUserDB } from '#app/models/index.server.ts'
 import { getSessionExpirationDate, sessionKey } from '#app/utils/auth.server.ts'
-import { prisma } from '#app/utils/db.server.ts'
 import { authSessionStorage } from '#app/utils/session.server.ts'
 import { loader as rootLoader } from '#app/root.tsx'
 
@@ -20,9 +20,12 @@ test('The user profile when not logged in as self', async () => {
 	const userImages = await getUserImages()
 	const userImage =
 		userImages[faker.number.int({ min: 0, max: userImages.length - 1 })]
-	const user = await prisma.user.create({
-		select: { id: true, username: true, name: true },
-		data: { ...createUser(), image: { create: userImage } },
+	const user = createUser()
+	const sessionExpirationDate = getSessionExpirationDate()
+	await createUserDB({
+		...user,
+		image: userImage,
+		sessionExpirationDate,
 	})
 	const App = createRoutesStub([
 		{
@@ -46,16 +49,12 @@ test('The user profile when logged in as self', async () => {
 	const userImages = await getUserImages()
 	const userImage =
 		userImages[faker.number.int({ min: 0, max: userImages.length - 1 })]
-	const user = await prisma.user.create({
-		select: { id: true, username: true, name: true },
-		data: { ...createUser(), image: { create: userImage } },
-	})
-	const session = await prisma.session.create({
-		select: { id: true },
-		data: {
-			expirationDate: getSessionExpirationDate(),
-			userId: user.id,
-		},
+	const user = createUser()
+	const sessionExpirationDate = getSessionExpirationDate()
+	const session = await createUserDB({
+		...user,
+		image: userImage,
+		sessionExpirationDate,
 	})
 
 	const authSession = await authSessionStorage.getSession()
