@@ -45,6 +45,22 @@ export async function getUserIdFromConnection({
 	})
 }
 
+export async function checkUserHasConnection({
+	userId,
+	providerId,
+}: {
+	userId: Connection['userId']
+	providerId: Connection['providerId']
+}) {
+	return prisma.connection.findFirst({
+		select: { id: true },
+		where: {
+			userId: userId,
+			providerId: providerId,
+		},
+	})
+}
+
 export async function deleteConnection({
 	userId,
 	connectionId,
