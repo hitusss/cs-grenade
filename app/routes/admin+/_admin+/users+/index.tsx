@@ -18,9 +18,10 @@ import {
 	addUserRole,
 	getFilteredUserCount,
 	getFilteredUsersWithPagginations,
+	getRolePriority,
+	getRoles,
 	removeUserRole,
 } from '#app/models/index.server.ts'
-import { prisma } from '#app/utils/db.server.ts'
 import { useDebounce } from '#app/utils/misc.tsx'
 import {
 	requireUserWithPermission,
@@ -247,12 +248,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 		perPage,
 	})
 
-	const roles = await prisma.role.findMany({
-		select: {
-			name: true,
-			priority: true,
-		},
-	})
+	const roles = await getRoles()
 
 	return data({ total, users, roles })
 }
@@ -280,17 +276,10 @@ export async function action({ request }: Route.ActionArgs) {
 			const { userId, role, value } = submission.value
 			const booleanValue = value === 'true'
 
-			const roleWithPriority = await prisma.role.findUnique({
-				where: {
-					name: role,
-				},
-				select: {
-					priority: true,
-				},
-			})
+			const rolePriority = await getRolePriority(role)
 
-			invariantResponse(roleWithPriority, "Role doesn't exist")
-			await requireUserWithRolePriority(request, roleWithPriority.priority)
+			invariantResponse(rolePriority, "Role doesn't exist")
+			await requireUserWithRolePriority(request, rolePriority.priority)
 
 			if (booleanValue) {
 				await addUserRole({
