@@ -15,12 +15,14 @@ export async function createUser({
 	username,
 	name,
 	passwordHash,
+	image,
 	sessionExpirationDate,
 }: {
 	email: User['email']
 	username: User['username']
 	name: User['name']
-	passwordHash: Password['hash']
+	passwordHash?: Password['hash']
+	image?: Pick<UserImage, 'contentType' | 'blob'>
 	sessionExpirationDate: Session['expirationDate']
 }) {
 	return prisma.session.create({
@@ -32,11 +34,14 @@ export async function createUser({
 					username,
 					name,
 					roles: { connect: { name: 'user' } },
-					password: {
-						create: {
-							hash: passwordHash,
-						},
-					},
+					image: image ? { create: image } : undefined,
+					password: passwordHash
+						? {
+								create: {
+									hash: passwordHash,
+								},
+							}
+						: undefined,
 				},
 			},
 		},
