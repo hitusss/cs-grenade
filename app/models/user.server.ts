@@ -45,7 +45,7 @@ export async function createUser({
 				},
 			},
 		},
-		select: { id: true, expirationDate: true },
+		select: { id: true, expirationDate: true, userId: true },
 	})
 }
 
@@ -80,7 +80,7 @@ export async function createUserWithConnection({
 				},
 			},
 		},
-		select: { id: true, expirationDate: true },
+		select: { id: true, expirationDate: true, userId: true },
 	})
 }
 
