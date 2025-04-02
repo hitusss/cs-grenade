@@ -6,6 +6,7 @@ import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { z } from 'zod'
 
 import {
+	checkUserHasPassword,
 	deleteUserSessionExceptOne,
 	deteteUser,
 	getUserIdByUsername,
@@ -14,7 +15,6 @@ import {
 	updateUsernameAndName,
 } from '#app/models/index.server.ts'
 import { requireUserId, sessionKey } from '#app/utils/auth.server.ts'
-import { prisma } from '#app/utils/db.server.ts'
 import { useDoubleCheck } from '#app/utils/misc.tsx'
 import { authSessionStorage } from '#app/utils/session.server.ts'
 import { redirectWithToast } from '#app/utils/toast.server.ts'
@@ -48,10 +48,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 		target: userId,
 	})
 
-	const password = await prisma.password.findUnique({
-		select: { userId: true },
-		where: { userId },
-	})
+	const password = await checkUserHasPassword(userId)
 
 	return data({
 		user,

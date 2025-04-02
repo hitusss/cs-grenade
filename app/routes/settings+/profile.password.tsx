@@ -4,13 +4,15 @@ import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { z } from 'zod'
 
-import { updateUserPassowrd } from '#app/models/index.server.ts'
+import {
+	checkUserHasPassword,
+	updateUserPassowrd,
+} from '#app/models/index.server.ts'
 import {
 	getPasswordHash,
 	requireUserId,
 	verifyUserPassword,
 } from '#app/utils/auth.server.ts'
-import { prisma } from '#app/utils/db.server.ts'
 import { useIsPending } from '#app/utils/misc.tsx'
 import { redirectWithToast } from '#app/utils/toast.server.ts'
 import { PasswordSchema } from '#app/utils/validators/user.ts'
@@ -44,10 +46,7 @@ const ChangePasswordForm = z
 	})
 
 async function requirePassword(userId: string) {
-	const password = await prisma.password.findUnique({
-		select: { userId: true },
-		where: { userId },
-	})
+	const password = await checkUserHasPassword(userId)
 	if (!password) {
 		throw redirect('/settings/profile/password/create')
 	}

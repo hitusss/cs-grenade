@@ -2,6 +2,13 @@ import { type Password, type User } from '@prisma/client'
 
 import { prisma } from '#app/utils/db.server.ts'
 
+export async function checkUserHasPassword(userId: Password['userId']) {
+	return prisma.password.findUnique({
+		select: { userId: true },
+		where: { userId },
+	})
+}
+
 export async function updateUserPassowrd({
 	userId,
 	passwordHash,

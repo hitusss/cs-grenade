@@ -3,9 +3,11 @@ import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 
-import { updateUserPassowrd } from '#app/models/index.server.ts'
+import {
+	checkUserHasPassword,
+	updateUserPassowrd,
+} from '#app/models/index.server.ts'
 import { getPasswordHash, requireUserId } from '#app/utils/auth.server.ts'
-import { prisma } from '#app/utils/db.server.ts'
 import { useIsPending } from '#app/utils/misc.tsx'
 import { PasswordAndConfirmPasswordSchema } from '#app/utils/validators/user.ts'
 import { Button } from '#app/components/ui/button.tsx'
@@ -24,10 +26,7 @@ export const handle: BreadcrumbHandle & SEOHandle = {
 const CreatePasswordForm = PasswordAndConfirmPasswordSchema
 
 async function requireNoPassword(userId: string) {
-	const password = await prisma.password.findUnique({
-		select: { userId: true },
-		where: { userId },
-	})
+	const password = await checkUserHasPassword(userId)
 	if (password) {
 		throw redirect('/settings/profile/password')
 	}
