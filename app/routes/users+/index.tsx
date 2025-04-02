@@ -1,7 +1,7 @@
 import { data, Link, redirect } from 'react-router'
 import { z } from 'zod'
 
-import { prisma } from '#app/utils/db.server.ts'
+import { getFilteredUsersOrderedByLastGrenadeUpdate } from '#app/models/user.server.ts'
 import { cn, useDelayedIsPending } from '#app/utils/misc.tsx'
 import { getUserDisplayName, getUserImgSrc } from '#app/utils/user.ts'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
@@ -25,23 +25,8 @@ export async function loader({ request }: Route.LoaderArgs) {
 		return redirect('/users')
 	}
 
-	const like = `%${searchTerm ?? ''}%`
-	const rawUsers = await prisma.$queryRaw`
-		SELECT User.id, User.username, User.name, UserImage.id AS imageId
-		FROM User
-		LEFT JOIN UserImage ON User.id = UserImage.userId
-		WHERE User.username LIKE ${like}
-		OR User.name LIKE ${like}
-		ORDER BY (
-			SELECT Grenade.updatedAt
-			FROM Grenade
-			WHERE Grenade.userId = User.id
-			ORDER BY Grenade.updatedAt DESC
-			LIMIT 1
-		) DESC
-		LIMIT 50
-	`
-
+	const query = searchTerm ?? ''
+	const rawUsers = await getFilteredUsersOrderedByLastGrenadeUpdate(query)
 	const result = UserSearchResultsSchema.safeParse(rawUsers)
 	if (!result.success) {
 		return data({ status: 'error', error: result.error.message } as const, {

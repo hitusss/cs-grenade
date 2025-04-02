@@ -84,6 +84,26 @@ export async function createUserWithConnection({
 	})
 }
 
+export async function getFilteredUsersOrderedByLastGrenadeUpdate(
+	query: string,
+) {
+	return prisma.$queryRaw`
+		SELECT User.id, User.username, User.name, UserImage.id AS imageId
+		FROM User
+		LEFT JOIN UserImage ON User.id = UserImage.userId
+		WHERE User.username LIKE %${query}%
+		OR User.name LIKE %${query}%
+		ORDER BY (
+			SELECT Grenade.updatedAt
+			FROM Grenade
+			WHERE Grenade.userId = User.id
+			ORDER BY Grenade.updatedAt DESC
+			LIMIT 1
+		) DESC
+		LIMIT 50
+	`
+}
+
 export async function getUserCount() {
 	return prisma.user.count()
 }
