@@ -33,7 +33,15 @@ export async function createUser({
 					email,
 					username,
 					name,
-					roles: { connect: { name: 'user' } },
+					roles: {
+						connectOrCreate: {
+							where: { name: 'user' },
+							create: {
+								name: 'user',
+								priority: 0,
+							},
+						},
+					},
 					image: image ? { create: image } : undefined,
 					password: passwordHash
 						? {
@@ -74,7 +82,15 @@ export async function createUserWithConnection({
 					email,
 					username,
 					name,
-					roles: { connect: { name: 'user' } },
+					roles: {
+						connectOrCreate: {
+							where: { name: 'user' },
+							create: {
+								name: 'user',
+								priority: 0,
+							},
+						},
+					},
 					connections: { create: { providerId, providerName } },
 					image: image ? { create: image } : undefined,
 				},
