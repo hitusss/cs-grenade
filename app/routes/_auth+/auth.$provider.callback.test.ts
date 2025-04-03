@@ -141,12 +141,13 @@ test('when a user exists with the same email, create connection and make session
 test('gives an error if the account is already connected to another user', async () => {
 	const githubUser = await insertGitHubUser()
 	const sessionExpirationDate = getSessionExpirationDate()
-	const session = await createUserWithConnection({
+	await createUserWithConnection({
 		...createUser(),
 		providerName: GITHUB_PROVIDER_NAME,
 		providerId: githubUser.profile.id.toString(),
 		sessionExpirationDate,
 	})
+	const session = await setupUser()
 	const request = await setupRequest({
 		sessionId: session.id,
 		code: githubUser.code,
