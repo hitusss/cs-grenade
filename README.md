@@ -37,6 +37,7 @@ To run the CS-Grenade locally, follow these steps:
    ```
 
 3. **Start the development server**:
+
    ```bash
    pnpm run dev
    ```
@@ -45,5 +46,5 @@ The app should now be running on `http://localhost:3000`.
 
 ## License
 
-This project is licensed under the GPL-3.0 License. See the [LICENSE](LICENSE)
+This project is licensed under the MIT License. See the [LICENSE](LICENSE)
 file for details.
